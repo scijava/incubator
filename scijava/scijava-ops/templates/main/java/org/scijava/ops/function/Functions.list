@@ -25,11 +25,11 @@ nilArgs = ```
 ```
 objectGenerics = ```
 { arity -> 
-  '<' + String.join(', ', (1..arity).stream().map{a -> "Object"}.collect() + ', O>'
+  '<' + String.join(', ', (1..arity).stream().map{a -> "Object"}.collect()) + ', O>'
 }
 ```
 insArgs = ```
 { arity ->
-  String.join(', ', (0..(arity-1)).stream().map{a -> 'ins[' + a ']'}.collect()
+  String.join(', ', (0..(arity-1)).stream().map{a -> 'ins[' + a + ']'}.collect())
 }
 ```
