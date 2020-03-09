@@ -29,14 +29,14 @@
 
 package net.imagej.ops2.imagemoments;
 
-import net.imagej.ops2.OpService;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 
+import org.scijava.ops.OpService;
 import org.scijava.ops.function.Computers;
 
 /**
- * Abstract {@link ImageMomentOp}. Provides {@link OpService} and create the
+ * Abstract {@code ImageMomentOp}. Provides {@link OpService} and create the
  * output.
  * 
  * @author Daniel Seebacher (University of Konstanz)
@@ -51,6 +51,7 @@ public interface AbstractImageMomentOp<I extends RealType<I>, O extends RealType
 	
 	public void computeMoment(IterableInterval<I> input, O output);
 
+	@Override
 	default void compute(IterableInterval<I> input, O output) {
 		if (input.numDimensions() != 2)
 			throw new IllegalArgumentException("Only two-dimensional inputs allowed!");

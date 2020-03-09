@@ -29,7 +29,6 @@
 
 package net.imagej.ops2.image.normalize;
 
-import net.imagej.ops2.special.computer.UnaryComputerOp;
 import net.imglib2.converter.Converter;
 import net.imglib2.type.numeric.RealType;
 

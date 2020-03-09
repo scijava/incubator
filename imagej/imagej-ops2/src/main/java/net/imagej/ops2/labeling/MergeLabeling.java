@@ -30,9 +30,8 @@
 package net.imagej.ops2.labeling;
 
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
-import net.imagej.ops2.map.Maps;
-import net.imagej.ops2.special.computer.AbstractBinaryComputerOp;
 import net.imglib2.Cursor;
 import net.imglib2.Dimensions;
 import net.imglib2.IterableInterval;
@@ -48,6 +47,7 @@ import net.imglib2.view.Views;
 
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.core.Op;
+import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Functions;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
@@ -69,6 +69,9 @@ public class MergeLabeling<L, I extends IntegerType<I>, B extends BooleanType<B>
 
 	@OpDependency(name = "create.imgLabeling")
 	private BiFunction<Dimensions, I, ImgLabeling<L, I>> imgLabelingCreator;
+	
+	@OpDependency(name = "adapt")
+	private Function<Computers.Arity2<LabelingType<L>, LabelingType<L>, LabelingType<L>>, Computers.Arity2<ImgLabeling<L, I>, ImgLabeling<L, I>, ImgLabeling<L, I>>> adaptor;
 
 	@SuppressWarnings({ "unchecked", "rawtypes", "hiding" })
 	@Override
@@ -90,8 +93,8 @@ public class MergeLabeling<L, I extends IntegerType<I>, B extends BooleanType<B>
 				outLabeling.addAll(randomAccess2.get());
 			}
 		} else {
-			Maps.map((IterableInterval) input1, (IterableInterval) input2, (IterableInterval) output,
-					new AbstractBinaryComputerOp<LabelingType<L>, LabelingType<L>, LabelingType<L>>() {
+			Computers.Arity2<ImgLabeling<L, I>, ImgLabeling<L, I>, ImgLabeling<L, I>> adapted = adaptor.apply(
+					new Computers.Arity2<LabelingType<L>, LabelingType<L>, LabelingType<L>>() {
 
 						@Override
 						public void compute(final LabelingType<L> input1, final LabelingType<L> input2,
@@ -100,6 +103,7 @@ public class MergeLabeling<L, I extends IntegerType<I>, B extends BooleanType<B>
 							output.addAll(input2);
 						}
 					});
+			adapted.compute(input1, input2, output);
 		}
 
 		return output;

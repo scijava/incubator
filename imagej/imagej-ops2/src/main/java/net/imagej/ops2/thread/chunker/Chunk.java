@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.thread.chunker;
 
-import net.imagej.ops2.Parallel;
+import edu.mines.jtk.util.Parallel;
 
 /**
  * A {@link Chunk} of code which can be executed by a {@link ChunkerOp}.
