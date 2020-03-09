@@ -363,7 +363,7 @@ public class OpBuilder {
 	// -- Helper methods --
 
 	@SuppressWarnings({ "unchecked" })
-	private <T> Nil<T> type(final T obj) {
+	private <T> Nil<T> type(Object obj) {
 		return (Nil<T>) Nil.of(ops.context().service(TypeService.class).reify(obj));
 	}
 

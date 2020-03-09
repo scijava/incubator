@@ -2245,6 +2245,10 @@ public final class Types {
 						Type[] fromTypes = ((ParameterizedType) fromResolved).getActualTypeArguments();
 						Type[] toTypes = ((ParameterizedType) toResolved).getActualTypeArguments();
 						for(int i = 0; i < fromTypes.length; i++) {
+							if(toTypes[i] instanceof TypeVariable<?> && Types.isAssignable(fromTypes[i], toTypes[i], typeVarAssigns)) {
+								typeVarAssigns.put((TypeVariable<?>) toTypes[i], fromTypes[i]);
+								continue;
+							}
 							if(!(fromTypes[i] instanceof Any || toTypes[i] instanceof Any)) return false;
 						}
 						continue;
@@ -3326,7 +3330,7 @@ public final class Types {
 			if (containsTypeVariables(type)) {
 				if (type instanceof TypeVariable) {
 					if (followTypeVars) {
-						return unrollVariables(typeArguments, typeArguments.get(type));
+						return unrollVariables(typeArguments, typeArguments.get(type), followTypeVars);
 					} else {
 						return typeArguments.get(type);
 					}
@@ -3344,7 +3348,7 @@ public final class Types {
 					final Type[] args = p.getActualTypeArguments();
 					for (int i = 0; i < args.length; i++) {
 						final Type unrolled = unrollVariables(parameterizedTypeArguments,
-							args[i]);
+							args[i], followTypeVars);
 						if (unrolled != null) {
 							args[i] = unrolled;
 						}

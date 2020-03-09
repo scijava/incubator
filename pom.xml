@@ -44,6 +44,7 @@
 	</mailingLists>
 
 	<modules>
+		<module>imagej/imagej-ops2</module>
 		<module>scijava/scijava-ops</module>
 	</modules>
 
