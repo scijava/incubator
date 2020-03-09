@@ -37,7 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.scijava.ops.OpService;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.scijava.ops.function.Functions;
+import org.scijava.ops.types.Nil;
 import org.scijava.parse.Operator;
 import org.scijava.parse.Operators;
 import org.scijava.parse.Variable;
@@ -143,7 +144,9 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 
 		// Try executing the op.
 		// TODO: Fix
-		return new OpBuilder(ops, opName).input(argValues).outType(Object.class).apply();
+		Nil<Object> outType = new Nil<Object>() {};
+		FunctionN func = Functions.matchN(ops, opName, outType, args);
+//		return new OpBuilder(ops, opName).input(argValues).outType(Object.class).apply();
 	}
 
 	/** Gets the op name associated with the given {@link Operator}. */

@@ -29,15 +29,14 @@
 
 package net.imagej.ops2.filter.variance;
 
-import net.imagej.ops2.special.chain.RAIs;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
+import net.imglib2.view.Views;
 
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.core.Op;
-import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
@@ -68,7 +67,9 @@ public class DefaultVarianceFilter<T, V> implements
 	public void compute(final RandomAccessibleInterval<T> input, final Shape inputNeighborhoodShape,
 			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory,
 			final IterableInterval<V> output) {
-		mapper.compute(RAIs.extend(input, outOfBoundsFactory), inputNeighborhoodShape, statsOp, output);
+		RandomAccessibleInterval<T> extended = outOfBoundsFactory == null ? input
+			: Views.interval((Views.extend(input, outOfBoundsFactory)), input);
+		mapper.compute(extended, inputNeighborhoodShape, statsOp, output);
 	}
 
 }

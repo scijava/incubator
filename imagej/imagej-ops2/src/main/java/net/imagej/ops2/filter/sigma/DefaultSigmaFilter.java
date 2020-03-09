@@ -29,21 +29,17 @@
 
 package net.imagej.ops2.filter.sigma;
 
-import net.imagej.ops2.special.chain.RAIs;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
+import net.imglib2.view.Views;
 
 import org.scijava.Priority;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.core.Op;
-import org.scijava.ops.function.Computers;
-import org.scijava.ops.function.Computers;
-import org.scijava.ops.function.Computers;
-import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
@@ -79,7 +75,9 @@ public class DefaultSigmaFilter<T extends RealType<T>, V extends RealType<V>> im
 		if (range <= 0)
 			throw new IllegalArgumentException("range must be positive!");
 		Computers.Arity2<Iterable<T>, T, V> mappedOp = (in1, in2, out) -> op.compute(in1, in2, range, minPixelFraction, out);
-		mapper.compute(RAIs.extend(input, outOfBoundsFactory), inputNeighborhoodShape, mappedOp, output);
+		RandomAccessibleInterval<T> extended = outOfBoundsFactory == null ? input
+			: Views.interval((Views.extend(input, outOfBoundsFactory)), input);
+		mapper.compute(extended, inputNeighborhoodShape, mappedOp, output);
 	}
 
 	final Computers.Arity4<Iterable<T>, T, Double, Double, V> op = new Computers.Arity4<Iterable<T>, T, Double, Double, V>() {
