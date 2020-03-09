@@ -53,6 +53,7 @@ import org.scijava.ops.core.Op;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.matcher.DefaultOpMatcher;
 import org.scijava.ops.matcher.MatchingUtils;
+import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
@@ -271,7 +272,7 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 		} catch (OpMatchingException e) {
 			throw new IllegalArgumentException(e);
 		}
-		OpInfo adaptedInfo = adaptation == null ? null : adaptation.opInfo();
+		OpAdaptationInfo adaptedInfo = adaptation == null ? null : adaptation.opInfo();
 		Object wrappedOp = wrapOp(op, match, adaptedInfo);
 		return wrappedOp;
 	}
@@ -331,9 +332,9 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 				// grab the first type parameter (from the OpCandidate?) and search for an Op
 				// that will then be adapted (this will be the first (only) type in the args of
 				// the adaptor)
-				Type srcOpType = adaptor.inputs().get(0).getType();
+				Type srcOpType = Types.substituteTypeVariables(adaptor.inputs().get(0).getType(), map);
 				final OpRef srcOpRef;
-					srcOpRef = inferOpRef(srcOpType, ref.getName(), candidate.typeVarAssigns());
+					srcOpRef = inferOpRef(srcOpType, ref.getName(), map);
 				// TODO: export this to another function (also done in findOpInstance).
 				// We need this here because we need to grab the OpInfo. 
 				// TODO: is there a better way to do this?
@@ -347,7 +348,7 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 				Object toOp = ((Function<Object, Object>) adaptorOp).apply(fromOp);
 				// construct type of adapted op
 				Type adapterOpType = Types.substituteTypeVariables(adaptor.output().getType(),
-						srcCandidate.typeVarAssigns());
+						map);
 				return new AdaptedOp(toOp, adapterOpType, srcCandidate.opInfo(), adaptor);
 			} catch (OpMatchingException e1) {
 				log.trace(e1);
@@ -372,14 +373,15 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 	 *            needed.
 	 * @return an {@link Op} wrapping of op.
 	 */
-	private Object wrapOp(Object op, OpCandidate match, OpInfo adaptationSrcInfo) {
+	private Object wrapOp(Object op, OpCandidate match, OpAdaptationInfo adaptationInfo) {
 		if (wrappers == null)
 			initWrappers();
 
-		OpInfo opInfo = match == null ? adaptationSrcInfo : match.opInfo();
+		OpInfo opInfo = match == null ? adaptationInfo : match.opInfo();
 		// FIXME: this type is not necessarily Computer, Function, etc. but often
 		// something more specific (like the class of an Op).
-		Type type = opInfo.opType();
+		// TODO: Is this correct?
+		Type type = match == null ? adaptationInfo.opType() : match.getRef().getTypes()[0];
 		try {
 			// determine the Op wrappers that could wrap the matched Op
 			Class<?>[] suitableWrappers = wrappers.keySet().stream().filter(wrapper -> wrapper.isInstance(op))
@@ -391,7 +393,9 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 				throw new IllegalArgumentException(
 						"Matched op Type " + type.getClass() + " matches multiple Op types: " + wrappers.toString());
 			// get the wrapper and wrap up the Op
-			return wrap(suitableWrappers[0], op, opInfo);
+			if (!Types.isAssignable(Types.raw(type), suitableWrappers[0]))
+				throw new IllegalArgumentException(Types.raw(type) + "cannot be wrapped as a " + suitableWrappers[0].getClass());
+			return wrap(op, type);
 		} catch (IllegalArgumentException | SecurityException exc) {
 			log.error(exc.getMessage() != null ? exc.getMessage() : "Cannot wrap " + op.getClass());
 			return op;
@@ -402,9 +406,11 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T wrap(Class<T> opType, Object op, OpInfo info) {
-		OpWrapper<T> wrapper = (OpWrapper<T>) wrappers.get(opType);
-		return wrapper.wrap((T) op, info);
+	public <T> T wrap(Object op, Type reifiedType) {
+		if (wrappers == null)
+			initWrappers();
+		OpWrapper<T> wrapper = (OpWrapper<T>) wrappers.get(Types.raw(reifiedType));
+		return wrapper.wrap((T) op, reifiedType);
 	}
 
 	public <T> T findOp(final String opName, final Nil<T> specialType, final Nil<?>[] inTypes, final Nil<?> outType) {
