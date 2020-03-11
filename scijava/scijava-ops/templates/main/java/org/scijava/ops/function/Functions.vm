@@ -178,7 +178,7 @@ public final class Functions {
 	}
 
 #foreach($arity in [1..$maxArity])
-	protected static class Arity${arity}AsN$generics.call($arity) implements ArityN<O> {
+	protected static class Arity${arity}AsN<O> implements ArityN<O> {
 
 		$functionArity.call($arity)$objectGenerics.call($arity) func;
 

@@ -39,6 +39,7 @@ import java.util.Map;
 import org.scijava.ops.OpService;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.types.Nil;
+import org.scijava.ops.types.TypeService;
 import org.scijava.parse.Operator;
 import org.scijava.parse.Operators;
 import org.scijava.parse.Variable;
@@ -141,12 +142,19 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 		for (int i=0; i<args.length; i++) {
 			argValues[i] = value(args[i]);
 		}
+		
+		// generate Nils from types
+		Nil<?>[] inTypes = Arrays.stream(args).map((obj) -> type(obj)).toArray(Nil[]::new);
+		Nil<Object> outType = new Nil<>() {};
 
 		// Try executing the op.
-		// TODO: Fix
-		Nil<Object> outType = new Nil<Object>() {};
-		FunctionN func = Functions.matchN(ops, opName, outType, args);
-//		return new OpBuilder(ops, opName).input(argValues).outType(Object.class).apply();
+		Functions.ArityN<Object> func = Functions.matchN(ops, opName, outType, inTypes);
+		return func.apply(argValues);
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private <T> Nil<T> type(Object obj) {
+		return (Nil<T>) Nil.of(ops.context().service(TypeService.class).reify(obj));
 	}
 
 	/** Gets the op name associated with the given {@link Operator}. */
