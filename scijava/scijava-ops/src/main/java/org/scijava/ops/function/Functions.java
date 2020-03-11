@@ -1050,7 +1050,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity1AsN<I, O> implements ArityN<O> {
+	protected static class Arity1AsN<O> implements ArityN<O> {
 
 		Function<Object, O> func;
 
@@ -1070,7 +1070,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity2AsN<I1, I2, O> implements ArityN<O> {
+	protected static class Arity2AsN<O> implements ArityN<O> {
 
 		BiFunction<Object, Object, O> func;
 
@@ -1090,7 +1090,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity3AsN<I1, I2, I3, O> implements ArityN<O> {
+	protected static class Arity3AsN<O> implements ArityN<O> {
 
 		Functions.Arity3<Object, Object, Object, O> func;
 
@@ -1110,7 +1110,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity4AsN<I1, I2, I3, I4, O> implements ArityN<O> {
+	protected static class Arity4AsN<O> implements ArityN<O> {
 
 		Functions.Arity4<Object, Object, Object, Object, O> func;
 
@@ -1130,7 +1130,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity5AsN<I1, I2, I3, I4, I5, O> implements ArityN<O> {
+	protected static class Arity5AsN<O> implements ArityN<O> {
 
 		Functions.Arity5<Object, Object, Object, Object, Object, O> func;
 
@@ -1150,7 +1150,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity6AsN<I1, I2, I3, I4, I5, I6, O> implements ArityN<O> {
+	protected static class Arity6AsN<O> implements ArityN<O> {
 
 		Functions.Arity6<Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1170,7 +1170,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity7AsN<I1, I2, I3, I4, I5, I6, I7, O> implements ArityN<O> {
+	protected static class Arity7AsN<O> implements ArityN<O> {
 
 		Functions.Arity7<Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1190,7 +1190,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity8AsN<I1, I2, I3, I4, I5, I6, I7, I8, O> implements ArityN<O> {
+	protected static class Arity8AsN<O> implements ArityN<O> {
 
 		Functions.Arity8<Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1210,7 +1210,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity9AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, O> implements ArityN<O> {
+	protected static class Arity9AsN<O> implements ArityN<O> {
 
 		Functions.Arity9<Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1230,7 +1230,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity10AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, O> implements ArityN<O> {
+	protected static class Arity10AsN<O> implements ArityN<O> {
 
 		Functions.Arity10<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1250,7 +1250,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity11AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, O> implements ArityN<O> {
+	protected static class Arity11AsN<O> implements ArityN<O> {
 
 		Functions.Arity11<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1270,7 +1270,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity12AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, O> implements ArityN<O> {
+	protected static class Arity12AsN<O> implements ArityN<O> {
 
 		Functions.Arity12<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1290,7 +1290,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity13AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I13, O> implements ArityN<O> {
+	protected static class Arity13AsN<O> implements ArityN<O> {
 
 		Functions.Arity13<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1310,7 +1310,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity14AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I13, I14, O> implements ArityN<O> {
+	protected static class Arity14AsN<O> implements ArityN<O> {
 
 		Functions.Arity14<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1330,7 +1330,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity15AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I13, I14, I15, O> implements ArityN<O> {
+	protected static class Arity15AsN<O> implements ArityN<O> {
 
 		Functions.Arity15<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
@@ -1350,7 +1350,7 @@ public final class Functions {
 
 	}
 
-	protected static class Arity16AsN<I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I13, I14, I15, I16, O> implements ArityN<O> {
+	protected static class Arity16AsN<O> implements ArityN<O> {
 
 		Functions.Arity16<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, O> func;
 
