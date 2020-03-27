@@ -29,13 +29,22 @@
 
 package net.imagej.ops2;
 
-import io.scif.img.IO;
-
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.Random;
 import java.util.stream.StreamSupport;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.scijava.Context;
+import org.scijava.cache.CacheService;
+import org.scijava.ops.OpService;
+import org.scijava.ops.core.Op;
+import org.scijava.ops.core.builder.OpBuilder;
+import org.scijava.thread.ThreadService;
+import org.scijava.util.MersenneTwisterFast;
+
+import io.scif.img.IO;
 import net.imagej.types.UnboundedIntegerType;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
@@ -76,14 +85,6 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
 
-import org.scijava.Context;
-import org.scijava.cache.CacheService;
-import org.scijava.ops.AbstractTestEnvironment;
-import org.scijava.ops.OpService;
-import org.scijava.ops.core.Op;
-import org.scijava.thread.ThreadService;
-import org.scijava.util.MersenneTwisterFast;
-
 /**
  * Base class for {@link Op} unit testing.
  * <p>
@@ -94,7 +95,27 @@ import org.scijava.util.MersenneTwisterFast;
  * @author Johannes Schindelin
  * @author Curtis Rueden
  */
-public abstract class AbstractOpTest extends AbstractTestEnvironment{
+public abstract class AbstractOpTest{
+	
+	protected static Context context;
+	protected static OpService ops;
+
+	@BeforeClass
+	public static void setUp() {
+		context = new Context(OpService.class, CacheService.class, ThreadService.class);
+		ops = context.service(OpService.class);
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		context.dispose();
+		context = null;
+		ops = null;
+	}
+	
+	protected static OpBuilder op(String name) {
+		return new OpBuilder(ops, name);
+	}
 
 	private int seed;
 
