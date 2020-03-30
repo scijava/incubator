@@ -31,6 +31,7 @@ package net.imagej.ops2.filter.derivative;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
@@ -56,7 +57,7 @@ public class PartialDerivativeFilterTest extends AbstractOpTest {
 
 	@Test
 	public void test() {
-		Img<FloatType> img = generateFloatArrayTestImg(false, new long[] { 20, 20 });
+		Img<FloatType> img = TestImgGeneration.floatArray(false, new long[] { 20, 20 });
 
 		Cursor<FloatType> cursorImg = img.cursor();
 		int counterX = 0;
@@ -137,7 +138,7 @@ public class PartialDerivativeFilterTest extends AbstractOpTest {
 
 	@Test
 	public void testAllDerivatives() {
-		Img<FloatType> img = generateFloatArrayTestImg(false, new long[] { 20, 20, 3 });
+		Img<FloatType> img = TestImgGeneration.floatArray(false, new long[] { 20, 20, 3 });
 
 		Cursor<FloatType> cursorImg = img.cursor();
 		int counterX = 0;

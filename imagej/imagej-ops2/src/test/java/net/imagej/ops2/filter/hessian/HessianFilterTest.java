@@ -31,6 +31,7 @@ package net.imagej.ops2.filter.hessian;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.FloatType;
@@ -55,7 +56,7 @@ public class HessianFilterTest extends AbstractOpTest {
 
 	@Test
 	public void test() {
-		Img<FloatType> img = generateFloatArrayTestImg(false, new long[] { 50, 50 });
+		Img<FloatType> img = TestImgGeneration.floatArray(false, new long[] { 50, 50 });
 
 		Cursor<FloatType> cursorImg = img.cursor();
 		int counterX = 0;

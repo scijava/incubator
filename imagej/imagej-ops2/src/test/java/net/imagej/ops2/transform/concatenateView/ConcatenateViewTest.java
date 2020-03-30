@@ -47,7 +47,7 @@ import net.imglib2.view.Views;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
@@ -63,7 +63,7 @@ import org.scijava.util.MersenneTwisterFast;
  *
  * @author Philipp Hanslovsky
  */
-public class ConcatenateViewTest extends AbstractTestEnvironment {
+public class ConcatenateViewTest extends AbstractOpTest {
 
 	private static final long SEED = 0x12345678;
 

@@ -31,6 +31,7 @@ package net.imagej.ops2.filter.sobel;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
@@ -54,7 +55,7 @@ public class SobelFilterTest extends AbstractOpTest {
 	@Test
 	public void test() {
 
-		Img<FloatType> img = generateFloatArrayTestImg(false, new long[] { 20, 20 });
+		Img<FloatType> img = TestImgGeneration.floatArray(false, new long[] { 20, 20 });
 
 		Cursor<FloatType> cursorImg = img.cursor();
 		int counterX = 0;

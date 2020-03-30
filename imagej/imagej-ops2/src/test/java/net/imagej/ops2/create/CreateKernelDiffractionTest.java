@@ -39,7 +39,7 @@ import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.types.Nil;
 
@@ -49,7 +49,7 @@ import org.scijava.ops.types.Nil;
  * @author Curtis Rueden
  * @author Eric Czech
  */
-public class CreateKernelDiffractionTest extends AbstractTestEnvironment {
+public class CreateKernelDiffractionTest extends AbstractOpTest {
 
 	@Test
 	public void testKernelDiffraction2D() {

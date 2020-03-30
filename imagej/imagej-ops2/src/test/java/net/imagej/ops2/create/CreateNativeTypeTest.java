@@ -40,7 +40,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Producer;
 import org.scijava.ops.types.Nil;
 
@@ -49,7 +49,7 @@ import org.scijava.ops.types.Nil;
  *
  * @author Brian Northan
  */
-public class CreateNativeTypeTest extends AbstractTestEnvironment {
+public class CreateNativeTypeTest extends AbstractOpTest {
 
 	@Test
 	public <T extends NativeType<T>> void testCreateNativeType() {

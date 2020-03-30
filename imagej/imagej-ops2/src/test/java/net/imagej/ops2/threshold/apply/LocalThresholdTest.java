@@ -55,6 +55,7 @@ import net.imagej.ops2.threshold.localMean.LocalMeanThreshold;
 import net.imagej.ops2.threshold.localMedian.LocalMedianThreshold;
 import net.imagej.ops2.threshold.localNiblack.LocalNiblackThreshold;
 import net.imagej.ops2.threshold.localSauvola.LocalSauvolaThreshold;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
@@ -99,7 +100,7 @@ public class LocalThresholdTest extends AbstractOpTest {
 	 */
 	@Before
 	public void before() throws Exception {
-		in = generateByteArrayTestImg(true, new long[] { 10, 10 });
+		in = TestImgGeneration.byteArray(true, new long[] { 10, 10 });
 		Pair<ByteType, ByteType> minMax = op("stats.minMax").input(in).outType(new Nil<Pair<ByteType, ByteType>>() {})
 				.apply();
 		normalizedIn = op("create.img").input(in, new DoubleType()).outType(new Nil<Img<DoubleType>>() {}).apply();

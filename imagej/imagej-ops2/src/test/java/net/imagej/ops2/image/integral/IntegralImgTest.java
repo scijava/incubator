@@ -32,6 +32,7 @@ package net.imagej.ops2.image.integral;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
 import net.imglib2.IterableInterval;
@@ -66,14 +67,13 @@ public class IntegralImgTest extends AbstractOpTest {
 	 */
 	@Before
 	public void before() throws Exception {
-		in = generateByteArrayTestImg(true, new long[] { 10, 10 });
-		out1 = generateDoubleArrayTestImg(true, new long[] { 10, 10 });
+		in = TestImgGeneration.byteArray(true, new long[] { 10, 10 });
+		out1 = TestImgGeneration.doubleArray(true, new long[] { 10, 10 });
 	}
 
 	/**
 	 * @see DefaultIntegralImg
 	 */
-	@SuppressWarnings({ "unchecked" })
 	@Test
 	public void testIntegralImageSimilarity() {
 		// should match DefaultIntegralImg

@@ -32,6 +32,7 @@ package net.imagej.ops2.project;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
@@ -52,7 +53,7 @@ public class ProjectTest extends AbstractOpTest {
 
 	@Before
 	public void initImg() {
-		in = generateUnsignedByteArrayTestImg(false, 10, 10, 10);
+		in = TestImgGeneration.unsignedByteArray(false, 10, 10, 10);
 
 		final RandomAccess<UnsignedByteType> randomAccess = in.randomAccess();
 
@@ -66,8 +67,8 @@ public class ProjectTest extends AbstractOpTest {
 			}
 		}
 
-		out1 = generateUnsignedByteArrayTestImg(false, 10, 10);
-		out2 = generateUnsignedByteArrayTestImg(false, 10, 10);
+		out1 = TestImgGeneration.unsignedByteArray(false, 10, 10);
+		out2 = TestImgGeneration.unsignedByteArray(false, 10, 10);
 
 		op = Computers.match(ops, "stats.sum", new Nil<Iterable<UnsignedByteType>>() {},
 				new Nil<UnsignedByteType>() {});

@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Iterator;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -55,8 +56,8 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 
 	@Before
 	public void initImg() {
-		in = generateByteArrayTestImg(true, 11, 10);
-		out = generateByteArrayTestImg(false, 11, 10);
+		in = TestImgGeneration.byteArray(true, 11, 10);
+		out = TestImgGeneration.byteArray(false, 11, 10);
 	}
 
 	/**

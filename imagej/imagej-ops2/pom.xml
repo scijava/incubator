@@ -310,6 +310,18 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scijava-test-util</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-test-util</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.scif</groupId>
 			<artifactId>scifio</artifactId>
 			<scope>test</scope>

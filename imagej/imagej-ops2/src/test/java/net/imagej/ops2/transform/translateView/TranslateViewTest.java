@@ -45,7 +45,7 @@ import net.imglib2.view.MixedTransformView;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
 
@@ -60,7 +60,7 @@ import org.scijava.ops.function.Functions;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  * @author Gabe Selzer
  */
-public class TranslateViewTest extends AbstractTestEnvironment {
+public class TranslateViewTest extends AbstractOpTest {
 
 	// TODO remove from this and other transform tests
 	public static <T> RandomAccessible<T> deinterval(RandomAccessibleInterval<T> input) {

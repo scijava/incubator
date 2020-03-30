@@ -42,7 +42,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.types.Nil;
 
@@ -51,7 +51,7 @@ import org.scijava.ops.types.Nil;
  * 
  * @author Vladimír Ulman
  */
-public class CreateKernelGaborTest extends AbstractTestEnvironment {
+public class CreateKernelGaborTest extends AbstractOpTest {
 
 	@Test
 	public <C extends ComplexType<C>> void testKernelGabor() {

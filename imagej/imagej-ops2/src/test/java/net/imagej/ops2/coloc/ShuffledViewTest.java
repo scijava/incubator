@@ -29,6 +29,8 @@
 
 package net.imagej.ops2.coloc;
 
+import static org.junit.Assert.assertTrue;
+
 import net.imglib2.img.array.ArrayImg;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.img.basictypeaccess.array.ByteArray;
@@ -37,6 +39,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
+import org.scijava.test_util.AssertIterations;
 
 public class ShuffledViewTest extends ColocalisationTest {
 
@@ -71,7 +74,7 @@ public class ShuffledViewTest extends ColocalisationTest {
 				1, 2, 29, 30, 25, 26, //
 				7, 8, 35, 36, 31, 32 //
 			}, 6, 6);
-		assertIterationsEqual(expected, Views.iterable(shuffled));
+		assertTrue(AssertIterations.equal(expected, Views.iterable(shuffled)));
 	}
 
 	/*
@@ -95,8 +98,8 @@ public class ShuffledViewTest extends ColocalisationTest {
 			blockSize, seed);
 		ShuffledView<UnsignedByteType> shuffled02 = new ShuffledView<>(inputImage,
 			blockSize, seed);
-		assertIterationsEqual(Views.iterable(shuffled01), Views.iterable(
-			shuffled02));
+		assertTrue(AssertIterations.equal(Views.iterable(shuffled01), Views.iterable(
+			shuffled02)));
 	}
 
 	/*
@@ -139,8 +142,8 @@ public class ShuffledViewTest extends ColocalisationTest {
 				3, 4, 13, 14, 1, 2, //
 				9, 10, 19, 20, 7, 8 //
 			}, 6, 6);
-		assertIterationsEqual(expected1, Views.iterable(shuffled1));
-		assertIterationsEqual(expected2, Views.iterable(shuffled2));
+		assertTrue(AssertIterations.equal(expected1, Views.iterable(shuffled1)));
+		assertTrue(AssertIterations.equal(expected2, Views.iterable(shuffled2)));
 	}
 
 	/*
@@ -171,7 +174,7 @@ public class ShuffledViewTest extends ColocalisationTest {
 				29, 30, 9, 10, 25, 26, //
 				35, 36, 15, 16, 31, 32 //
 			}, 6, 6);
-		assertIterationsEqual(expected, Views.iterable(shuffled));
+		assertTrue(AssertIterations.equal(expected, Views.iterable(shuffled)));
 	}
 
 	/*
@@ -202,7 +205,7 @@ public class ShuffledViewTest extends ColocalisationTest {
 				4, 5, 6, 16, 17, 18, //
 				10, 11, 12, 22, 23, 24 //
 			}, 6, 6);
-		assertIterationsEqual(expected, Views.iterable(shuffled));
+		assertTrue(AssertIterations.equal(expected, Views.iterable(shuffled)));
 	}
 
 	/*
@@ -233,6 +236,6 @@ public class ShuffledViewTest extends ColocalisationTest {
 				11, 25, 4, 24, 26, 6, //
 				23, 10, 13, 15, 22, 16 //
 			}, 6, 6);
-		assertIterationsEqual(expected, Views.iterable(shuffled));
+		assertTrue(AssertIterations.equal(expected, Views.iterable(shuffled)));
 	}
 }

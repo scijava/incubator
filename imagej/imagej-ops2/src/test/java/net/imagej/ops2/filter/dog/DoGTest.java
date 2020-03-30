@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.dog.DifferenceOfGaussian;
@@ -62,9 +63,9 @@ public class DoGTest extends AbstractOpTest {
 		final double[] sigmas2 = new double[] { 2, 2 };
 		final long[] dims = new long[] { 10, 10 };
 
-		final Img<ByteType> in = generateByteArrayTestImg(true, dims);
-		final Img<ByteType> out1 = generateByteArrayTestImg(false, dims);
-		final Img<ByteType> out2 = generateByteArrayTestImg(false, dims);
+		final Img<ByteType> in = TestImgGeneration.byteArray(true, dims);
+		final Img<ByteType> out1 = TestImgGeneration.byteArray(false, dims);
+		final Img<ByteType> out2 = TestImgGeneration.byteArray(false, dims);
 		final OutOfBoundsFactory<ByteType, Img<ByteType>> outOfBounds = new OutOfBoundsMirrorFactory<>(Boundary.SINGLE);
 
 		op("filter.DoG").input(in, sigmas1, sigmas2, outOfBounds, es).output(out1).compute();
@@ -86,9 +87,9 @@ public class DoGTest extends AbstractOpTest {
 		ExecutorService es = context.getService(ThreadService.class).getExecutorService();
 		final OutOfBoundsFactory<ByteType, Img<ByteType>> outOfBounds = new OutOfBoundsMirrorFactory<>(Boundary.SINGLE);
 		final RandomAccessibleInterval<ByteType> res = op("create.img")
-				.input(generateByteArrayTestImg(true, new long[] { 10, 10 }), new ByteType())
+				.input(TestImgGeneration.byteArray(true, new long[] { 10, 10 }), new ByteType())
 				.outType(new Nil<RandomAccessibleInterval<ByteType>>() {}).apply();
-		op("filter.DoG").input(generateByteArrayTestImg(true, new long[] { 10, 10 }), 1., 2., outOfBounds, es)
+		op("filter.DoG").input(TestImgGeneration.byteArray(true, new long[] { 10, 10 }), 1., 2., outOfBounds, es)
 				.output(res).compute();
 
 		org.junit.Assert.assertNotNull(res);

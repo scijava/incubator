@@ -33,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.ExecutorService;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.FinalDimensions;
 import net.imglib2.IterableInterval;
@@ -73,10 +74,10 @@ public class FFTTest extends AbstractOpTest {
 			final long[] dimensions = new long[] { i, i, i };
 
 			// create an input with a small sphere at the center
-			final Img<FloatType> in = generateFloatArrayTestImg(false, dimensions);
+			final Img<FloatType> in = TestImgGeneration.floatArray(false, dimensions);
 			placeSphereInCenter(in);
 
-			final Img<FloatType> inverse = generateFloatArrayTestImg(false, dimensions);
+			final Img<FloatType> inverse = TestImgGeneration.floatArray(false, dimensions);
 
 			final RandomAccessibleInterval<ComplexFloatType> out = op("filter.fft")
 					.input(in, null, true, new ComplexFloatType(), es)
@@ -117,11 +118,11 @@ public class FFTTest extends AbstractOpTest {
 			fftDimensions = fftSize.getB();
 
 			// create an input with a small sphere at the center
-			final Img<FloatType> inOriginal = generateFloatArrayTestImg(false, originalDimensions);
+			final Img<FloatType> inOriginal = TestImgGeneration.floatArray(false, originalDimensions);
 			placeSphereInCenter(inOriginal);
 
 			// create a similar input using the fast size
-			final Img<FloatType> inFast = generateFloatArrayTestImg(false, fastDimensions);
+			final Img<FloatType> inFast = TestImgGeneration.floatArray(false, fastDimensions);
 			placeSphereInCenter(inFast);
 
 			// call FFT passing false for "fast" (in order to pass the optional
@@ -145,16 +146,16 @@ public class FFTTest extends AbstractOpTest {
 
 			// create an image to be used for the inverse, using the original
 			// size
-			final Img<FloatType> inverseOriginalSmall = generateFloatArrayTestImg(false, originalDimensions);
+			final Img<FloatType> inverseOriginalSmall = TestImgGeneration.floatArray(false, originalDimensions);
 
 			// create an inverse image to be used for the inverse, using the
 			// original
 			// size
-			final Img<FloatType> inverseOriginalFast = generateFloatArrayTestImg(false, originalDimensions);
+			final Img<FloatType> inverseOriginalFast = TestImgGeneration.floatArray(false, originalDimensions);
 
 			// create an inverse image to be used for the inverse, using the
 			// fast size
-			final Img<FloatType> inverseFast = generateFloatArrayTestImg(false, fastDimensions);
+			final Img<FloatType> inverseFast = TestImgGeneration.floatArray(false, fastDimensions);
 
 			// invert the "small" FFT
 			op("filter.ifft").input(fft1, es).output(inverseOriginalSmall).compute();

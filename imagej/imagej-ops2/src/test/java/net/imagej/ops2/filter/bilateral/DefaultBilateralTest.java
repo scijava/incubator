@@ -31,6 +31,7 @@ package net.imagej.ops2.filter.bilateral;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
@@ -45,7 +46,7 @@ public class DefaultBilateralTest extends AbstractOpTest {
 		final byte[] data = { 7, 8, 9, 1, 2, 3, 7, 9, 8, 1, 3, 2, 8, 7, 9, 2, 1, 3, 8, 9, 7, 2, 3, 1, 9, 7, 8, 3, 1, 2,
 				9, 8, 7, 3, 2, 1 };
 		final Img<ByteType> in = ArrayImgs.bytes(data, 6, 6);
-		final Img<ByteType> out = generateByteArrayTestImg(false, 6, 6);
+		final Img<ByteType> out = TestImgGeneration.byteArray(false, 6, 6);
 
 		op("filter.bilateral").input(in, 15.0, 5.0, 2).output(out).compute();
 
@@ -62,7 +63,7 @@ public class DefaultBilateralTest extends AbstractOpTest {
 	public void testMath() {
 		final byte[] data = { 7, 4, 9, 1 };
 		final Img<ByteType> in = ArrayImgs.bytes(data, 2, 2);
-		final Img<ByteType> out = generateByteArrayTestImg(false, 2, 2);
+		final Img<ByteType> out = TestImgGeneration.byteArray(false, 2, 2);
 
 		op("filter.bilateral").input(in, 15.0, 5.0, 1).output(out).compute();
 
@@ -81,8 +82,8 @@ public class DefaultBilateralTest extends AbstractOpTest {
 		final byte[] data = { 7, 8, 9, 1, 2, 3, 7, 9, 8, 1, 3, 2, 8, 7, 9, 2, 1, 3, 8, 9, 7, 2, 3, 1, 9, 7, 8, 3, 1, 2,
 				9, 8, 7, 3, 2, 1 };
 		final Img<ByteType> in = ArrayImgs.bytes(data, 6, 6);
-		final Img<ByteType> out = generateByteArrayTestImg(false, 6, 6);
-		final Img<ByteType> cellOut = generateByteTestCellImg(false, 6, 6);
+		final Img<ByteType> out = TestImgGeneration.byteArray(false, 6, 6);
+		final Img<ByteType> cellOut = TestImgGeneration.byteArray(false, 6, 6);
 
 		op("filter.bilateral").input(in, 15.0, 5.0, 2).output(out).compute();
 		op("filter.bilateral").input(in, 15.0, 5.0, 2).output(cellOut).compute();
@@ -117,7 +118,7 @@ public class DefaultBilateralTest extends AbstractOpTest {
 		final byte[] data = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, 0, 0 };
 		final Img<ByteType> in = ArrayImgs.bytes(data, 6, 6);
-		final Img<ByteType> out = generateByteArrayTestImg(false, 6, 6);
+		final Img<ByteType> out = TestImgGeneration.byteArray(false, 6, 6);
 
 		op("filter.bilateral").input(in, 15.0, 5.0, 2).output(out).compute();
 
@@ -133,7 +134,7 @@ public class DefaultBilateralTest extends AbstractOpTest {
 		final byte[] data = { -7, -8, -9, -1, -2, -3, -7, -9, -8, -1, -3, -2, -8, -7, -9, -2, -1, -3, -8, -9, -7, -2,
 				-3, -1, -9, -7, -8, -3, -1, -2, -9, -8, -7, -3, -2, -1 };
 		final Img<ByteType> in = ArrayImgs.bytes(data, 6, 6);
-		final Img<ByteType> out = generateByteArrayTestImg(false, 6, 6);
+		final Img<ByteType> out = TestImgGeneration.byteArray(false, 6, 6);
 
 		op("filter.bilateral").input(in, 15.0, 5.0, 2).output(out).compute();
 

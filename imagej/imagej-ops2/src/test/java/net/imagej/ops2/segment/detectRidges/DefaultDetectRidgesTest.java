@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.scijava.ops.types.Nil;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.roi.geom.real.DefaultWritablePolyline;
@@ -53,7 +54,7 @@ public class DefaultDetectRidgesTest extends AbstractOpTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testTooFewDimensions() {
-		Img<FloatType> input = generateFloatArrayTestImg(false, 30);
+		Img<FloatType> input = TestImgGeneration.floatArray(false, 30);
 
 		// run the image through ridge detection
 		int ridgeLengthMin = 4;
@@ -67,7 +68,7 @@ public class DefaultDetectRidgesTest extends AbstractOpTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testTooManyDimensions() {
-		Img<FloatType> input = generateFloatArrayTestImg(false, 30, 30, 30, 30);
+		Img<FloatType> input = TestImgGeneration.floatArray(false, 30, 30, 30, 30);
 
 		// run the image through ridge detection
 		int ridgeLengthMin = 4;
@@ -81,7 +82,7 @@ public class DefaultDetectRidgesTest extends AbstractOpTest {
 
 	@Test
 	public void RegressionTest() {
-		Img<FloatType> input = generateFloatArrayTestImg(false, 30, 30);
+		Img<FloatType> input = TestImgGeneration.floatArray(false, 30, 30);
 		RandomAccess<FloatType> linePainter = input.randomAccess();
 
 		// paint lines on the input image

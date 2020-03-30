@@ -41,6 +41,7 @@ import net.imagej.ops2.filter.median.DefaultMedianFilter;
 import net.imagej.ops2.filter.min.DefaultMinFilter;
 import net.imagej.ops2.filter.sigma.DefaultSigmaFilter;
 import net.imagej.ops2.filter.variance.DefaultVarianceFilter;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.neighborhood.RectangleShape.NeighborhoodsIterableInterval;
 import net.imglib2.img.Img;
@@ -74,8 +75,8 @@ public class NonLinearFiltersTest extends AbstractOpTest {
 	 */
 	@Before
 	public void before() throws Exception {
-		in = generateByteArrayTestImg(true, new long[] { 10, 10 });
-		out = generateByteArrayTestImg(false, new long[] { 10, 10 });
+		in = TestImgGeneration.byteArray(true, new long[] { 10, 10 });
+		out = TestImgGeneration.byteArray(false, new long[] { 10, 10 });
 		shape = new RectangleShape(1, false);
 	}
 

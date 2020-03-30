@@ -32,6 +32,7 @@ package net.imagej.ops2.filter.gauss;
 import java.util.concurrent.ExecutorService;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.algorithm.gauss3.Gauss3;
 import net.imglib2.exception.IncompatibleTypeException;
@@ -59,7 +60,7 @@ public class GaussTest extends AbstractOpTest {
 		// retrieve an ExecutorService TODO is there a better way to do this?
 		ExecutorService es = context.getService(ThreadService.class).getExecutorService();
 
-		final Img<ByteType> in = generateByteArrayTestImg(true, new long[] { 10, 10 });
+		final Img<ByteType> in = TestImgGeneration.byteArray(true, new long[] { 10, 10 });
 		final Img<ByteType> out1 = op("create.img").input(in, Util.getTypeFromInterval(in))
 				.outType(new Nil<Img<ByteType>>() {}).apply();
 		final double sigma = 5;

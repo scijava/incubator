@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Iterator;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
@@ -175,7 +176,7 @@ public class SliceTest<I extends RealType<I>, O extends RealType<O>> extends Abs
 		final int numSlices = 25;
 		final int numTimePoints = 5;
 
-		final Img<UnsignedByteType> testImage = generateUnsignedByteArrayTestImg(true, xSize, ySize, numChannels,
+		final Img<UnsignedByteType> testImage = TestImgGeneration.unsignedByteArray(true, xSize, ySize, numChannels,
 				numSlices, numTimePoints);
 
 		final int[] axisIndices = new int[3];

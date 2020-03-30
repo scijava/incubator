@@ -44,7 +44,7 @@ import net.imglib2.view.composite.CompositeView;
 import net.imglib2.view.composite.NumericComposite;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.types.Nil;
 
@@ -58,7 +58,7 @@ import org.scijava.ops.types.Nil;
  *
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
-public class CollapseNumericViewTest extends AbstractTestEnvironment {
+public class CollapseNumericViewTest extends AbstractOpTest {
 	
 	private static CompositeIntervalView<NativeARGBDoubleType, ? extends NumericComposite<NativeARGBDoubleType>> foo() {
 		return null;

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.scijava</groupId>
@@ -8,10 +10,10 @@
 		<version>0-SNAPSHOT</version>
 		<relativePath />
 	</parent>
-	
+
 	<artifactId>scijava-test-util</artifactId>
 
-  <name>SciJava Test-Util</name>
+	<name>SciJava Test-Util</name>
 	<description>SciJava Test Utils: a set of shared test utilities for Scijava projects.</description>
 	<url>https://github.com/scijava/scijava-test-util</url>
 	<inceptionYear>2020</inceptionYear>
@@ -52,6 +54,17 @@
 		</developer>
 	</developers>
 	<contributors>
+		<!-- TODO: Remove -->
+		<contributor>
+			<name>Christian Dietz</name>
+			<url>https://imagej.net/User:Dietzc</url>
+			<roles>
+				<role>founder</role>
+			</roles>
+			<properties>
+				<id>dietzc</id>
+			</properties>
+		</contributor>
 	</contributors>
 
 	<mailingLists>
@@ -62,10 +75,10 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/scijava/test-util</connection>
-		<developerConnection>scm:git:git@github.com:scijava/test-util</developerConnection>
+		<connection>scm:git:git://github.com/scijava/incubator</connection>
+		<developerConnection>scm:git:git@github.com:scijava/incubator</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/scijava/test-util</url>
+		<url>https://github.com/scijava/incubator</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -92,13 +105,13 @@
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-common</artifactId>
 		</dependency>
-
-		<!-- Test scope dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
+
+		<!-- TOOD: can we delete this section? -->
+		<!-- Test scope dependencies -->
 	</dependencies>
 </project>
 
