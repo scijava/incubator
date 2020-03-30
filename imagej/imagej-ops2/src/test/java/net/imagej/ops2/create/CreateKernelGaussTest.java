@@ -38,7 +38,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
 
@@ -49,7 +49,7 @@ import org.scijava.ops.function.Functions;
  * @author Brian Northan
  * @author Curtis Rueden
  */
-public class CreateKernelGaussTest extends AbstractTestEnvironment {
+public class CreateKernelGaussTest extends AbstractOpTest {
 
 	@Test
 	public void testKernelGauss() {

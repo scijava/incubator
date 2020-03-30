@@ -41,7 +41,7 @@ import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
 
@@ -52,7 +52,7 @@ import org.scijava.ops.function.Functions;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 
-public class CreateImgPlusTest extends AbstractTestEnvironment {
+public class CreateImgPlusTest extends AbstractOpTest {
 
 	@Test
 	public void createImgPlusTest() {

@@ -32,6 +32,7 @@ package net.imagej.ops2.filter.derivativeGauss;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.FinalDimensions;
 import net.imglib2.RandomAccess;
@@ -52,7 +53,7 @@ public class DefaultDerivativeGaussTest extends AbstractOpTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testImgParamDimensionsMismatch() {
 		final Img<DoubleType> input = op("convert.float64")
-				.input(generateFloatArrayTestImg(false, 30, 30, 30)).outType(new Nil<Img<DoubleType>>() {}).apply();
+				.input(TestImgGeneration.floatArray(false, 30, 30, 30)).outType(new Nil<Img<DoubleType>>() {}).apply();
 
 		final Img<DoubleType> output = op("create.img").input(input)
 				.outType(new Nil<Img<DoubleType>>() {}).apply();

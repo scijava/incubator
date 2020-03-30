@@ -30,6 +30,7 @@
 package net.imagej.ops2.image.integral;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImg;
@@ -57,7 +58,7 @@ public class SquareIntegralImgTest extends AbstractOpTest {
 	 */
 	@Before
 	public void before() throws Exception {
-		out = generateDoubleArrayTestImg(true, new long[] { 3, 3 });
+		out = TestImgGeneration.doubleArray(true, new long[] { 3, 3 });
 	}
 
 	/**

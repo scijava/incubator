@@ -43,7 +43,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
 
@@ -57,7 +57,7 @@ import org.scijava.ops.function.Functions;
  *
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
-public class ExtendViewTest extends AbstractTestEnvironment {
+public class ExtendViewTest extends AbstractOpTest {
 
 	Nil<RandomAccessibleInterval<DoubleType>> raiNil = new Nil<RandomAccessibleInterval<DoubleType>>() {
 	};

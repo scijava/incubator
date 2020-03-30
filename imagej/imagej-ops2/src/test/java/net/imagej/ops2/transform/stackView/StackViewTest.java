@@ -43,7 +43,7 @@ import net.imglib2.view.StackView.StackAccessMode;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
 
@@ -57,7 +57,7 @@ import org.scijava.ops.function.Functions;
  *
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
-public class StackViewTest extends AbstractTestEnvironment {
+public class StackViewTest extends AbstractOpTest {
 
 	@Test
 	public void defaultStackTest() {

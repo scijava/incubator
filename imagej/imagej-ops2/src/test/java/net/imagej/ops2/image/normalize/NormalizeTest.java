@@ -32,6 +32,7 @@ package net.imagej.ops2.image.normalize;
 import static org.junit.Assert.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.img.Img;
@@ -53,7 +54,7 @@ public class NormalizeTest extends AbstractOpTest {
 		// TODO these method calls are not right - need lazy normalization parameters
 		// Ops
 
-		Img<ByteType> in = generateByteArrayTestImg(true, 5, 5);
+		Img<ByteType> in = TestImgGeneration.byteArray(true, 5, 5);
 		Img<ByteType> out = in.factory().create(in, new ByteType());
 
 		op("image.normalize").input(in).output(out).compute();

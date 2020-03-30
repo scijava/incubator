@@ -45,7 +45,7 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
 import org.junit.Before;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
 import org.scijava.util.ListUtils;
@@ -56,7 +56,7 @@ import org.scijava.util.ListUtils;
  * @author Brian Northan
  * @author Curtis Rueden
  */
-public class AbstractThresholdTest extends AbstractTestEnvironment {
+public class AbstractThresholdTest extends AbstractOpTest {
 
 	private final int xSize = 10;
 	private final int ySize = 10;

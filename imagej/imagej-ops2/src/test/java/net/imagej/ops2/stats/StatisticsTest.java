@@ -30,6 +30,7 @@
 package net.imagej.ops2.stats;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImg;
 import net.imglib2.img.array.ArrayImgs;
@@ -72,7 +73,7 @@ public class StatisticsTest extends AbstractOpTest {
 		super.setUp();
 
 		// make a random float array image
-		img = generateFloatArrayTestImg(true, 100, 100);
+		img = TestImgGeneration.floatArray(true, 100, 100);
 
 		// get direct access to the float array
 		array = img.update(null).getCurrentStorageArray();
@@ -81,7 +82,7 @@ public class StatisticsTest extends AbstractOpTest {
 		for (int d = 0; d < img.numDimensions(); d++)
 			arraySize *= img.dimension(d);
 
-		randomlyFilledImg = generateRandomlyFilledUnsignedByteTestImgWithSeed(new long[] { 100, 100 }, 1234567890L);
+		randomlyFilledImg = TestImgGeneration.randomlyFilledUnsignedByteWithSeed(new long[] { 100, 100 }, 1234567890L);
 	}
 
 	@Test

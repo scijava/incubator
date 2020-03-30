@@ -37,6 +37,7 @@ import java.util.function.BiFunction;
 
 import net.imagej.ops2.coloc.ColocalisationTest;
 import net.imagej.ops2.coloc.pValue.PValueResult;
+import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -48,7 +49,7 @@ import org.scijava.ops.types.Nil;
 import org.scijava.thread.ThreadService;
 
 /**
- * Tests {@link net.imagej.ops2.Ops.Coloc.ICQ}.
+ * Tests {@link net.imagej.ops2.coloc.icq.LiICQ}.
  *
  * @author Curtis Rueden
  */
@@ -56,8 +57,8 @@ public class LiICQTest extends ColocalisationTest {
 
 	@Test
 	public void testICQ() {
-		final Img<ByteType> img1 = generateByteArrayTestImg(true, 10, 15, 20);
-		final Img<ByteType> img2 = generateByteArrayTestImg(true, 10, 15, 20);
+		final Img<ByteType> img1 = TestImgGeneration.byteArray(true, 10, 15, 20);
+		final Img<ByteType> img2 = TestImgGeneration.byteArray(true, 10, 15, 20);
 
 		final Double icqValue = op("coloc.icq").input(img1, img2).outType(Double.class).apply();
 

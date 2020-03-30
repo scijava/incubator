@@ -45,7 +45,7 @@ import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.util.Intervals;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
@@ -58,7 +58,7 @@ import org.scijava.util.MersenneTwisterFast;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 
-public class CreateLabelingTest extends AbstractTestEnvironment {
+public class CreateLabelingTest extends AbstractOpTest {
 
 	private static final int TEST_SIZE = 100;
 	private static final long SEED = 0x12345678;

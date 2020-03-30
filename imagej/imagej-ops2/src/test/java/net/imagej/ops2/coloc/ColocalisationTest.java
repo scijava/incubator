@@ -26,17 +26,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package net.imagej.ops2.coloc;
 
+import io.scif.SCIFIOService;
+import io.scif.img.ImgIOException;
+import io.scif.img.ImgOpener;
+import io.scif.services.FormatService;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import org.junit.Before;
-
-import io.scif.img.ImgIOException;
-import io.scif.img.ImgOpener;
-import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Interval;
 import net.imglib2.Localizable;
 import net.imglib2.Point;
@@ -53,8 +53,17 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.scijava.Context;
+import org.scijava.app.StatusService;
+import org.scijava.cache.CacheService;
+import org.scijava.ops.OpService;
+import org.scijava.ops.core.builder.OpBuilder;
+import org.scijava.thread.ThreadService;
+
 /** Abstract base class for coloc op unit tests. */
-public abstract class ColocalisationTest extends AbstractOpTest {
+public abstract class ColocalisationTest {
 
 	// images and meta data for zero correlation
 	protected Img<UnsignedByteType> zeroCorrelationImageCh1;
@@ -64,7 +73,22 @@ public abstract class ColocalisationTest extends AbstractOpTest {
 	// and real noisy image Manders' coeff with mask test
 	protected Img<UnsignedByteType> positiveCorrelationImageCh1;
 	protected Img<UnsignedByteType> positiveCorrelationImageCh2;
+
+	protected static Context context;
+	protected static OpService ops;
+
+	@BeforeClass
+	public static void setUp() {
+		context = new Context(OpService.class, CacheService.class,
+			ThreadService.class, StatusService.class, SCIFIOService.class,
+			FormatService.class);
+		ops = context.service(OpService.class);
+	}
 	
+	protected static OpBuilder op(String name) {
+		return new OpBuilder(ops, name);
+	}
+
 	/**
 	 * This method is run before every single test is run and is meant to set up
 	 * the images and meta data needed for testing image colocalisation.
@@ -79,11 +103,10 @@ public abstract class ColocalisationTest extends AbstractOpTest {
 	}
 
 	/**
-	 * Loads a Tiff file from within the jar to use as a mask Cursor.
-	 * So we use Img<T> which has a cursor() method. 
-	 * The given path is treated
-	 * as relative to this tests-package (i.e. "Data/test.tiff" refers
-	 * to the test.tiff in sub-folder Data).
+	 * Loads a Tiff file from within the jar to use as a mask Cursor. So we use
+	 * Img<T> which has a cursor() method. The given path is treated as relative
+	 * to this tests-package (i.e. "Data/test.tiff" refers to the test.tiff in
+	 * sub-folder Data).
 	 *
 	 * @param <T> The wanted output type.
 	 * @param relPath The relative path to the Tiff file.
@@ -117,10 +140,10 @@ public abstract class ColocalisationTest extends AbstractOpTest {
 	 * @return IllegalArgumentException if specified means and spreads are not
 	 *         valid
 	 */
-	public static <T extends RealType<T> & NativeType<T>>
-		Img<T> produceMeanBasedNoiseImage(T type, int width,
-			int height, double mean, double spread, double[] smoothingSigma,
-			long seed) throws IllegalArgumentException
+	public static <T extends RealType<T> & NativeType<T>> Img<T>
+		produceMeanBasedNoiseImage(T type, int width, int height, double mean,
+			double spread, double[] smoothingSigma, long seed)
+			throws IllegalArgumentException
 	{
 		if (mean < spread || mean + spread > type.getMaxValue()) {
 			throw new IllegalArgumentException(
@@ -147,13 +170,13 @@ public abstract class ColocalisationTest extends AbstractOpTest {
 	 * @param sigma
 	 * @return
 	 */
-	public static <T extends RealType<T> & NativeType<T>>
-		Img<T> gaussianSmooth(RandomAccessibleInterval<T> img,
-			double[] sigma)
+	public static <T extends RealType<T> & NativeType<T>> Img<T> gaussianSmooth(
+		RandomAccessibleInterval<T> img, double[] sigma)
 	{
 		Interval interval = Views.iterable(img);
 
-		ImgFactory<T> outputFactory = new ArrayImgFactory<>(Util.getTypeFromInterval(img));
+		ImgFactory<T> outputFactory = new ArrayImgFactory<>(Util
+			.getTypeFromInterval(img));
 		final long[] dim = new long[img.numDimensions()];
 		img.dimensions(dim);
 		Img<T> output = outputFactory.create(dim);

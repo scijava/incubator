@@ -57,7 +57,7 @@ import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
@@ -70,7 +70,7 @@ import org.scijava.util.MersenneTwisterFast;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 
-public class CreateImgTest<T extends RealType<T>> extends AbstractTestEnvironment {
+public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 
 	private static final int TEST_SIZE = 100;
 	private static final long SEED = 0x12345678;

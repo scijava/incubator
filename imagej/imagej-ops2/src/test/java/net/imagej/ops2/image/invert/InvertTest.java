@@ -35,6 +35,7 @@ import static org.junit.Assert.fail;
 import java.math.BigInteger;
 
 import net.imagej.ops2.AbstractOpTest;
+import net.imagej.test_util.TestImgGeneration;
 import net.imagej.types.UnboundedIntegerType;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
@@ -70,7 +71,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testBitTypeInvert() {
-		final Img<BitType> inBitType = generateBitArrayTestImg(true, 10, 10);
+		final Img<BitType> inBitType = TestImgGeneration.bitArray(true, 10, 10);
 		final Img<BitType> outBitType = inBitType.factory().create(inBitType, new BitType());
 		assertDefaultInvert(inBitType, outBitType);
 		assertDefaultInvertMinMaxProvided(inBitType, outBitType, new BitType(false), new BitType(true));
@@ -79,7 +80,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testByteTypeInvert() {
-		final Img<ByteType> inByteType = generateByteArrayTestImg(true, 5, 5);
+		final Img<ByteType> inByteType = TestImgGeneration.byteArray(true, 5, 5);
 		final Img<ByteType> outByteType = inByteType.factory().create(inByteType, new ByteType());
 		assertDefaultInvert(inByteType, outByteType);
 		assertDefaultInvertMinMaxProvided(inByteType, outByteType, new ByteType((byte) 0), new ByteType((byte) 0));
@@ -89,7 +90,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsigned2BitTypeInvert() {
-		final Img<Unsigned2BitType> inUnsigned2BitType = generateUnsigned2BitArrayTestImg(true, 5, 5);
+		final Img<Unsigned2BitType> inUnsigned2BitType = TestImgGeneration.unsigned2BitArray(true, 5, 5);
 		final Img<Unsigned2BitType> outUnsigned2BitType = inUnsigned2BitType.factory().create(inUnsigned2BitType,
 				new Unsigned2BitType());
 		assertDefaultInvert(inUnsigned2BitType, outUnsigned2BitType);
@@ -99,7 +100,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsigned4BitTypeInvert() {
-		final Img<Unsigned4BitType> inUnsigned4BitType = generateUnsigned4BitArrayTestImg(true, 5, 5);
+		final Img<Unsigned4BitType> inUnsigned4BitType = TestImgGeneration.unsigned4BitArray(true, 5, 5);
 		final Img<Unsigned4BitType> outUnsigned4BitType = inUnsigned4BitType.factory().create(inUnsigned4BitType,
 				new Unsigned4BitType());
 		assertDefaultInvert(inUnsigned4BitType, outUnsigned4BitType);
@@ -109,7 +110,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsigned12BitTypeInvert() {
-		final Img<Unsigned12BitType> inUnsigned12BitType = generateUnsigned12BitArrayTestImg(true, 5, 5);
+		final Img<Unsigned12BitType> inUnsigned12BitType = TestImgGeneration.unsigned12BitArray(true, 5, 5);
 		final Img<Unsigned12BitType> outUnsigned12BitType = inUnsigned12BitType.factory().create(inUnsigned12BitType,
 				new Unsigned12BitType());
 		assertDefaultInvert(inUnsigned12BitType, outUnsigned12BitType);
@@ -119,7 +120,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsignedByteTypeInvert() {
-		final Img<UnsignedByteType> inUnsignedByteType = generateUnsignedByteArrayTestImg(true, 5, 5);
+		final Img<UnsignedByteType> inUnsignedByteType = TestImgGeneration.unsignedByteArray(true, 5, 5);
 		final Img<UnsignedByteType> outUnsignedByteType = inUnsignedByteType.factory().create(inUnsignedByteType,
 				new UnsignedByteType());
 		assertDefaultInvert(inUnsignedByteType, outUnsignedByteType);
@@ -131,7 +132,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testDoubleTypeInvert() {
-		final Img<DoubleType> inDoubleType = generateDoubleArrayTestImg(true, 5, 5);
+		final Img<DoubleType> inDoubleType = TestImgGeneration.doubleArray(true, 5, 5);
 		final Img<DoubleType> outDoubleType = inDoubleType.factory().create(inDoubleType, new DoubleType());
 		assertDefaultInvert(inDoubleType, outDoubleType);
 		assertDefaultInvertMinMaxProvided(inDoubleType, outDoubleType, new DoubleType(437d), new DoubleType(8008d));
@@ -141,7 +142,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testDoubleTypeCustomInvert() {
-		final Img<DoubleType> inDoubleType = generateDoubleArrayTestImg(true, 5, 5);
+		final Img<DoubleType> inDoubleType = TestImgGeneration.doubleArray(true, 5, 5);
 		final Img<DoubleType> outDoubleType = inDoubleType.factory().create(inDoubleType, new DoubleType());
 
 		// set this array of doubles to be the pixel values.
@@ -159,7 +160,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testFloatTypeInvert() {
-		final Img<FloatType> inFloatType = generateFloatArrayTestImg(true, 5, 5);
+		final Img<FloatType> inFloatType = TestImgGeneration.floatArray(true, 5, 5);
 		final Img<FloatType> outFloatType = inFloatType.factory().create(inFloatType, new FloatType());
 		assertDefaultInvert(inFloatType, outFloatType);
 		assertDefaultInvertMinMaxProvided(inFloatType, outFloatType, new FloatType(0f), new FloatType(1f));
@@ -167,7 +168,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testIntTypeInvert() {
-		final Img<IntType> inIntType = generateIntArrayTestImg(true, 5, 5);
+		final Img<IntType> inIntType = TestImgGeneration.intArray(true, 5, 5);
 		final Img<IntType> outIntType = inIntType.factory().create(inIntType, new IntType());
 		assertDefaultInvert(inIntType, outIntType);
 		assertDefaultInvertMinMaxProvided(inIntType, outIntType, new IntType(10), new IntType(40));
@@ -176,7 +177,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsignedIntTypeInvert() {
-		final Img<UnsignedIntType> inUnsignedIntType = generateUnsignedIntArrayTestImg(true, 5, 5);
+		final Img<UnsignedIntType> inUnsignedIntType = TestImgGeneration.unsignedIntArray(true, 5, 5);
 		final Img<UnsignedIntType> outUnsignedIntType = inUnsignedIntType.factory().create(inUnsignedIntType,
 				new UnsignedIntType());
 		assertDefaultInvert(inUnsignedIntType, outUnsignedIntType);
@@ -188,7 +189,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testLongTypeInvert() {
-		final Img<LongType> inLongType = generateLongArrayTestImg(true, 5, 5);
+		final Img<LongType> inLongType = TestImgGeneration.longArray(true, 5, 5);
 		final Img<LongType> outLongType = inLongType.factory().create(inLongType, new LongType());
 		assertIntegerInvert(inLongType, outLongType);
 		assertIntegerInvertMinMaxProvided(inLongType, outLongType, new LongType(3025), new LongType(3846));
@@ -196,7 +197,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsignedLongTypeInvert() {
-		final Img<UnsignedLongType> inUnsignedLongType = generateUnsignedLongArrayTestImg(true, 5, 5);
+		final Img<UnsignedLongType> inUnsignedLongType = TestImgGeneration.unsignedLongArray(true, 5, 5);
 		final Img<UnsignedLongType> outUnsignedLongType = inUnsignedLongType.factory().create(inUnsignedLongType,
 				new UnsignedLongType());
 		assertIntegerInvert(inUnsignedLongType, outUnsignedLongType);
@@ -206,7 +207,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsigned128ByteTypeInvert() {
-		final Img<Unsigned128BitType> inUnsigned128BitType = generateUnsigned128BitArrayTestImg(true, 5, 5);
+		final Img<Unsigned128BitType> inUnsigned128BitType = TestImgGeneration.unsigned128BitArray(true, 5, 5);
 		final Img<Unsigned128BitType> outUnsigned128BitType = inUnsigned128BitType.factory()
 				.create(inUnsigned128BitType, new Unsigned128BitType());
 		assertIntegerInvert(inUnsigned128BitType, outUnsigned128BitType);
@@ -216,7 +217,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testShortTypeInvert() {
-		final Img<ShortType> inShortType = generateShortArrayTestImg(true, 5, 5);
+		final Img<ShortType> inShortType = TestImgGeneration.shortArray(true, 5, 5);
 		final Img<ShortType> outShortType = inShortType.factory().create(inShortType, new ShortType());
 		assertDefaultInvert(inShortType, outShortType);
 		assertDefaultInvertMinMaxProvided(inShortType, outShortType, new ShortType(Short.MIN_VALUE),
@@ -229,7 +230,7 @@ public class InvertTest extends AbstractOpTest {
 
 	@Test
 	public void testUnsignedShortTypeInvert() {
-		final Img<UnsignedShortType> inUnsignedShortType = generateUnsignedShortArrayTestImg(true, 5, 5);
+		final Img<UnsignedShortType> inUnsignedShortType = TestImgGeneration.unsignedShortArray(true, 5, 5);
 		final Img<UnsignedShortType> outUnsignedShortType = inUnsignedShortType.factory().create(inUnsignedShortType,
 				new UnsignedShortType());
 		assertDefaultInvert(inUnsignedShortType, outUnsignedShortType);
@@ -237,21 +238,22 @@ public class InvertTest extends AbstractOpTest {
 				new UnsignedShortType((short) 8008));
 	}
 
-	@Test
-	public void testUnboundedIntegerTypeInvert() {
-		final Img<UnboundedIntegerType> inUnboundedIntegerType = generateUnboundedIntegerTypeListTestImg(true, 5, 5);
-		final Img<UnboundedIntegerType> outUnboundedIntegerType = inUnboundedIntegerType.factory()
-				.create(inUnboundedIntegerType, new UnboundedIntegerType());
-		assertIntegerInvert(inUnboundedIntegerType, outUnboundedIntegerType);
-		assertIntegerInvertMinMaxProvided(inUnboundedIntegerType, outUnboundedIntegerType,
-				new UnboundedIntegerType(437), new UnboundedIntegerType(8008));
-		assertIntegerInvertMinMaxProvided(inUnboundedIntegerType, outUnboundedIntegerType, new UnboundedIntegerType(0),
-				new UnboundedIntegerType(1));
-	}
+	//TODO: resolve imagej-common dependency within imagej-test-util
+//	@Test
+//	public void testUnboundedIntegerTypeInvert() {
+//		final Img<UnboundedIntegerType> inUnboundedIntegerType = TestImgGeneration.generateUnboundedIntegerTypeListTestImg(true, 5, 5);
+//		final Img<UnboundedIntegerType> outUnboundedIntegerType = inUnboundedIntegerType.factory()
+//				.create(inUnboundedIntegerType, new UnboundedIntegerType());
+//		assertIntegerInvert(inUnboundedIntegerType, outUnboundedIntegerType);
+//		assertIntegerInvertMinMaxProvided(inUnboundedIntegerType, outUnboundedIntegerType,
+//				new UnboundedIntegerType(437), new UnboundedIntegerType(8008));
+//		assertIntegerInvertMinMaxProvided(inUnboundedIntegerType, outUnboundedIntegerType, new UnboundedIntegerType(0),
+//				new UnboundedIntegerType(1));
+//	}
 
 	@Test
 	public void testUnsignedVariableBitLengthTypeInvert() {
-		final Img<UnsignedVariableBitLengthType> inUnsignedVariableBitLengthType = generateUnsignedVariableBitLengthTypeArrayTestImg(
+		final Img<UnsignedVariableBitLengthType> inUnsignedVariableBitLengthType = TestImgGeneration.unsignedVariableBitLengthTypeArray(
 				true, 64, 5, 5);
 		final Img<UnsignedVariableBitLengthType> outUnsignedVariableBitLengthType = inUnsignedVariableBitLengthType
 				.factory().create(inUnsignedVariableBitLengthType, new UnsignedVariableBitLengthType(1, 64));

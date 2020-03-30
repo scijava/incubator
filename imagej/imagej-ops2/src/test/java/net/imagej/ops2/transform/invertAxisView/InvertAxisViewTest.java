@@ -42,7 +42,7 @@ import net.imglib2.view.MixedTransformView;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
-import org.scijava.ops.AbstractTestEnvironment;
+import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.types.Nil;
 import org.scijava.ops.function.Functions;
 
@@ -57,7 +57,7 @@ import org.scijava.ops.function.Functions;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  * @author Gabe Selzer
  */
-public class InvertAxisViewTest extends AbstractTestEnvironment {
+public class InvertAxisViewTest extends AbstractOpTest {
 
 	public static <T> RandomAccessible<T> deinterval(RandomAccessibleInterval<T> input) {
 		return Views.extendBorder(input);
