@@ -71,7 +71,7 @@ public class MergeLabeling<L, I extends IntegerType<I>, B extends BooleanType<B>
 	private BiFunction<Dimensions, I, ImgLabeling<L, I>> imgLabelingCreator;
 	
 	@OpDependency(name = "adapt")
-	private Function<Computers.Arity2<LabelingType<L>, LabelingType<L>, LabelingType<L>>, Computers.Arity2<ImgLabeling<L, I>, ImgLabeling<L, I>, ImgLabeling<L, I>>> adaptor;
+	private Function<Computers.Arity2<LabelingType<L>, LabelingType<L>, LabelingType<L>>, Computers.Arity2<Iterable<LabelingType<L>>, Iterable<LabelingType<L>>, Iterable<LabelingType<L>>>> adaptor;
 
 	@SuppressWarnings({ "unchecked", "rawtypes", "hiding" })
 	@Override
@@ -94,7 +94,7 @@ public class MergeLabeling<L, I extends IntegerType<I>, B extends BooleanType<B>
 				outLabeling.addAll(randomAccess2.get());
 			}
 		} else {
-			Computers.Arity2<ImgLabeling<L, I>, ImgLabeling<L, I>, ImgLabeling<L, I>> adapted = adaptor.apply(
+			Computers.Arity2<Iterable<LabelingType<L>>, Iterable<LabelingType<L>>, Iterable<LabelingType<L>>> adapted = adaptor.apply(
 					new Computers.Arity2<LabelingType<L>, LabelingType<L>, LabelingType<L>>() {
 
 						@Override

@@ -107,7 +107,7 @@ public class CreateKernelDiffractionTest extends AbstractOpTest {
 		double[] actual = StreamSupport.stream(kernel.spliterator(), false).mapToDouble(t -> t
 				.getRealDouble()).toArray();
 
-		assertArrayEquals(expected, actual, 0.0);
+		assertArrayEquals(expected, actual, 1e-6);
 	}
 
 	/**
