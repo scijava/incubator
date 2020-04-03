@@ -29,10 +29,22 @@
 
 package net.imagej.ops2;
 
-import java.math.BigInteger;
+import io.scif.img.IO;
+
 import java.net.URL;
-import java.util.Random;
 import java.util.stream.StreamSupport;
+
+import net.imglib2.Cursor;
+import net.imglib2.IterableInterval;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessible;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.Img;
+import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
+import net.imglib2.type.numeric.real.DoubleType;
+import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.view.Views;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -42,48 +54,6 @@ import org.scijava.ops.OpService;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.thread.ThreadService;
-import org.scijava.util.MersenneTwisterFast;
-
-import io.scif.img.IO;
-import net.imagej.types.UnboundedIntegerType;
-import net.imglib2.Cursor;
-import net.imglib2.FinalInterval;
-import net.imglib2.IterableInterval;
-import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessible;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.Img;
-import net.imglib2.img.array.ArrayImg;
-import net.imglib2.img.array.ArrayImgs;
-import net.imglib2.img.basictypeaccess.array.ByteArray;
-import net.imglib2.img.basictypeaccess.array.DoubleArray;
-import net.imglib2.img.basictypeaccess.array.FloatArray;
-import net.imglib2.img.basictypeaccess.array.IntArray;
-import net.imglib2.img.basictypeaccess.array.LongArray;
-import net.imglib2.img.basictypeaccess.array.ShortArray;
-import net.imglib2.img.cell.CellImg;
-import net.imglib2.img.cell.CellImgFactory;
-import net.imglib2.img.list.ListImg;
-import net.imglib2.img.list.ListImgFactory;
-import net.imglib2.type.logic.BitType;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.numeric.integer.ByteType;
-import net.imglib2.type.numeric.integer.IntType;
-import net.imglib2.type.numeric.integer.LongType;
-import net.imglib2.type.numeric.integer.ShortType;
-import net.imglib2.type.numeric.integer.Unsigned128BitType;
-import net.imglib2.type.numeric.integer.Unsigned12BitType;
-import net.imglib2.type.numeric.integer.Unsigned2BitType;
-import net.imglib2.type.numeric.integer.Unsigned4BitType;
-import net.imglib2.type.numeric.integer.UnsignedByteType;
-import net.imglib2.type.numeric.integer.UnsignedIntType;
-import net.imglib2.type.numeric.integer.UnsignedLongType;
-import net.imglib2.type.numeric.integer.UnsignedShortType;
-import net.imglib2.type.numeric.integer.UnsignedVariableBitLengthType;
-import net.imglib2.type.numeric.real.DoubleType;
-import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.util.Intervals;
-import net.imglib2.view.Views;
 
 /**
  * Base class for {@link Op} unit testing.
@@ -137,21 +107,21 @@ public abstract class AbstractOpTest{
 		final String resourcePath)
 	{
 		final URL url = c.getResource(resourcePath);
-		return IO.openFloatImgs(url.getPath()).get(0).getImg();
+		return IO.openFloat(url.getPath()).get(0).getImg();
 	}
 
 	public static Img<UnsignedByteType> openUnsignedByteType(final Class<?> c,
 		final String resourcePath)
 	{
 		final URL url = c.getResource(resourcePath);
-		return IO.openUnsignedByteImgs(url.getPath()).get(0).getImg();
+		return IO.openUnsignedByte(url.getPath()).get(0).getImg();
 	}
 
 	public static Img<DoubleType> openDoubleImg(final Class<?> c,
 		final String resourcePath)
 	{
 		final URL url = c.getResource(resourcePath);
-		return IO.openDoubleImgs(url.getPath()).get(0).getImg();
+		return IO.openDouble(url.getPath()).get(0).getImg();
 	}
 
 	public static <T> RandomAccessible<T> deinterval(

@@ -41,6 +41,7 @@ import org.scijava.util.MersenneTwisterFast;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
+import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.labeling.ConnectedComponents.StructuringElement;
@@ -204,7 +205,9 @@ public class WatershedSeededTest extends AbstractOpTest {
 
 		// count labels
 		Set<Integer> labelSet = new HashSet<>();
-		for (LabelingType<Integer> pixel : Regions.sample(regions, out)) {
+		for (LabelingType<Integer> pixel : Regions.sample(
+			(IterableInterval<Void>) regions, out))
+		{
 			labelSet.addAll(pixel);
 		}
 

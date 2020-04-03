@@ -58,6 +58,7 @@ import org.junit.BeforeClass;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
 import org.scijava.cache.CacheService;
+import org.scijava.io.location.FileLocation;
 import org.scijava.ops.OpService;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.thread.ThreadService;
@@ -124,7 +125,8 @@ public abstract class ColocalisationTest {
 		// Until this is fixed, the test will not pass when run from a JAR file.
 		String source = "src/test/resources/net/imagej/ops/coloc/" + relPath;
 		try {
-			return (Img) opener.openImgs(source).get(0);
+			final FileLocation location = new FileLocation(source);
+			return (Img) opener.openImgs(location).get(0);
 		}
 		catch (final ImgIOException exc) {
 			throw new IllegalStateException("File " + relPath +

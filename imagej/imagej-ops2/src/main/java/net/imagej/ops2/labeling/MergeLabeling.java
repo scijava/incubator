@@ -81,7 +81,8 @@ public class MergeLabeling<L, I extends IntegerType<I>, B extends BooleanType<B>
 				Views.iterable(input1.getSource()).firstElement());
 		if (mask != null) {
 			final IterableRegion iterable = Regions.iterable(mask);
-			final IterableInterval<LabelingType<L>> sample = Regions.sample(iterable, output);
+			final IterableInterval<LabelingType<L>> sample = Regions.sample(
+				(IterableInterval<Void>) iterable, output);
 			final RandomAccess<LabelingType<L>> randomAccess = input1.randomAccess();
 			final RandomAccess<LabelingType<L>> randomAccess2 = input2.randomAccess();
 			final Cursor<LabelingType<L>> cursor = sample.cursor();

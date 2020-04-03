@@ -67,8 +67,6 @@ import net.imglib2.view.Views;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.function.Computers;
-import org.scijava.ops.function.Functions;
 import org.scijava.ops.function.Functions;
 import org.scijava.param.Mutable;
 import org.scijava.param.Parameter;
@@ -201,7 +199,8 @@ public class WatershedSeeded<T extends RealType<T>, B extends BooleanType<B>> im
 
 		// Only iterate seeds that are not excluded by the mask
 		final IterableRegion<B> maskRegions = Regions.iterable(mask);
-		final IterableInterval<LabelingType<Integer>> seedsMasked = Regions.sample(maskRegions, seeds);
+		final IterableInterval<LabelingType<Integer>> seedsMasked = Regions.sample(
+			(IterableInterval<Void>) maskRegions, seeds);
 		final Cursor<LabelingType<Integer>> cursorSeeds = seedsMasked.localizingCursor();
 
 		while (cursorSeeds.hasNext()) {
