@@ -124,6 +124,7 @@ public class TestImgGeneration {
 			dims))];
 
 		if (fill) {
+			seed = 17;
 			for (int i = 0; i < array.length; i++) {
 				array[i] = (byte) pseudoRandom();
 			}
@@ -139,6 +140,7 @@ public class TestImgGeneration {
 			dims))];
 
 		if (fill) {
+			seed = 17;
 			for (int i = 0; i < array.length; i++) {
 				array[i] = (byte) pseudoRandom();
 			}

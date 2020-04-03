@@ -123,7 +123,7 @@ public abstract class ColocalisationTest {
 
 		// HACK: Read data from file system for now.
 		// Until this is fixed, the test will not pass when run from a JAR file.
-		String source = "src/test/resources/net/imagej/ops/coloc/" + relPath;
+		String source = "src/test/resources/net/imagej/ops2/coloc/" + relPath;
 		try {
 			final FileLocation location = new FileLocation(source);
 			return (Img) opener.openImgs(location).get(0);

@@ -31,8 +31,19 @@ package net.imagej.ops2.filter.vesselness;
 
 import static org.junit.Assert.assertEquals;
 
+import io.scif.img.IO;
+
+import java.net.URL;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.scijava.Context;
+import org.scijava.cache.CacheService;
+import org.scijava.ops.OpService;
+import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.script.ScriptService;
+import org.scijava.thread.ThreadService;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
@@ -48,7 +59,34 @@ import net.imglib2.view.Views;
  * 
  * @author Gabe Selzer
  */
-public class FrangiVesselnessTest extends AbstractOpTest {
+public class FrangiVesselnessTest{
+	
+	protected static Context context;
+	protected static OpService ops;
+
+	@BeforeClass
+	public static void setUp() {
+		context = new Context(OpService.class, CacheService.class, ThreadService.class, ScriptService.class);
+		ops = context.service(OpService.class);
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		context.dispose();
+		context = null;
+		ops = null;
+	}
+	
+	private static OpBuilder op(String name) {
+		return new OpBuilder(ops, name);
+	}
+	
+	private Img<FloatType> openFloatImg(
+		final String resourcePath)
+	{
+		final URL url = getClass().getResource(resourcePath);
+		return IO.openFloat(url.getPath()).get(0).getImg();
+	}
 
 	@Test
 	public void regressionTest() throws Exception {

@@ -144,7 +144,7 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 		}
 		
 		// generate Nils from types
-		Nil<?>[] inTypes = Arrays.stream(args).map((obj) -> type(obj)).toArray(Nil[]::new);
+		Nil<?>[] inTypes = Arrays.stream(args).map((obj) -> type(value(obj))).toArray(Nil[]::new);
 		Nil<Object> outType = new Nil<>() {};
 
 		// Try executing the op.
