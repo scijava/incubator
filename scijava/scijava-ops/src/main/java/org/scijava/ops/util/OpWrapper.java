@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import org.scijava.plugin.SciJavaPlugin;
-import org.scijava.util.Types;
+import org.scijava.types.Types;
 
 public interface OpWrapper<T> extends SciJavaPlugin {
 	T wrap(T op, Type reifiedType);

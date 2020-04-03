@@ -39,7 +39,7 @@ import net.imglib2.util.Pair;
 
 import org.junit.Test;
 import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Tests {@link net.imagej.ops2.Ops.Image.ASCII}.

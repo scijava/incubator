@@ -46,7 +46,7 @@ import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Tests for the {@link Outline} op

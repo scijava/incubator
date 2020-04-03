@@ -10,7 +10,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Tests {@link HistogramCreate}

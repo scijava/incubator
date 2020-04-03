@@ -37,8 +37,8 @@ import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImg;
 
 import org.scijava.Priority;
-import org.scijava.ops.types.TypeExtractor;
-import org.scijava.ops.types.TypeService;
+import org.scijava.types.TypeExtractor;
+import org.scijava.types.TypeService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 

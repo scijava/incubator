@@ -43,7 +43,7 @@ import org.scijava.param.ValidityException;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
-import org.scijava.util.Types;
+import org.scijava.types.Types;
 
 /**
  * Metadata about an op implementation defined as a class.

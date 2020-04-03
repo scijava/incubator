@@ -49,7 +49,7 @@ import net.imglib2.view.Views;
 import org.junit.Before;
 import org.junit.Test;
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * @author Stefan Helfrich (University of Konstanz)

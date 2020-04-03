@@ -39,7 +39,7 @@ import net.imagej.ops2.AbstractOpTest;
 import org.junit.Test;
 import org.scijava.ops.OpService;
 import org.scijava.ops.function.Functions;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Tests {@link net.imagej.ops2.Ops.Eval}.

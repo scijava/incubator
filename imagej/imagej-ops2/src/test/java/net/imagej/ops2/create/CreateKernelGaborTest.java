@@ -44,7 +44,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import org.junit.Test;
 import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Tests {@link DefaultCreateKernelGabor} and its derivates.

@@ -43,9 +43,9 @@ import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.function.Inplaces;
 import org.scijava.ops.function.Producer;
-import org.scijava.ops.types.Nil;
-import org.scijava.ops.types.TypeService;
-import org.scijava.util.Types;
+import org.scijava.types.Nil;
+import org.scijava.types.TypeService;
+import org.scijava.types.Types;
 
 /**
  * Convenience class for looking up and/or executing ops using a builder

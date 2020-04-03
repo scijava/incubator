@@ -31,7 +31,7 @@ import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 import org.scijava.util.AnnotationUtils;
 import org.scijava.util.ClassUtils;
-import org.scijava.util.Types;
+import org.scijava.types.Types;
 
 /**
  * Utility functions for working with {@link org.scijava.param} classes.

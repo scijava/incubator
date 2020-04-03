@@ -77,7 +77,7 @@ import net.imglib2.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Test for {@link LocalThreshold} and various {@code LocalThresholdMethod}s.

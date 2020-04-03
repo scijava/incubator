@@ -52,7 +52,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 import org.scijava.plugin.Plugin;
 
 /**

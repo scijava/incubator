@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.ExecutorService;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 import org.scijava.test_util.AssertIterations;
 import org.scijava.thread.ThreadService;
 

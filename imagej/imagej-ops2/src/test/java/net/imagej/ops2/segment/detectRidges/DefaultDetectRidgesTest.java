@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.test_util.TestImgGeneration;

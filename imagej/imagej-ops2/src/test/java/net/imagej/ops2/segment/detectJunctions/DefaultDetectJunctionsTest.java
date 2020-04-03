@@ -39,7 +39,7 @@ import net.imglib2.RealPoint;
 import net.imglib2.roi.geom.real.DefaultWritablePolyline;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Tests {@link DefaultDetectJunctions}

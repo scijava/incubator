@@ -43,7 +43,7 @@ import net.imglib2.type.numeric.integer.ShortType;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Test XY, and coordinate based equations that is equations of the form f(x,y)
