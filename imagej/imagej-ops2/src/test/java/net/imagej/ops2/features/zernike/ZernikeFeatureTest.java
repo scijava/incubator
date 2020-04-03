@@ -34,7 +34,7 @@ import net.imagej.ops2.features.AbstractFeatureTest;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * 

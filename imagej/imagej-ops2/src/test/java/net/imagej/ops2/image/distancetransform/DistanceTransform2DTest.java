@@ -31,7 +31,7 @@ package net.imagej.ops2.image.distancetransform;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
 import org.scijava.util.MersenneTwisterFast;
 

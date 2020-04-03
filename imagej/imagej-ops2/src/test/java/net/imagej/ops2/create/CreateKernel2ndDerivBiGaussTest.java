@@ -39,7 +39,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Test;
 import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Tests {@link DefaultCreateKernel2ndDerivBiGauss} and its derivates.

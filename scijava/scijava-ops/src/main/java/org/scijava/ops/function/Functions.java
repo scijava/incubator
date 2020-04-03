@@ -16,8 +16,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.scijava.ops.OpService;
-import org.scijava.ops.types.Nil;
-import org.scijava.util.Types;
+import org.scijava.types.Nil;
+import org.scijava.types.Types;
 
 /**
  * Container class for

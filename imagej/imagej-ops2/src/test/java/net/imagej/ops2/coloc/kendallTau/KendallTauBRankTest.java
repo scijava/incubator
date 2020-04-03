@@ -51,7 +51,7 @@ import net.imglib2.util.Pair;
 
 import org.junit.Test;
 import org.scijava.ops.function.Functions;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
 
 /**

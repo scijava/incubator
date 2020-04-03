@@ -33,7 +33,7 @@
 package org.scijava.core;
 
 import org.scijava.util.MiscUtils;
-import org.scijava.util.Types;
+import org.scijava.types.Types;
 
 /**
  * An interface defining details useful for generating relevant user interface

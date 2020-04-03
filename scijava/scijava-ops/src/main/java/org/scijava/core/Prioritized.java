@@ -32,7 +32,7 @@
 
 package org.scijava.core;
 
-import org.scijava.util.Types;
+import org.scijava.types.Types;
 
 /**
  * An object that can be sorted according to priority.

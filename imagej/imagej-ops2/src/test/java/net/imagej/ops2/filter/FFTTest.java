@@ -48,7 +48,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
 
 /**

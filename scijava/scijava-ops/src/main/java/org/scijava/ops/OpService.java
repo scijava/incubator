@@ -61,8 +61,8 @@ import org.scijava.ops.matcher.OpInfo;
 import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpRef;
-import org.scijava.ops.types.Nil;
-import org.scijava.ops.types.TypeService;
+import org.scijava.types.Nil;
+import org.scijava.types.TypeService;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
 import org.scijava.param.ParameterStructs;
@@ -75,7 +75,7 @@ import org.scijava.service.SciJavaService;
 import org.scijava.service.Service;
 import org.scijava.struct.ItemIO;
 import org.scijava.util.ClassUtils;
-import org.scijava.util.Types;
+import org.scijava.types.Types;
 
 /**
  * Service to provide a list of available ops structured in a prefix tree and to

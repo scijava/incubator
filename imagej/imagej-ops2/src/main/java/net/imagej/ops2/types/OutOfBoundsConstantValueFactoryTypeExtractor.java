@@ -36,11 +36,11 @@ import java.lang.reflect.Type;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.outofbounds.OutOfBoundsConstantValueFactory;
 
-import org.scijava.ops.types.TypeExtractor;
-import org.scijava.ops.types.TypeService;
+import org.scijava.types.TypeExtractor;
+import org.scijava.types.TypeService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.util.Types;
+import org.scijava.types.Types;
 
 /**
  * {@link TypeExtractor} plugin which operates on

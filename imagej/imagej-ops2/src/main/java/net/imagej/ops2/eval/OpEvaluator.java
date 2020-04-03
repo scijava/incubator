@@ -38,8 +38,8 @@ import java.util.Map;
 
 import org.scijava.ops.OpService;
 import org.scijava.ops.function.Functions;
-import org.scijava.ops.types.Nil;
-import org.scijava.ops.types.TypeService;
+import org.scijava.types.Nil;
+import org.scijava.types.TypeService;
 import org.scijava.parse.Operator;
 import org.scijava.parse.Operators;
 import org.scijava.parse.Variable;

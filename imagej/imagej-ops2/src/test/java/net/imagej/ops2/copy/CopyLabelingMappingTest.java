@@ -42,7 +42,7 @@ import net.imglib2.type.numeric.integer.IntType;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Test @link {@link CopyLabelingMapping}.

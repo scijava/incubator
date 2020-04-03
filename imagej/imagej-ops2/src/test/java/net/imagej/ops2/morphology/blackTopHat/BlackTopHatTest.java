@@ -48,7 +48,7 @@ import net.imglib2.type.numeric.integer.ByteType;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 import org.scijava.test_util.AssertIterations;
 
 /**

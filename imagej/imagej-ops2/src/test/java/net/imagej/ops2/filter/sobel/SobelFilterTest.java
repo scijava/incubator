@@ -41,7 +41,7 @@ import net.imglib2.util.Util;
 
 import org.junit.Test;
 import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.ops.types.Nil;
+import org.scijava.types.Nil;
 
 /**
  * Test for sobel op using separated kernel.
