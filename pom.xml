@@ -5,7 +5,8 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>28.0.0</version>
+		<version>999</version>
+		<relativePath />
 	</parent>
 
 	<artifactId>scijava-incubator</artifactId>
@@ -75,6 +76,8 @@
 		<!-- NB: Old version of javadoc plugin avoids modularity conflicts -->
 		<maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
 		<doclint>none</doclint>
+
+		<ojalgo.version>45.1.1</ojalgo.version>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>deploy-to-scijava</releaseProfiles>

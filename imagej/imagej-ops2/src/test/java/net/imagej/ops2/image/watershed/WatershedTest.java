@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
+import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
@@ -51,8 +52,8 @@ import net.imglib2.view.Views;
 
 import org.junit.Test;
 import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
+import org.scijava.types.Nil;
 
 /**
  * Test for the watershed op.
@@ -201,7 +202,9 @@ public class WatershedTest extends AbstractOpTest {
 
 		// count labels
 		Set<Integer> labelSet = new HashSet<>();
-		for (LabelingType<Integer> pixel : Regions.sample(regions, out)) {
+		for (LabelingType<Integer> pixel : Regions.sample(
+			(IterableInterval<Void>) regions, out))
+		{
 			labelSet.addAll(pixel);
 		}
 
