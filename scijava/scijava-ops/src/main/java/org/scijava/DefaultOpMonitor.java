@@ -1,7 +1,7 @@
 package org.scijava;
 
 import org.scijava.ops.OpMonitor;
-import org.scijava.util.Logger;
+import org.scijava.ops.log.Logger;
 
 /**
  * Default implementation of {@link OpMonitor}

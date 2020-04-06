@@ -30,7 +30,7 @@ package org.scijava.ops;
 
 import java.util.concurrent.CancellationException;
 
-import org.scijava.util.Logger;
+import org.scijava.ops.log.Logger;
 
 /**
  * Used as a bridge between the {@link Op} and the user. Allows the user to

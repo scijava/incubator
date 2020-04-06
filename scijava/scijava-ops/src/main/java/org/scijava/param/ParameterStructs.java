@@ -25,11 +25,11 @@ import org.scijava.ops.FieldOpDependencyMember;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.matcher.OpInfo;
+import org.scijava.ops.util.AnnotationUtils;
 import org.scijava.struct.ItemIO;
 import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
-import org.scijava.util.AnnotationUtils;
 import org.scijava.util.ClassUtils;
 import org.scijava.types.Types;
 
