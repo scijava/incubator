@@ -1,5 +1,5 @@
 
-package org.scijava.util;
+package org.scijava.ops.log;
 
 import static org.scijava.log.LogLevel.DEBUG;
 import static org.scijava.log.LogLevel.ERROR;
