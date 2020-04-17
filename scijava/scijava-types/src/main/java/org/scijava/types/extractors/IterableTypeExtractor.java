@@ -27,49 +27,59 @@
  * #L%
  */
 
-package org.scijava.types;
+package org.scijava.types.extractors;
 
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.types.TypeService;
+import org.scijava.types.Types;
 
 /**
- * {@link TypeExtractor} plugin which operates on {@link Map} objects.
+ * {@link TypeExtractor} plugin which operates on {@link Iterable} objects.
  * <p>
- * For performance reasons, we examine only one entry of the map, which may be
- * more specifically typed than later entries. Hence the generic types given by
- * this extraction may be overly constrained.
+ * In an attempt to balance performance and correctness, we examine the first
+ * 100 elements of the iteration and obtain the greatest common supertype of
+ * each.
  * </p>
  *
  * @author Curtis Rueden
  */
 @Plugin(type = TypeExtractor.class, priority = Priority.LOW)
-public class MapTypeExtractor implements TypeExtractor<Map<?, ?>> {
+public class IterableTypeExtractor implements TypeExtractor<Iterable<?>> {
 
 	@Parameter
 	private TypeService typeService;
 
 	@Override
-	public Type reify(final Map<?, ?> o, final int n) {
-		if (n < 0 || n > 1) throw new IndexOutOfBoundsException("" + n);
+	public Type reify(final Iterable<?> o, final int n) {
+		if (n != 0) throw new IndexOutOfBoundsException();
 
-		if (o.isEmpty()) return null;
+		final Iterator<?> iterator = o.iterator();
+		if (!iterator.hasNext()) return null;
 
-		final Entry<?, ?> entry = o.entrySet().iterator().next();
-		if (n == 0) return typeService.reify(entry.getKey());
-		return typeService.reify(entry.getValue());
+		// Obtain the element type using the TypeService.
+		int typesToCheck = 100;
+		// can we make this more efficient (possibly a parallel stream)?
+		Type[] types = StreamSupport.stream(o.spliterator(), false) //
+			.limit(typesToCheck) //
+			.map(s -> typeService.reify(s)) //
+			.toArray(Type[]::new);
 
-		// TODO: Avoid infinite recursion when the map references itself.
+		return Types.greatestCommonSuperType(types, true);
+		// TODO: Avoid infinite recursion when the list references itself.
 	}
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Class<Map<?, ?>> getRawType() {
-		return (Class) Map.class;
+	public Class<Iterable<?>> getRawType() {
+		return (Class) Iterable.class;
 	}
 
 }

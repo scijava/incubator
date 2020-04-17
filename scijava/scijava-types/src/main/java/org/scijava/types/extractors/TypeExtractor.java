@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.types;
+package org.scijava.types.extractors;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -35,6 +35,7 @@ import java.lang.reflect.TypeVariable;
 
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.SingletonPlugin;
+import org.scijava.types.Any;
 import org.scijava.types.Types;
 
 /**
