@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.types.extractors;
+package org.scijava.types;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -35,8 +35,6 @@ import java.lang.reflect.TypeVariable;
 
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.SingletonPlugin;
-import org.scijava.types.Any;
-import org.scijava.types.Types;
 
 /**
  * A plugin for extracting generic {@link Type} from instances at runtime.

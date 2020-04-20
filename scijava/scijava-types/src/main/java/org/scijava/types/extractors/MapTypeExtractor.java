@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.types.TypeExtractor;
 import org.scijava.types.TypeService;
 
 /**
