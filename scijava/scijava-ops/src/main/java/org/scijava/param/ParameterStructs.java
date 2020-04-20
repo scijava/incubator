@@ -354,6 +354,7 @@ public final class ParameterStructs {
 						+ "#specified paraeter annotations: " + annotations.length));
 				return;
 			}
+			// START HERE: Instead of hacking the annotation here, we need to 
 			if (resolveItemIOAuto(annotations, fmts, problems)) {
 				// specified parameter annotations do not match functional method signature
 				return;

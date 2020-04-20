@@ -38,10 +38,7 @@ package org.scijava.ops.util;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Map;
 
 import org.scijava.param.Parameter;
 import org.scijava.param.Parameters;
@@ -73,41 +70,6 @@ public final class AnnotationUtils {
 		return p == null ? new Parameter[0] : new Parameter[] { p };
 	}
 
-	/**
-	 * Changes the annotation value for the given key of the given annotation to
-	 * newValue and returns the previous value.
-	 * 
-	 * Taken and modified (only renaming) from: https://stackoverflow.com/a/28118436
-	 * 
-	 * @param instance the annotation to mutate
-	 * @param key the key of the field to mutate
-	 * @param newValue the new value to set
-	 * @return the old value of the field with the specified key
-	 */
-	@SuppressWarnings("unchecked")
-	public static Object mutateAnnotationInstance(Annotation instance, String key, Object newValue) {
-		Object handler = Proxy.getInvocationHandler(instance);
-		Field f;
-		try {
-			f = handler.getClass().getDeclaredField("memberValues");
-		} catch (NoSuchFieldException | SecurityException e) {
-			throw new IllegalStateException(e);
-		}
-		f.setAccessible(true);
-		Map<String, Object> memberValues;
-		try {
-			memberValues = (Map<String, Object>) f.get(handler);
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			throw new IllegalStateException(e);
-		}
-		Object oldValue = memberValues.get(key);
-		if (oldValue == null || oldValue.getClass() != newValue.getClass()) {
-			throw new IllegalArgumentException();
-		}
-		memberValues.put(key, newValue);
-		return oldValue;
-	}
-	
 	/**
 	 * Attempt to retrieve the specified annotation from the i'th parameter
 	 * of the specified method. This method will only find annotations with:
