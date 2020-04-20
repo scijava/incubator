@@ -40,7 +40,6 @@ import java.util.Map;
 import org.scijava.plugin.SingletonService;
 import org.scijava.service.SciJavaService;
 import org.scijava.types.extractors.IterableTypeExtractor;
-import org.scijava.types.extractors.TypeExtractor;
 
 /**
  * Service for working with generic {@link Type}s. This service can extract

@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.junit.Test;
-import org.scijava.DefaultOpMonitor;
+import org.scijava.monitor.DefaultOpMonitor;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;

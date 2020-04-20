@@ -1,4 +1,4 @@
-package org.scijava;
+package org.scijava.monitor;
 
 import org.scijava.ops.OpMonitor;
 import org.scijava.ops.log.Logger;

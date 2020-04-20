@@ -38,6 +38,7 @@ import java.util.stream.StreamSupport;
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.types.TypeExtractor;
 import org.scijava.types.TypeService;
 import org.scijava.types.Types;
 

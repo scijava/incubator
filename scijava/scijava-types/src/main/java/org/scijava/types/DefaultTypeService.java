@@ -35,7 +35,6 @@ import java.util.Map;
 import org.scijava.plugin.AbstractSingletonService;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.Service;
-import org.scijava.types.extractors.TypeExtractor;
 
 /**
  * Default {@link TypeService} implementation.
