@@ -288,7 +288,11 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 	 */
 	private AdaptedOp adaptOp(OpRef ref) throws OpMatchingException {
 		Type opType = ref.getTypes()[0];
-		List<OpInfo> adaptors = new ArrayList<>(opCache.get("adapt"));
+		List<OpInfo> adaptors = opCache.get("adapt");
+		// TODO: is there a better way to handle this?
+		if (adaptors == null)
+			throw new OpMatchingException("No adapt Ops available");
+
 		Collections.sort(adaptors, (OpInfo i1, OpInfo i2) -> i1.priority() < i2.priority() ? 1 : i1.priority() == i2.priority() ? 0 : -1);
 
 		for (final OpInfo adaptor : adaptors) {
