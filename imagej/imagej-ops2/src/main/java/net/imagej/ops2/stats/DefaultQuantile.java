@@ -29,6 +29,7 @@
 
 package net.imagej.ops2.stats;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.imglib2.IterableInterval;
@@ -42,6 +43,8 @@ import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;
 import org.scijava.util.ArrayUtils;
 import org.scijava.util.DoubleArray;
+
+import static java.util.Collections.swap;
 
 /**
  * {@link Op} to calculate the n-th {@code stats.percentile}.
@@ -60,77 +63,70 @@ public class DefaultQuantile<I extends RealType<I>, O extends RealType<O>>
 implements Computers.Arity2<Iterable<I>, Double, O>
 {
 
-//	@Parameter(min = "0.0", max = "1.0")
-//	private double quantile;
-	
 	@Override
-	public void compute(final Iterable<I> input, final Double quantile, final O output) {
-		final DoubleArray statistics;
-		if(input instanceof IterableInterval) {
-			statistics = new DoubleArray(0);
-			statistics.ensureCapacity(ArrayUtils.safeMultiply32(Intervals.numElements((IterableInterval<?>)input)));
-		}
-		else 
-			statistics = new DoubleArray();
+	public void compute(final Iterable<I> input, final Double quantile,
+		final O output)
+	{
+		final ArrayList<Double> statistics = new ArrayList<>();
 
 		final Iterator<I> it = input.iterator();
-		int counter = 0;
 		while (it.hasNext()) {
-			statistics.addValue(counter++, it.next().getRealDouble());
+			statistics.add(it.next().getRealDouble());
 		}
 
-		output.setReal(select(statistics, 0, statistics.size() - 1, (int) (statistics
-			.size() * quantile)));
+		output.setReal(select(statistics, (int) (statistics.size() * quantile)));
 	}
 
 	/**
 	 * Returns the value of the kth lowest element. Do note that for nth lowest
 	 * element, k = n - 1.
+	 * <p>
+	 * This an all-in-one method version of your basic quick select algorithm.
+	 * </p>
 	 */
-	private double select(final DoubleArray array, final int inLeft,
-		final int inRight, final int k)
+	static double select(final ArrayList<Double> array, final int k)
 	{
 
-		int left = inLeft;
-		int right = inRight;
+		int left = 0;
+		int right = array.size() - 1;
 
 		while (true) {
 
 			if (right <= left + 1) {
 
-				if (right == left + 1 && array.getValue(right) < array.getValue(left)) {
+				if (right == left + 1 && array.get(right) < array.get(left)) {
 					swap(array, left, right);
 				}
 
-				return array.getValue(k);
+				return array.get(k);
 
 			}
-			final int middle = left + right >>> 1;
+			final int middle = (left + right) >>> 1;
 			swap(array, middle, left + 1);
 
-			if (array.getValue(left) > array.getValue(right)) {
+			if (array.get(left) > array.get(right)) {
 				swap(array, left, right);
 			}
 
-			if (array.getValue(left + 1) > array.getValue(right)) {
+			if (array.get(left + 1) > array.get(right)) {
 				swap(array, left + 1, right);
 			}
 
-			if (array.getValue(left) > array.getValue(left + 1)) {
+			if (array.get(left) > array.get(left + 1)) {
 				swap(array, left, left + 1);
 			}
 
 			int i = left + 1;
 			int j = right;
-			final double pivot = array.getValue(left + 1);
+			final double pivot = array.get(left + 1);
 
 			while (true) {
 				do
 					++i;
-				while (array.getValue(i) < pivot);
+				while (array.get(i) < pivot);
 				do
 					--j;
-				while (array.getValue(j) > pivot);
+				while (array.get(j) > pivot);
 
 				if (j < i) {
 					break;
@@ -139,7 +135,7 @@ implements Computers.Arity2<Iterable<I>, Double, O>
 				swap(array, i, j);
 			}
 
-			array.set(left + 1, array.getValue(j));
+			array.set(left + 1, array.get(j));
 			array.set(j, pivot);
 
 			if (j >= k) {
@@ -150,12 +146,5 @@ implements Computers.Arity2<Iterable<I>, Double, O>
 				left = i;
 			}
 		}
-	}
-
-	/** Helper method for swapping array entries */
-	private void swap(final DoubleArray array, final int a, final int b) {
-		final double temp = array.getValue(a);
-		array.set(a, array.getValue(b));
-		array.set(b, temp);
 	}
 }

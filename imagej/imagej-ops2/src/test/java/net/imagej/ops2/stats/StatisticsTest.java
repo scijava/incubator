@@ -156,13 +156,6 @@ public class StatisticsTest extends AbstractOpTest {
 	}
 
 	@Test
-	public void testMedian() {
-		final DoubleType median = new DoubleType();
-		op("stats.median").input(randomlyFilledImg).output(median).compute();
-		Assert.assertEquals("Median", 128d, median.getRealDouble(), 0.00001d);
-	}
-
-	@Test
 	public void testMin() {
 		final UnsignedByteType min = new UnsignedByteType();
 		op("stats.min").input(randomlyFilledImg).output(min).compute();

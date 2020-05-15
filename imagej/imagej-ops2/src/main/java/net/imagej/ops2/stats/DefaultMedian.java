@@ -29,11 +29,12 @@
 
 package net.imagej.ops2.stats;
 
+import java.util.ArrayList;
+
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.core.Op;
-import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
@@ -45,6 +46,7 @@ import org.scijava.struct.ItemIO;
  * @author Daniel Seebacher (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
  * @author Jan Eglinger
+ * @author Richard Domander
  * @param <I>
  *            input type
  * @param <O>
@@ -61,7 +63,18 @@ public class DefaultMedian<I extends RealType<I>, O extends RealType<O>>
 
 	@Override
 	public void compute(final Iterable<I> input, final O output) {
-		quantileOp.compute(input, 0.5d, output);
+		final ArrayList<Double> statistics = new ArrayList<>();
+
+		input.forEach(i -> statistics.add(i.getRealDouble()));
+
+		final int k = statistics.size() / 2;
+		double result = DefaultQuantile.select(statistics, k);
+		if (statistics.size() % 2 == 0) {
+			result += DefaultQuantile.select(statistics, k - 1);
+			result *= 0.5;
+		}
+
+		output.setReal(result);
 	}
 
 }
