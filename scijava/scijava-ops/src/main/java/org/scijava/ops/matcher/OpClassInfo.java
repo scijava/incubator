@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import org.scijava.core.Priority;
+import org.scijava.Priority;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpUtils;
 import org.scijava.param.ParameterStructs;
