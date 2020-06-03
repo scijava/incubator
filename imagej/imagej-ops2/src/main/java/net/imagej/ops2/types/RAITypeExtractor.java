@@ -1,8 +1,10 @@
 /*
  * #%L
- * SciJava Operations: a framework for reusable algorithms.
+ * SciJava Common shared library for SciJava software.
  * %%
- * Copyright (C) 2016 - 2019 SciJava Ops developers.
+ * Copyright (C) 2009 - 2016 Board of Regents of the University of
+ * Wisconsin-Madison, Broad Institute of MIT and Harvard, and Max Planck
+ * Institute of Molecular Cell Biology and Genetics.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,39 +29,50 @@
  * #L%
  */
 
-package org.scijava.types;
+package net.imagej.ops2.types;
 
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.util.Util;
 
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.types.TypeExtractor;
+import org.scijava.types.TypeService;
 
 /**
- * {@link TypeExtractor} plugin which operates on {@link GenericTyped} objects.
+ * {@link TypeExtractor} plugin which operates on
+ * {@link RandomAccessibleInterval} objects.
  * <p>
- * We assume that if the Object implements {@link GenericTyped} then it knows
- * best about what type it is.
+ * Note that this {@link TypeExtractor} is low priority since we prefer subclass
+ * TypeExtractors to take pre
  * </p>
  *
  * @author Gabriel Selzer
  */
-@Plugin(type = TypeExtractor.class, priority = Priority.HIGH)
-public class GenericTypedTypeExtractor implements TypeExtractor<GenericTyped> {
+@Plugin(type = TypeExtractor.class, priority = Priority.LOW)
+public class RAITypeExtractor implements
+	TypeExtractor<RandomAccessibleInterval<?>>
+{
 
 	@Parameter
 	private TypeService typeService;
-	
+
 	@Override
-	public ParameterizedType reify(final GenericTyped o) {
-		// TODO: is this safe?
-		return (ParameterizedType) o.getType();
+	public Type reify(final RandomAccessibleInterval<?> o, final int n) {
+		if (n != 0) throw new IndexOutOfBoundsException();
+
+		// type of the image
+		Type raiType = typeService.reify(Util.getTypeFromInterval(o));
+		return raiType;
 	}
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Class<GenericTyped> getRawType() {
-		return GenericTyped.class;
+	public Class<RandomAccessibleInterval<?>> getRawType() {
+		return (Class) RandomAccessibleInterval.class;
 	}
 
 }

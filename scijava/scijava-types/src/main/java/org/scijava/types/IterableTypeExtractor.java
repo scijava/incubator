@@ -33,6 +33,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
@@ -42,9 +43,9 @@ import org.scijava.types.Types;
 /**
  * {@link TypeExtractor} plugin which operates on {@link Iterable} objects.
  * <p>
- * For performance reasons, we examine only the first element of the iteration,
- * which may be a more specific type than later elements. Hence the generic type
- * given by this extraction may be overly constrained.
+ * In an attempt to balance performance and correctness, we examine the first
+ * 100 elements of the iteration and obtain the greatest common supertype of
+ * each.
  * </p>
  *
  * @author Curtis Rueden
@@ -57,23 +58,20 @@ public class IterableTypeExtractor implements TypeExtractor<Iterable<?>> {
 
 	@Override
 	public Type reify(final Iterable<?> o, final int n) {
-		if (n != 0)
-			throw new IndexOutOfBoundsException();
+		if (n != 0) throw new IndexOutOfBoundsException();
 
 		final Iterator<?> iterator = o.iterator();
-		if (!iterator.hasNext())
-			return null;
+		if (!iterator.hasNext()) return null;
 
 		// Obtain the element type using the TypeService.
 		int typesToCheck = 100;
-		//can we make this more efficient?
-		List<Type> typeList = new ArrayList<>();
-		for (int i = 0; i < typesToCheck; i++) {
-			if(!iterator.hasNext()) break;
-			typeList.add(typeService.reify(iterator.next()));
-		}
+		// can we make this more efficient (possibly a parallel stream)?
+		Type[] types = StreamSupport.stream(o.spliterator(), false) //
+			.limit(typesToCheck) //
+			.map(s -> typeService.reify(s)) //
+			.toArray(Type[]::new);
 
-		return Types.greatestCommonSuperType(typeList.toArray(new Type[] {}), true);
+		return Types.greatestCommonSuperType(types, true);
 		// TODO: Avoid infinite recursion when the list references itself.
 	}
 
