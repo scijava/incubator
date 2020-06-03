@@ -20,25 +20,25 @@ module org.scijava.ops {
 	exports org.scijava.param;
 	exports org.scijava.struct;
 
-  opens org.scijava.core;
-  opens org.scijava.monitor;
-	opens org.scijava.ops;
-  opens org.scijava.ops.adapt;
-  opens org.scijava.ops.adapt.complexLift;
-  opens org.scijava.ops.adapt.functional;
-  opens org.scijava.ops.adapt.lift;
-  opens org.scijava.ops.copy;
-  opens org.scijava.ops.core;
-  opens org.scijava.ops.core.builder;
-  opens org.scijava.ops.create;
-  opens org.scijava.ops.function;
-  opens org.scijava.ops.log;
-	opens org.scijava.ops.matcher;
-	opens org.scijava.ops.math;
-	opens org.scijava.ops.stats;
-	opens org.scijava.ops.util;
-	opens org.scijava.param;
-	opens org.scijava.struct;
+  opens org.scijava.core to org.scijava;
+  opens org.scijava.monitor to org.scijava;
+	opens org.scijava.ops to org.scijava;
+  opens org.scijava.ops.adapt to org.scijava;
+  opens org.scijava.ops.adapt.complexLift to org.scijava;
+  opens org.scijava.ops.adapt.functional to org.scijava;
+  opens org.scijava.ops.adapt.lift to org.scijava;
+  opens org.scijava.ops.copy to org.scijava;
+  opens org.scijava.ops.core to org.scijava;
+  opens org.scijava.ops.core.builder to org.scijava;
+  opens org.scijava.ops.create to org.scijava;
+  opens org.scijava.ops.function to org.scijava;
+  opens org.scijava.ops.log to org.scijava;
+	opens org.scijava.ops.matcher to org.scijava;
+	opens org.scijava.ops.math to org.scijava;
+	opens org.scijava.ops.stats to org.scijava;
+	opens org.scijava.ops.util to org.scijava;
+	opens org.scijava.param to org.scijava;
+	opens org.scijava.struct to org.scijava;
 
   // FIXME: This is a file name and is thus unstable
   requires geantyref;
