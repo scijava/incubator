@@ -1,6 +1,5 @@
 module org.scijava.ops {
 
-  exports org.scijava.core;
   exports org.scijava.monitor;
 	exports org.scijava.ops;
   exports org.scijava.ops.adapt;
@@ -20,7 +19,6 @@ module org.scijava.ops {
 	exports org.scijava.param;
 	exports org.scijava.struct;
 
-  opens org.scijava.core to org.scijava;
   opens org.scijava.monitor to org.scijava;
 	opens org.scijava.ops to org.scijava;
   opens org.scijava.ops.adapt to org.scijava;

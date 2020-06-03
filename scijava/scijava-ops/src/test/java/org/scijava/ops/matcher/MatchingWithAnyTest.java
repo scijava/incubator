@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.junit.Test;
-import org.scijava.core.Priority;
+import org.scijava.Priority;
 import org.scijava.ops.AbstractTestEnvironment;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.core.builder.OpBuilder;
