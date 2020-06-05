@@ -214,10 +214,33 @@
 
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
+		<guava.version>28.2-jre</guava.version>
 		
 		<scijava-common.version>2.83.1</scijava-common.version>
 		<parsington.version>2.0.0</parsington.version>
 	</properties>
+
+  	<build>
+        <plugins>
+            <plugin>
+            	<groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>union-metadata-indices</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                        	<goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${basedir}/unionPluginInfo.sh</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 	<repositories>
 		<repository>
@@ -252,10 +275,6 @@
 		</dependency>
 		<dependency>
 			<groupId>net.imglib2</groupId>
-			<artifactId>imglib2-realtransform</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-roi</artifactId>
 		</dependency>
 
@@ -267,12 +286,7 @@
 		<dependency>
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.scijava</groupId>
-			<artifactId>scijava-search</artifactId>
-		</dependency>
-		<dependency>
+		</dependency>		<dependency>
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-ops</artifactId>
 			<version>${project.version}</version>
@@ -289,6 +303,10 @@
 		</dependency>
 
 		<!-- Third party dependencies -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
@@ -314,11 +332,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.scijava</groupId>
-			<artifactId>junit-benchmarks</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.scijava</groupId>
 			<artifactId>scijava-test-util</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -338,16 +351,6 @@
 			<!-- Do not remove - Maven incorrectly identifies it as an unused dependency!  -->
 			<groupId>org.scijava</groupId>
 			<artifactId>scripting-jython</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.imagej</groupId>
-			<artifactId>ij</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.imglib2</groupId>
-			<artifactId>imglib2-ij</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

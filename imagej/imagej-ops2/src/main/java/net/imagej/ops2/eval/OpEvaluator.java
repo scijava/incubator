@@ -40,11 +40,11 @@ import org.scijava.ops.OpService;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
 import org.scijava.types.TypeService;
-import org.scijava.parse.Operator;
-import org.scijava.parse.Operators;
-import org.scijava.parse.Variable;
-import org.scijava.parse.eval.AbstractStandardStackEvaluator;
-import org.scijava.parse.eval.Evaluator;
+import org.scijava.parsington.Operator;
+import org.scijava.parsington.Operators;
+import org.scijava.parsington.Variable;
+import org.scijava.parsington.eval.AbstractStandardStackEvaluator;
+import org.scijava.parsington.eval.Evaluator;
 
 /**
  * A Parsington {@link Evaluator} using available {@link Op}s.
