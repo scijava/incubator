@@ -1,4 +1,4 @@
-package org.scijava.ops;
+package org.scijava.ops.monitor;
 
 import java.math.BigInteger;
 import java.util.concurrent.CancellationException;
@@ -9,9 +9,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.junit.Test;
-import org.scijava.monitor.DefaultOpMonitor;
+import org.scijava.ops.AbstractTestEnvironment;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Functions;
+import org.scijava.ops.monitor.DefaultOpMonitor;
+import org.scijava.ops.monitor.OpMonitor;
 import org.scijava.types.Nil;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
