@@ -32,7 +32,7 @@ package net.imagej.ops2.math;
 import net.imglib2.type.numeric.NumericType;
 import net.imglib2.type.numeric.RealType;
 
-import org.scijava.core.Priority;
+import org.scijava.Priority;
 import org.scijava.ops.OpField;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
