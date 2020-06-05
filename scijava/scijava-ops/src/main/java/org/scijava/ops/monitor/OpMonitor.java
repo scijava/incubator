@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
-package org.scijava.ops;
+package org.scijava.ops.monitor;
 
 import java.util.concurrent.CancellationException;
 
