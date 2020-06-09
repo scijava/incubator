@@ -292,14 +292,13 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 			Map<TypeVariable<?>, Type> map = new HashMap<>();
 			// make sure that the adaptor outputs the correct type
 			if (opType instanceof ParameterizedType) {
-				// TODO: remove try/catch
-				try {
-					if (!MatchingUtils.checkGenericAssignability(adaptTo, (ParameterizedType) opType, map, true))
-						continue;
-				} catch (IllegalArgumentException e) {
+				if (!MatchingUtils.checkGenericAssignability(adaptTo,
+					(ParameterizedType) opType, map, true))
+				{
 					continue;
 				}
-			} else if (!Types.isAssignable(opType, adaptTo, map)) {
+			}
+			else if (!Types.isAssignable(opType, adaptTo, map)) {
 				continue;
 			}
 			// make sure that the adaptor is a Function (so we can cast it later)
