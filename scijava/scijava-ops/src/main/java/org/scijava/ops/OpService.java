@@ -38,11 +38,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,8 +58,6 @@ import org.scijava.ops.matcher.OpInfo;
 import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpRef;
-import org.scijava.types.Nil;
-import org.scijava.types.TypeService;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
 import org.scijava.param.ParameterStructs;
@@ -74,8 +69,10 @@ import org.scijava.service.AbstractService;
 import org.scijava.service.SciJavaService;
 import org.scijava.service.Service;
 import org.scijava.struct.ItemIO;
-import org.scijava.util.ClassUtils;
+import org.scijava.types.Nil;
+import org.scijava.types.TypeService;
 import org.scijava.types.Types;
+import org.scijava.util.ClassUtils;
 
 /**
  * Service to provide a list of available ops structured in a prefix tree and to
@@ -96,11 +93,6 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 
 	@Parameter
 	private TypeService typeService;
-
-	/**
-	 * Prefix tree to cache and quickly find {@link OpInfo}s.
-	 */
-	// private PrefixTree<OpInfo> opCache;
 
 	/**
 	 * Map to collect all aliases for a specific op. All aliases will map to one
@@ -477,316 +469,5 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 			throw new OpMatchingException(error);
 		}
 		return new OpRef(name, new Type[] { type }, mappedOutputs[0], mappedInputs);
-	}
-
-	/**
-	 * Constructs a string with the specified number of tabs '\t'.
-	 *
-	 * @param numOfTabs
-	 * @return
-	 */
-	private static String getIndent(int numOfTabs) {
-		String str = "";
-		for (int i = 0; i < numOfTabs; i++) {
-			str += "\t";
-		}
-		return str;
-	}
-
-	/**
-	 * Class to represent a query for a {@link PrefixTree}. Prefixes must be
-	 * separated by dots ('.'). E.g. 'math.add'. These queries are used in order to
-	 * specify the level where elements should be inserted into or retrieved from
-	 * the tree.
-	 */
-	private static class PrefixQuery {
-		String cachedToString;
-
-		LinkedList<String> list = new LinkedList<>();
-
-		public static PrefixQuery all() {
-			return new PrefixQuery("");
-		}
-
-		/**
-		 * Construct a new query from the specified string. Prefixes must be separated
-		 * by dots.
-		 *
-		 * @param query
-		 *            the string to use as query
-		 */
-		public PrefixQuery(String query) {
-			if (query == null || query.isEmpty()) {
-				return;
-			}
-			for (String s : query.split("\\.")) {
-				list.add(s);
-			}
-			cachedToString = string();
-		}
-
-		/**
-		 * Remove and return the first prefix.
-		 *
-		 * @return
-		 */
-		public String pop() {
-			return list.removeFirst();
-		}
-
-		/**
-		 * Whether there are more prefixes.
-		 *
-		 * @return
-		 */
-		public boolean hasNext() {
-			return !list.isEmpty();
-		}
-
-		private String string() {
-			int i = 1;
-			String toString = "root \u00AC \n";
-			for (String s : list) {
-				toString += getIndent(i);
-				toString += s + " \u00AC \n";
-				i++;
-			}
-			return toString.substring(0, toString.length() - 3);
-		}
-
-		@Override
-		public String toString() {
-			return cachedToString;
-		}
-	}
-
-	/**
-	 * Data structure to group elements which share common prefixes. E.g. adding the
-	 * following elements:
-	 *
-	 * <pre>
-	 *	Prefix:		Elem:
-	 *	"math.add"	obj1
-	 *	"math.add"	obj2
-	 *	"math.sqrt"	obj3
-	 *	"math"		obj4
-	 *	""		obj5
-	 * </pre>
-	 *
-	 * Will result in the following tree:
-	 *
-	 * <pre>
-	 *               root [obj5]
-	 *                     |
-	 *                     |
-	 *                math [obj4]
-	 *               /           \
-	 *              /             \
-	 *      add [obj1, obj2]   sqrt [obj3]
-	 * </pre>
-	 *
-	 * @author David Kolb
-	 *
-	 * @param <T>
-	 */
-	private static class PrefixTree<T> {
-		private PrefixNode<T> root;
-
-		public PrefixTree() {
-			root = new PrefixNode<>();
-		}
-
-		/**
-		 * Adds the specified element on the level represented by the specified query.
-		 * This method is in O(#number of prefixes in query)
-		 *
-		 * @param query
-		 * @param node
-		 * @param data
-		 */
-		public void add(PrefixQuery query, T data) {
-			add(query, root, data);
-		}
-
-		private void add(PrefixQuery query, PrefixNode<T> node, T data) {
-			if (query.hasNext()) {
-				String level = query.pop();
-				PrefixNode<T> child = node.getChildOrCreate(level);
-				add(query, child, data);
-			} else {
-				node.data.add(data);
-			}
-		}
-
-		/**
-		 * Collects all elements of the level specified by the query and below. E.g.
-		 * using the query 'math' on the example tree from the javadoc of this class
-		 * would return all elements contained in the tree except for 'obj5'. 'math.add'
-		 * would only return 'obj1' and 'obj2'. This method returns an iterable over
-		 * these elements in O(# number of all nodes below query). The number of nodes
-		 * is the number of distinct prefixes below the specified query.
-		 *
-		 * @param query
-		 * @return
-		 */
-		public Iterable<T> getAndBelow(PrefixQuery query) {
-			PrefixNode<T> queryNode = findNode(query);
-			LinkedLinkedLists list = new LinkedLinkedLists();
-			collectAll(queryNode, list);
-			return () -> list.iterator();
-		}
-
-		private PrefixNode<T> findNode(PrefixQuery query) {
-			return findNode(query, root);
-		}
-
-		private PrefixNode<T> findNode(PrefixQuery query, PrefixNode<T> node) {
-			if (query.hasNext()) {
-				String level = query.pop();
-				PrefixNode<T> child = node.getChild(level);
-				if (child != null) {
-					return findNode(query, child);
-				}
-			}
-			return node;
-		}
-
-		private void collectAll(PrefixNode<T> node, LinkedLinkedLists list) {
-			if (node.hasData()) {
-				list.append(node.data);
-			}
-			for (PrefixNode<T> v : node.children.values()) {
-				collectAll(v, list);
-			}
-		}
-
-		/**
-		 * Wrapper for {@link ArrayList}s providing O(1) concatenation of lists if only
-		 * an iterator over theses lists is required. The order of lists will be
-		 * retained. Added lists will be simply saved in a super LinkedList. If the
-		 * iterator reaches the end of one list, it will switch to the next if
-		 * available.
-		 *
-		 * @author David Kolb
-		 */
-		private class LinkedLinkedLists implements Iterable<T> {
-
-			LinkedList<LinkedList<T>> lists = new LinkedList<>();
-
-			long size = 0;
-
-			private void append(LinkedList<T> list) {
-				lists.add(list);
-				size += list.size();
-			}
-
-			@Override
-			public Iterator<T> iterator() {
-				return new LinkedIterator();
-			}
-
-			private class LinkedIterator implements Iterator<T> {
-
-				private Iterator<LinkedList<T>> listsIter = lists.iterator();
-				private Iterator<T> currentIter;
-
-				public LinkedIterator() {
-					if (!lists.isEmpty()) {
-						currentIter = listsIter.next().iterator();
-					}
-				}
-
-				@Override
-				public boolean hasNext() {
-					if (currentIter == null) {
-						return false;
-					}
-					// if there are still lists available, possibly switch
-					// to the next one
-					if (listsIter.hasNext()) {
-						// if the current iterator still has elements we are
-						// fine, if not
-						// switch to the next one
-						if (!currentIter.hasNext()) {
-							currentIter = listsIter.next().iterator();
-						}
-					}
-					return currentIter.hasNext();
-				}
-
-				@Override
-				public T next() {
-					return currentIter.next();
-				}
-			}
-
-			@Override
-			public String toString() {
-				StringBuilder sb = new StringBuilder();
-				int i = 0;
-				for (LinkedList<T> l : lists) {
-					sb.append(i + ".) ");
-					sb.append(l.toString() + "\n");
-					i++;
-				}
-				return sb.toString();
-			}
-		}
-
-		private static class PrefixNode<T> {
-			private LinkedList<T> data = new LinkedList<>();
-			private Map<String, PrefixNode<T>> children = new HashMap<>();
-
-			public PrefixNode<T> getChildOrCreate(String id) {
-				if (children.containsKey(id)) {
-					return children.get(id);
-				} else {
-					PrefixNode<T> n = new PrefixNode<>();
-					children.put(id, n);
-					return n;
-				}
-			}
-
-			public PrefixNode<T> getChild(String id) {
-				return children.get(id);
-			}
-
-			public boolean hasData() {
-				return !data.isEmpty();
-			}
-		}
-
-		private String nodeToString(PrefixNode<T> node, String nodeName, StringBuilder sb, int level) {
-			if (node.children.isEmpty() && node.data.isEmpty()) {
-				return "";
-			}
-			sb.append(getIndent(level) + "Node -> Name: [");
-			sb.append(nodeName + "]\n");
-			sb.append(getIndent(level) + "Data:\n");
-			for (T t : node.data) {
-				sb.append(getIndent(level) + "\t" + t.getClass().getSimpleName() + "\n");
-			}
-			if (!node.data.isEmpty()) {} else {
-				sb.delete(sb.length() - 1, sb.length());
-				sb.append(" <empty>\n");
-			}
-
-			sb.append(getIndent(level) + "Children:\n");
-
-			for (Entry<String, PrefixNode<T>> e : node.children.entrySet()) {
-				String sub = nodeToString(e.getValue(), e.getKey(), new StringBuilder(), level + 1);
-				sb.append(sub + "\n");
-			}
-			if (!node.children.isEmpty()) {} else {
-				sb.delete(sb.length() - 1, sb.length());
-				sb.append(" <empty>\n");
-			}
-			return sb.toString();
-		}
-
-		@Override
-		public String toString() {
-			return nodeToString(root, "root", new StringBuilder(), 0);
-		}
 	}
 }
