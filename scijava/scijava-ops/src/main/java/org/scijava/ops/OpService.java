@@ -40,6 +40,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -98,7 +100,7 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 	 * Map to collect all aliases for a specific op. All aliases will map to one
 	 * canonical name of the op which is defined as the first one.
 	 */
-	private Map<String, List<OpInfo>> opCache;
+	private Map<String, Set<OpInfo>> opCache;
 
 	private Map<Class<?>, OpWrapper<?>> wrappers;
 
@@ -155,7 +157,7 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 		}
 		for (String opName : parsedOpNames) {
 			if (!opCache.containsKey(opName))
-				opCache.put(opName, new ArrayList<>());
+				opCache.put(opName, new TreeSet<>());
 			opCache.get(opName).add(opInfo);
 		}
 	}
@@ -176,10 +178,7 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 		if (name == null || name.isEmpty()) {
 			return infos();
 		}
-		Iterable<OpInfo> infos = opCache.get(name);
-		if (infos == null)
-			throw new IllegalArgumentException("No op infos with name: " + name + " available.");
-		return infos;
+		return opsOfName(name);
 	}
 
 	private OpMatcher getOpMatcher() {
@@ -279,15 +278,10 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 	 * @throws OpMatchingException
 	 */
 	private AdaptedOp adaptOp(OpRef ref) throws OpMatchingException {
-		Type opType = ref.getTypes()[0];
-		List<OpInfo> adaptors = opCache.get("adapt");
-		// TODO: is there a better way to handle this?
-		if (adaptors == null)
-			throw new OpMatchingException("No adapt Ops available");
+		// FIXME: Need to validate against all types, not just the first.
+		final Type opType = ref.getTypes()[0];
 
-		Collections.sort(adaptors, (OpInfo i1, OpInfo i2) -> i1.priority() < i2.priority() ? 1 : i1.priority() == i2.priority() ? 0 : -1);
-
-		for (final OpInfo adaptor : adaptors) {
+		for (final OpInfo adaptor : opsOfName("adapt")) {
 			Type adaptTo = adaptor.output().getType();
 			Map<TypeVariable<?>, Type> map = new HashMap<>();
 			// make sure that the adaptor outputs the correct type
@@ -468,5 +462,10 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 			throw new OpMatchingException(error);
 		}
 		return new OpRef(name, new Type[] { type }, mappedOutputs[0], mappedInputs);
+	}
+
+	private Set<OpInfo> opsOfName(final String name) {
+		final Set<OpInfo> ops = opCache.getOrDefault(name, Collections.emptySet());
+		return Collections.unmodifiableSet(ops);
 	}
 }
