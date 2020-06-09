@@ -85,7 +85,7 @@ public class FrangiVesselnessTest{
 		final String resourcePath)
 	{
 		final URL url = getClass().getResource(resourcePath);
-		return IO.openFloat(url.getPath()).get(0).getImg();
+		return IO.openFloat(url.getPath()).getImg();
 	}
 
 	@Test

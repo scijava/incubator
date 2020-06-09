@@ -107,21 +107,21 @@ public abstract class AbstractOpTest{
 		final String resourcePath)
 	{
 		final URL url = c.getResource(resourcePath);
-		return IO.openFloat(url.getPath()).get(0).getImg();
+		return IO.openFloat(url.getPath()).getImg();
 	}
 
 	public static Img<UnsignedByteType> openUnsignedByteType(final Class<?> c,
 		final String resourcePath)
 	{
 		final URL url = c.getResource(resourcePath);
-		return IO.openUnsignedByte(url.getPath()).get(0).getImg();
+		return IO.openUnsignedByte(url.getPath()).getImg();
 	}
 
 	public static Img<DoubleType> openDoubleImg(final Class<?> c,
 		final String resourcePath)
 	{
 		final URL url = c.getResource(resourcePath);
-		return IO.openDouble(url.getPath()).get(0).getImg();
+		return IO.openDouble(url.getPath()).getImg();
 	}
 
 	public static <T> RandomAccessible<T> deinterval(
