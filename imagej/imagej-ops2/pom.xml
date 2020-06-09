@@ -214,10 +214,6 @@
 
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
-		<guava.version>28.2-jre</guava.version>
-		
-		<scijava-common.version>2.83.1</scijava-common.version>
-		<parsington.version>2.0.0</parsington.version>
 	</properties>
 
 	<build>
