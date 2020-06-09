@@ -364,7 +364,7 @@ public class OpService extends AbstractService implements SciJavaService, OpEnvi
 	 * @param match
 	 *            - where to retrieve the {@link OpInfo} if no transformation is
 	 *            needed.
-	 * @param transformation
+	 * @param adaptationInfo
 	 *            - where to retrieve the {@link OpInfo} if a transformation is
 	 *            needed.
 	 * @return an {@link Op} wrapping of op.
