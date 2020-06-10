@@ -67,9 +67,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.RandomAccessibleIntervalCursor;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.junit.Before;
-import org.scijava.Context;
-import org.scijava.ops.OpService;
+import org.junit.jupiter.api.BeforeEach;
 import org.scijava.util.LongArray;
 
 /**
@@ -115,7 +113,7 @@ public class AbstractFeatureTest extends AbstractOpTest {
 	protected Img<UnsignedByteType> ellipse;
 	protected Img<UnsignedByteType> rotatedEllipse;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		final ImageGenerator dataGenerator = new ImageGenerator(SEED);
 		final long[] dim = new long[] { 100, 100 };

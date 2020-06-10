@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.image.ascii;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.img.Img;
@@ -37,7 +37,7 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.util.Pair;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.types.Nil;
 

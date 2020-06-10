@@ -40,9 +40,8 @@ import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Stefan Helfrich (University of Konstanz)
@@ -56,7 +55,7 @@ public class SquareIntegralImgTest extends AbstractOpTest {
 	 *
 	 * @throws Exception
 	 */
-	@Before
+	@BeforeEach
 	public void before() throws Exception {
 		out = TestImgGeneration.doubleArray(true, new long[] { 3, 3 });
 	}

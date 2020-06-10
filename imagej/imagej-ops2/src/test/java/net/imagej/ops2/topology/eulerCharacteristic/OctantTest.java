@@ -28,16 +28,16 @@
  */
 package net.imagej.ops2.topology.eulerCharacteristic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.logic.BitType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the {@link Octant} convenience class
@@ -52,13 +52,15 @@ public class OctantTest {
 
         octant.setNeighborhood(1, 1, 1);
 
-        assertTrue("Neighborhood should be empty", octant.isNeighborhoodEmpty());
+				assertTrue(octant.isNeighborhoodEmpty(),
+					"Neighborhood should be empty");
 
-        img.forEach(BitType::setOne);
-        octant.setNeighborhood(1, 1, 1);
+				img.forEach(BitType::setOne);
+				octant.setNeighborhood(1, 1, 1);
 
-        assertFalse("Neighborhood should not be empty", octant.isNeighborhoodEmpty());
-    }
+				assertFalse(octant.isNeighborhoodEmpty(),
+					"Neighborhood should not be empty");
+	    }
 
     @Test
     public void testSetNeighborhood() throws Exception {
@@ -77,10 +79,12 @@ public class OctantTest {
             }
         }
 
-        octant.setNeighborhood(1, 1, 1);
-        assertEquals("All neighbours should be foreground", 8, octant.getNeighborCount());
+				octant.setNeighborhood(1, 1, 1);
+				assertEquals(8, octant.getNeighborCount(),
+					"All neighbours should be foreground");
 
-        octant.setNeighborhood(2, 2, 2);
-        assertEquals("Wrong number of foreground neighbors", 1, octant.getNeighborCount());
-    }
+				octant.setNeighborhood(2, 2, 2);
+				assertEquals(1, octant.getNeighborCount(),
+					"Wrong number of foreground neighbors");
+	    }
 }

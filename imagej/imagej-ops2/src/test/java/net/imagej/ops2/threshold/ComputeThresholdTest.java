@@ -33,7 +33,7 @@ package net.imagej.ops2.threshold;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
 import org.scijava.ops.function.Computers;

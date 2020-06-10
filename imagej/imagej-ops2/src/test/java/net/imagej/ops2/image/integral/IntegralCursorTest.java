@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.image.integral;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
@@ -43,8 +43,8 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.img.basictypeaccess.array.ByteArray;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link IntegralCursor} implementation.
@@ -55,7 +55,7 @@ public class IntegralCursorTest {
 
 	protected ArrayImg<ByteType, ByteArray> img;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		this.img = generateKnownByteArrayTestImg();
 	}

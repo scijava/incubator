@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.topology;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 import java.util.PrimitiveIterator;
@@ -47,7 +47,7 @@ import net.imglib2.util.ValuePair;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -79,10 +79,10 @@ public class BoxCountTest extends AbstractOpTest {
 
 		// VERIFY
 		assertNotNull(points);
-		assertEquals(ITERATIONS, points.size());
+		Assertions.assertEquals(ITERATIONS, points.size());
 		for (int i = 0; i < ITERATIONS; i++) {
-			assertEquals(EXPECTED_SIZES[i], points.get(i).a.get(), 1e-12);
-			assertEquals(expectedCount, points.get(i).b.get(), 1e-12);
+			Assertions.assertEquals(EXPECTED_SIZES[i], points.get(i).a.get(), 1e-12);
+			Assertions.assertEquals(expectedCount, points.get(i).b.get(), 1e-12);
 		}
 	}
 
@@ -103,8 +103,8 @@ public class BoxCountTest extends AbstractOpTest {
 
 		// VERIFY
 		for (int i = 0; i < ITERATIONS; i++) {
-			assertEquals(EXPECTED_SIZES[i], points.get(i).a.get(), 1e-12);
-			assertEquals(expectedCounts[i], points.get(i).b.get(), 1e-12);
+			Assertions.assertEquals(EXPECTED_SIZES[i], points.get(i).a.get(), 1e-12);
+			Assertions.assertEquals(expectedCounts[i], points.get(i).b.get(), 1e-12);
 		}
 	}
 
@@ -124,8 +124,8 @@ public class BoxCountTest extends AbstractOpTest {
 
 		// VERIFY
 		for (int i = 0; i < expectedSizes.length; i++) {
-			assertEquals(expectedSizes[i], points.get(i).a.get(), 1e-12);
-			assertEquals(expectedCounts[i], points.get(i).b.get(), 1e-12);
+			Assertions.assertEquals(expectedSizes[i], points.get(i).a.get(), 1e-12);
+			Assertions.assertEquals(expectedCounts[i], points.get(i).b.get(), 1e-12);
 		}
 	}
 
@@ -148,8 +148,8 @@ public class BoxCountTest extends AbstractOpTest {
 
 		// VERIFY
 		for (int i = 0; i < expectedSizes.length; i++) {
-			assertEquals(expectedSizes[i], points.get(i).a.get(), 1e-12);
-			assertEquals(expectedCounts[i], points.get(i).b.get(), 1e-12);
+			Assertions.assertEquals(expectedSizes[i], points.get(i).a.get(), 1e-12);
+			Assertions.assertEquals(expectedCounts[i], points.get(i).b.get(), 1e-12);
 		}
 	}
 
@@ -169,33 +169,39 @@ public class BoxCountTest extends AbstractOpTest {
 
 		// VERIFY
 		points.forEach(p -> {
-			assertEquals(p.a.get(), sizes.next(), 1e-12);
-			assertEquals(p.b.get(), counts.next(), 1e-12);
+			Assertions.assertEquals(p.a.get(), sizes.next(), 1e-12);
+			Assertions.assertEquals(p.b.get(), counts.next(), 1e-12);
 		});
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testThrowsIAEIfScalingEqualsOne() {
 		final Img<BitType> img = ArrayImgs.bits(9, 9, 9);
 
-		op("topology.boxCount").input(img, 8L, 2L, 1.0, 0L).outType(new Nil<List<ValuePair<DoubleType, DoubleType>>>(){}).apply();
-		
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			op("topology.boxCount").input(img, 8L, 2L, 1.0, 0L).outType(
+				new Nil<List<ValuePair<DoubleType, DoubleType>>>()
+				{}).apply();
+		});
+
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testLimitTranslationsThrowsIAEIfSizeNonPositive() {
-		BoxCount.limitTranslations(0L, 5L);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			BoxCount.limitTranslations(0L, 5L);
+		});
 	}
 
 	@Test
 	public void testLimitTranslationsNonPositiveTranslations() {
-		assertEquals(1L, BoxCount.limitTranslations(10L, 0L));
-		assertEquals(1L, BoxCount.limitTranslations(100L, -1L));
+		Assertions.assertEquals(1L, BoxCount.limitTranslations(10L, 0L));
+		Assertions.assertEquals(1L, BoxCount.limitTranslations(100L, -1L));
 	}
 
 	@Test
 	public void testLimitTranslations() {
-		assertEquals(9L, BoxCount.limitTranslations(10L, 9L));
-		assertEquals(10L, BoxCount.limitTranslations(10L, 11L));
+		Assertions.assertEquals(9L, BoxCount.limitTranslations(10L, 9L));
+		Assertions.assertEquals(10L, BoxCount.limitTranslations(10L, 11L));
 	}
 }

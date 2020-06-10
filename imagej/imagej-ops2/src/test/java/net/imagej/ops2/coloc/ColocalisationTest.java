@@ -53,8 +53,8 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.scijava.Context;
 import org.scijava.app.StatusService;
 import org.scijava.cache.CacheService;
@@ -78,7 +78,7 @@ public abstract class ColocalisationTest {
 	protected static Context context;
 	protected static OpService ops;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		context = new Context(OpService.class, CacheService.class,
 			ThreadService.class, StatusService.class, SCIFIOService.class,
@@ -94,7 +94,7 @@ public abstract class ColocalisationTest {
 	 * This method is run before every single test is run and is meant to set up
 	 * the images and meta data needed for testing image colocalisation.
 	 */
-	@Before
+	@BeforeEach
 	public void setup() {
 		zeroCorrelationImageCh1 = loadTiffFromJar("greenZstack.tif");
 		zeroCorrelationImageCh2 = loadTiffFromJar("redZstack.tif");

@@ -28,13 +28,13 @@
  */
 package net.imagej.ops2.image.watershed;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
 import org.scijava.util.MersenneTwisterFast;

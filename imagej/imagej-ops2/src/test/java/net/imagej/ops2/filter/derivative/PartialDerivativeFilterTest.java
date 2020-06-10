@@ -28,7 +28,7 @@
 
 package net.imagej.ops2.filter.derivative;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.test_util.TestImgGeneration;
@@ -42,7 +42,7 @@ import net.imglib2.view.composite.CompositeIntervalView;
 import net.imglib2.view.composite.CompositeView;
 import net.imglib2.view.composite.RealComposite;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.types.Nil;
 

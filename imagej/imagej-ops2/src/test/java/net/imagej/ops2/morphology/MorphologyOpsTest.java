@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.morphology;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
@@ -42,8 +42,8 @@ import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.FloatType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 public class MorphologyOpsTest extends AbstractOpTest {
@@ -54,7 +54,7 @@ public class MorphologyOpsTest extends AbstractOpTest {
 
 	private boolean initialized = false;
 
-	@Before
+	@BeforeEach
 	public void loadImages() {
 		if (initialized) {
 			return;
@@ -98,10 +98,12 @@ public class MorphologyOpsTest extends AbstractOpTest {
 
 	@Test
 	public void testExtractHoles() {
-		assertNotNull("Img Without Holes", op("morphology.extractHoles").input(imgWithoutHoles, new DiamondShape(1))
-				.outType(new Nil<Img<BitType>>() {}).apply());
-		assertNotNull("Img With Holes", op("morphology.extractHoles").input(imgWithHoles, new DiamondShape(1))
-				.outType(new Nil<Img<BitType>>() {}).apply());
+		assertNotNull(op("morphology.extractHoles").input(imgWithoutHoles,
+			new DiamondShape(1)).outType(new Nil<Img<BitType>>()
+		{}).apply(), "Img Without Holes");
+		assertNotNull(op("morphology.extractHoles").input(imgWithHoles,
+			new DiamondShape(1)).outType(new Nil<Img<BitType>>()
+		{}).apply(), "Img With Holes");
 	}
 
 	@Test

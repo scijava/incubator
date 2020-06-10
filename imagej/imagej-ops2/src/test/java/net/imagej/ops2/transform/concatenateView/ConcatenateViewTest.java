@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.array.ArrayImg;
 import net.imglib2.img.array.ArrayImgs;
@@ -44,13 +45,11 @@ import net.imglib2.view.IntervalView;
 import net.imglib2.view.StackView.StackAccessMode;
 import net.imglib2.view.Views;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import net.imagej.ops2.AbstractOpTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
-import org.scijava.ops.function.Functions;
 import org.scijava.util.MersenneTwisterFast;
 
 /**
@@ -77,7 +76,7 @@ public class ConcatenateViewTest extends AbstractOpTest {
 	final byte[] data = new byte[(int) numElements];
 	final ArrayImg<ByteType, ByteArray> img = ArrayImgs.bytes(data, dim);
 
-	@Before
+	@BeforeEach()
 	public void fillData() {
 		rng.nextBytes(data);
 	}
@@ -100,10 +99,10 @@ public class ConcatenateViewTest extends AbstractOpTest {
 
 	private static <T extends ValueEquals<T>> void testEqual(final RandomAccessibleInterval<T> rai1,
 			final RandomAccessibleInterval<T> rai2) {
-		Assert.assertArrayEquals(Intervals.minAsLongArray(rai1), Intervals.minAsLongArray(rai2));
-		Assert.assertArrayEquals(Intervals.maxAsLongArray(rai1), Intervals.maxAsLongArray(rai2));
+		Assertions.assertArrayEquals(Intervals.minAsLongArray(rai1), Intervals.minAsLongArray(rai2));
+		Assertions.assertArrayEquals(Intervals.maxAsLongArray(rai1), Intervals.maxAsLongArray(rai2));
 		for (final Pair<T, T> p : Views.interval(Views.pair(rai1, rai2), rai1))
-			Assert.assertTrue(p.getA().valueEquals(p.getB()));
+			Assertions.assertTrue(p.getA().valueEquals(p.getB()));
 	}
 
 	@Test

@@ -28,7 +28,7 @@
  */
 package net.imagej.ops2.features.haralick;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.ops2.features.AbstractFeatureTest;
@@ -37,9 +37,8 @@ import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.DoubleType;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Haralick features tested against matlab implementations and all formulas
@@ -59,7 +58,7 @@ public class HaralickFeatureTest extends AbstractOpTest {
 
 	private Img<UnsignedByteType> img;
 
-	@Before
+	@BeforeEach
 	public void loadImage() {
 		img = openUnsignedByteType(AbstractFeatureTest.class, "haralick_test_img.tif");
 	}

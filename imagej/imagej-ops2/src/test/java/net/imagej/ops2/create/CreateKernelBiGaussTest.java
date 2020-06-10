@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.create;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.RandomAccess;
@@ -37,7 +37,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.complex.ComplexDoubleType;
 import net.imglib2.type.numeric.real.DoubleType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.types.Nil;
 

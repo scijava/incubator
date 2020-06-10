@@ -28,7 +28,7 @@
  */
 package net.imagej.ops2.transform.extendRandomView;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessible;
@@ -38,7 +38,7 @@ import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;

@@ -28,7 +28,7 @@
  */
 package net.imagej.ops2.features.hog;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.ExecutorService;
 
@@ -38,7 +38,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.FloatType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
@@ -80,8 +80,8 @@ public class HistogramOfOrientedGradients2DTest extends AbstractOpTest {
 				for (int k = 0; k < hogTestImg.dimension(2); k++) {
 					raTest.setPosition(new long[] { i, j, k });
 					raOp.setPosition(new long[] { i, j, k });
-					assertEquals("i=" + i + ", j=" + j + ", k=" + k, raTest.get().getRealFloat(),
-							raOp.get().getRealFloat(), EPSILON);
+					assertEquals(raTest.get().getRealFloat(), raOp.get().getRealFloat(),
+						EPSILON, "i=" + i + ", j=" + j + ", k=" + k);
 				}
 			}
 		}

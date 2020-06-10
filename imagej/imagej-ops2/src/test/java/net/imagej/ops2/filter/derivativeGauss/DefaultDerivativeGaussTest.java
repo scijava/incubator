@@ -29,18 +29,20 @@
 
 package net.imagej.ops2.filter.derivativeGauss;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.test_util.TestImgGeneration;
 import net.imglib2.Cursor;
 import net.imglib2.FinalDimensions;
 import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.DoubleType;
+import net.imglib2.type.numeric.real.FloatType;
 
-import org.junit.Test;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -50,17 +52,24 @@ import org.scijava.types.Nil;
  */
 public class DefaultDerivativeGaussTest extends AbstractOpTest {
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test //(expected = IllegalArgumentException.class)
 	public void testImgParamDimensionsMismatch() {
-		final Img<DoubleType> input = op("convert.float64")
-				.input(TestImgGeneration.floatArray(false, 30, 30, 30)).outType(new Nil<Img<DoubleType>>() {}).apply();
+		final RandomAccessibleInterval<FloatType> input = TestImgGeneration
+			.floatArray(false, 30, 30, 30);
 
 		final Img<DoubleType> output = op("create.img").input(input)
 				.outType(new Nil<Img<DoubleType>>() {}).apply();
 
 		final int[] derivatives = new int[] { 1, 0 };
 		final double[] sigmas = new double[] { 1, 1 };
-		op("filter.derivativeGauss").input(input, derivatives, sigmas).output(output).compute();
+		IllegalArgumentException e = Assertions.assertThrows(
+			IllegalArgumentException.class, () -> {
+				op("filter.derivativeGauss").input(input, sigmas, derivatives).output(
+					output).compute();
+			});
+
+		Assertions.assertTrue(e.getMessage().equalsIgnoreCase(
+			"derivatives array must include values for each dimension!"));
 	}
 
 	@Test

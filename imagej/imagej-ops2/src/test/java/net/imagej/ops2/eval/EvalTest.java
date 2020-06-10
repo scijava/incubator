@@ -29,14 +29,14 @@
 
 package net.imagej.ops2.eval;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import net.imagej.ops2.AbstractOpTest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.OpService;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;

@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.copy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
@@ -46,8 +46,8 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
 import org.scijava.util.MersenneTwisterFast;
@@ -71,7 +71,7 @@ public class CopyRAITest extends AbstractOpTest {
 
 	double delta = 0.0000001;
 
-	@Before
+	@BeforeEach
 	public void createData() {
 		input = new ArrayImgFactory<>(new UnsignedByteType()).create(new int[] { 120, 100 });
 

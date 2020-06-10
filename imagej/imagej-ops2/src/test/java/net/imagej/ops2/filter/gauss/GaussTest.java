@@ -41,7 +41,8 @@ import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
 
@@ -79,7 +80,7 @@ public class GaussTest extends AbstractOpTest {
 		final Cursor<ByteType> c2 = out2.cursor();
 
 		while (c1.hasNext()) {
-			org.junit.Assert.assertEquals(c1.next().getRealDouble(), c2.next().getRealDouble(), 0);
+			Assertions.assertEquals(c1.next().getRealDouble(), c2.next().getRealDouble(), 0);
 		}
 	}
 	//

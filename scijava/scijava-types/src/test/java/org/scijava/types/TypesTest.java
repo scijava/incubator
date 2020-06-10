@@ -32,13 +32,13 @@
 
 package org.scijava.types;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.scijava.test.TestUtils.createTemporaryDirectory;
 
 import java.io.File;
@@ -68,7 +68,8 @@ import java.util.function.Function;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 import org.scijava.util.FileUtils;
 import org.scijava.types.Types;
@@ -151,9 +152,11 @@ public class TypesTest {
 	}
 
 	/** Tests {@link Types#load}. */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testLoadFailureLoud() {
-		Types.load("a.non.existent.class", false);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			Types.load("a.non.existent.class", false);
+		});
 	}
 
 	/** Tests {@link Types#location} with a class on the file system. */
@@ -202,11 +205,13 @@ public class TypesTest {
 	}
 
 	/** Tests exceptions from {@link Types#location(Class, boolean)}. */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testLocationFailureLoud() {
 		final Class<?> weirdClass = loadCustomClass();
 		assertEquals("Hello", weirdClass.getName());
-		Types.location(weirdClass, false);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			Types.location(weirdClass, false);
+		});
 	}
 
 	/** Tests {@link Types#name}. */
@@ -374,7 +379,7 @@ public class TypesTest {
 			Collection[].class, List[].class, Set[].class, Map[].class };
 		for (final Class<?> c : types) {
 			final Object nullValue = Types.nullValue(c);
-			assertNull("Expected null for " + c.getName(), nullValue);
+			assertNull(nullValue, "Expected null for " + c.getName());
 		}
 	}
 
@@ -512,15 +517,19 @@ public class TypesTest {
 	}
 
 	/** Tests {@link Types#isAssignable(Type, Type)} from null to null. */
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void testIsAssignableNullToNull() {
-		Types.isAssignable(null, null);
+		Assertions.assertThrows(NullPointerException.class, () -> {
+			Types.isAssignable(null, null);
+		});
 	}
 
 	/** Tests {@link Types#isAssignable(Type, Type)} from Class to null. */
-	@Test(expected = NullPointerException.class)
+	@Test
 	public void testIsAssignableClassToNull() {
-		Types.isAssignable(Object.class, null);
+		Assertions.assertThrows(NullPointerException.class, () -> {
+			Types.isAssignable(Object.class, null);
+		});
 	}
 
 	/** Tests {@link Types#isAssignable(Type, Type)} with type variable. */
@@ -967,15 +976,19 @@ public class TypesTest {
 	}
 
 	/** Tests {@link Types#enumValue(String, Class)} for invalid value. */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testEnumValueNoConstant() {
-		Types.enumValue("NONE", Words.class);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			Types.enumValue("NONE", Words.class);
+		});
 	}
 
 	/** Tests {@link Types#enumValue(String, Class)} for non-enum class. */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testEnumValueNonEnum() {
-		Types.enumValue("HOOYAH", String.class);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			Types.enumValue("HOOYAH", String.class);
+		});
 	}
 
 	/** Tests {@link Types#parameterize(Class, Map)}. */

@@ -29,11 +29,11 @@
 
 package net.imagej.ops2.filter.tubeness;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.ExecutorService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 import org.scijava.test_util.AssertIterations;
 import org.scijava.thread.ThreadService;

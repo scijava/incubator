@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.morphology.blackTopHat;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,10 +46,10 @@ import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.scijava.types.Nil;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.test_util.AssertIterations;
+import org.scijava.types.Nil;
 
 /**
  * Tests BlackTopHat operations.
@@ -60,7 +60,7 @@ public class BlackTopHatTest extends AbstractOpTest {
 
 	private Img<ByteType> in;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		in = TestImgGeneration.byteArray(true, 10, 10);
 	}

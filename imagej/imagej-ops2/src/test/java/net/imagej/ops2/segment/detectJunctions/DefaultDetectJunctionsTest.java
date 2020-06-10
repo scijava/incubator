@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.segment.detectJunctions;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.RealPoint;
 import net.imglib2.roi.geom.real.DefaultWritablePolyline;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**

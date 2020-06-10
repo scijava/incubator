@@ -28,7 +28,7 @@
  */
 package net.imagej.ops2.transform.collapseRealView;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -43,7 +43,7 @@ import net.imglib2.view.composite.CompositeIntervalView;
 import net.imglib2.view.composite.CompositeView;
 import net.imglib2.view.composite.RealComposite;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import net.imagej.ops2.AbstractOpTest;
 import org.scijava.types.Nil;
 import org.scijava.ops.function.Functions;

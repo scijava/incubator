@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.math;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Random;
 
@@ -39,7 +39,8 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.ExpectedException;
 import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
@@ -452,14 +453,14 @@ public class UnaryRealTypeMathTest extends AbstractOpTest {
 		assertArccsc(-(2 * Math.sqrt(3)) / 3, -Math.PI / 3);
 	}
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-
 	@Test
 	public void testArccscIllegalArgument() {
-		exception.expect(IllegalArgumentException.class);
-		exception.expectMessage("arccsc(x) : x out of range");
-		assertArccsc(0, 0);
+		IllegalArgumentException e = Assertions.assertThrows(
+			IllegalArgumentException.class, () -> {
+				assertArccsc(0, 0);
+			});
+		Assertions.assertTrue(e.getMessage().equalsIgnoreCase(
+			"arccsc(x) : x out of range"));
 	}
 
 	@Test
@@ -474,9 +475,12 @@ public class UnaryRealTypeMathTest extends AbstractOpTest {
 
 	@Test
 	public void testArcsecIllegalArgument() {
-		exception.expect(IllegalArgumentException.class);
-		exception.expectMessage("arcsec(x) : x out of range");
-		assertArcsec(0, 0);
+		IllegalArgumentException e = Assertions.assertThrows(
+			IllegalArgumentException.class, () -> {
+				assertArcsec(0, 0);
+			});
+		Assertions.assertTrue(e.getMessage().equalsIgnoreCase(
+			"arcsec(x) : x out of range"));
 	}
 
 	@Test

@@ -28,8 +28,8 @@
  */
 package net.imagej.ops2.copy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
@@ -39,8 +39,8 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.util.MersenneTwisterFast;
 
@@ -53,7 +53,7 @@ public class CopyArrayImgTest extends AbstractOpTest {
 
 	private Img<UnsignedByteType> input;
 
-	@Before
+	@BeforeEach
 	public void createData() {
 		input = new ArrayImgFactory<>(new UnsignedByteType()).create(new int[] { 120, 100 });
 

@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.filter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,8 +51,8 @@ import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests implementations of {@code MaxFilterOp}, {@code MeanFilterOp},
@@ -73,7 +73,7 @@ public class NonLinearFiltersTest extends AbstractOpTest {
 	 *
 	 * @throws Exception
 	 */
-	@Before
+	@BeforeEach
 	public void before() throws Exception {
 		in = TestImgGeneration.byteArray(true, new long[] { 10, 10 });
 		out = TestImgGeneration.byteArray(false, new long[] { 10, 10 });

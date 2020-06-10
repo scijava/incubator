@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.coloc.kendallTau;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.Iterator;
@@ -49,7 +49,7 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.IterablePair;
 import net.imglib2.util.Pair;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
@@ -107,9 +107,10 @@ public class KendallTauBRankTest extends AbstractOpTest {
 			double kendallValue1 = calculateNaive(iter.iterator());
 			double kendallValue2 = op("coloc.kendallTau").input(values1, values2).outType(Double.class).apply();
 			if (Double.isNaN(kendallValue1)) {
-				assertTrue("i: " + i + ", value2: " + kendallValue2, Double.isInfinite(kendallValue2) || Double.isNaN(kendallValue2));
+				assertTrue(Double.isInfinite(kendallValue2) || Double.isNaN(
+					kendallValue2), "i: " + i + ", value2: " + kendallValue2);
 			} else {
-				assertEquals("i: " + i, kendallValue1, kendallValue2, 1e-10);
+				assertEquals(kendallValue1, kendallValue2, 1e-10, "i: " + i);
 			}
 		}
 	}

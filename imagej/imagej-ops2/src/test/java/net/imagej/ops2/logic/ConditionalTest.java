@@ -29,13 +29,13 @@
 
 package net.imagej.ops2.logic;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.type.logic.BoolType;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 
 /**

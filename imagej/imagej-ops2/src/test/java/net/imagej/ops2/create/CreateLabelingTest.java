@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.create;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.function.BiFunction;
 
@@ -44,7 +44,7 @@ import net.imglib2.roi.labeling.ImgLabeling;
 import net.imglib2.type.numeric.integer.IntType;
 import net.imglib2.util.Intervals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
@@ -89,7 +89,7 @@ public class CreateLabelingTest extends AbstractOpTest {
 			@SuppressWarnings("unchecked")
 			final ImgLabeling<String, IntType> img = createFunc.apply(new FinalDimensions(dim), new IntType());
 
-			assertArrayEquals("Labeling Dimensions:", dim, Intervals.dimensionsAsLongArray(img));
+			assertArrayEquals(dim, Intervals.dimensionsAsLongArray(img), "Labeling Dimensions:");
 		}
 	}
 
@@ -106,26 +106,30 @@ public class CreateLabelingTest extends AbstractOpTest {
 				}, new Nil<ImgLabeling<String, IntType>>() {
 				});
 
-		assertEquals("Labeling Factory: ", ArrayImgFactory.class,
+		assertEquals(ArrayImgFactory.class,
 				((Img<IntType>) createFunc.apply(dim, new IntType(), new ArrayImgFactory<>(new IntType())).getIndexImg())
-						.factory().getClass());
+						.factory().getClass(), "Labeling Factory: ");
 
-		assertEquals("Labeling Factory: ", CellImgFactory.class,
+		assertEquals(CellImgFactory.class,
 				((Img<IntType>) createFunc.apply(dim, new IntType(), new CellImgFactory<>(new IntType())).getIndexImg())
-						.factory().getClass());
+						.factory().getClass(), "Labeling Factory: ");
 
 	}
 
 	@Test
 	public void testImageType() {
 
-		assertEquals("Labeling Type", String.class, createLabelingWithType("1").firstElement().toArray()[0].getClass());
+		assertEquals(String.class, createLabelingWithType("1").firstElement().toArray()[0]
+			.getClass(), "Labeling Type");
 
-		assertEquals("Labeling Type", Integer.class, createLabelingWithType(1).firstElement().toArray()[0].getClass());
+		assertEquals(Integer.class, createLabelingWithType(1).firstElement().toArray()[0]
+			.getClass(), "Labeling Type");
 
-		assertEquals("Labeling Type", Double.class, createLabelingWithType(1d).firstElement().toArray()[0].getClass());
+		assertEquals(Double.class, createLabelingWithType(1d).firstElement()
+			.toArray()[0].getClass(), "Labeling Type");
 
-		assertEquals("Labeling Type", Float.class, createLabelingWithType(1f).firstElement().toArray()[0].getClass());
+		assertEquals(Float.class, createLabelingWithType(1f).firstElement()
+			.toArray()[0].getClass(), "Labeling Type");
 	}
 
 	@SuppressWarnings("unchecked")

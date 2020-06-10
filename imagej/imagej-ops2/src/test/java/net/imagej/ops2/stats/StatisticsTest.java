@@ -41,9 +41,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -68,7 +68,7 @@ public class StatisticsTest extends AbstractOpTest {
 
 	private Img<UnsignedByteType> randomlyFilledImg;
 
-	@Before
+	@BeforeEach
 	public void setUpTest() {
 		super.setUp();
 
@@ -101,8 +101,8 @@ public class StatisticsTest extends AbstractOpTest {
 		Pair<FloatType, FloatType> minMax = op("stats.minMax").input((Iterable<FloatType>) img)
 				.outType(new Nil<Pair<FloatType, FloatType>>() {}).apply();
 
-		Assert.assertEquals(min, minMax.getA().get(), 0);
-		Assert.assertEquals(max, minMax.getB().get(), 0);
+		Assertions.assertEquals(min, minMax.getA().get(), 0);
+		Assertions.assertEquals(max, minMax.getB().get(), 0);
 
 	}
 
@@ -133,145 +133,145 @@ public class StatisticsTest extends AbstractOpTest {
 		op("stats.mean").input(img).output(mean2).compute();
 
 		// check that the ratio between mean1 and mean2 is 1.0
-		Assert.assertEquals(1.0, mean1 / mean2.getRealFloat(), delta);
+		Assertions.assertEquals(1.0, mean1 / mean2.getRealFloat(), delta);
 
 		// calculate standard deviation using ops
 		final DoubleType std2 = new DoubleType();
 		op("stats.stdDev").input(img).output(std2).compute();
 
 		// check that the ratio between std1 and std2 is 1.0
-		Assert.assertEquals(1.0, std1 / std2.getRealFloat(), delta);
+		Assertions.assertEquals(1.0, std1 / std2.getRealFloat(), delta);
 	}
 
 	@Test
 	public void testMax() {
 		final UnsignedByteType max = new UnsignedByteType();
 		op("stats.max").input(randomlyFilledImg).output(max).compute();
-		Assert.assertEquals("Max", 254d, max.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(254d, max.getRealDouble(), 0.00001d, "Max");
 
 		// NB: should work with negative numbers
 		final ByteType maxByte = new ByteType();
 		op("stats.max").input(ArrayImgs.bytes(new byte[] { -1, -2, -4, -3 }, 2, 2)).output(maxByte).compute();
-		Assert.assertEquals("Max", -1.0, maxByte.getRealDouble(), 0.0);
+		Assertions.assertEquals(-1.0, maxByte.getRealDouble(), 0.0, "Max");
 	}
 
 	@Test
 	public void testMin() {
 		final UnsignedByteType min = new UnsignedByteType();
 		op("stats.min").input(randomlyFilledImg).output(min).compute();
-		Assert.assertEquals("Min", 0, min.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(0, min.getRealDouble(), 0.00001d, "Min");
 	}
 
 	@Test
 	public void testStdDev() {
 		final DoubleType stdDev = new DoubleType();
 		op("stats.stdDev").input(randomlyFilledImg).output(stdDev).compute();
-		Assert.assertEquals("StdDev", 73.7460374274008, stdDev.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(73.7460374274008, stdDev.getRealDouble(), 0.00001d, "StdDev");
 	}
 
 	@Test
 	public void testSum() {
 		final DoubleType sum = new DoubleType();
 		op("stats.sum").input(randomlyFilledImg).output(sum).compute();
-		Assert.assertEquals("Sum", 1277534.0, sum.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(1277534.0, sum.getRealDouble(), 0.00001d, "Sum");
 	}
 
 	@Test
 	public void testVariance() {
 		final DoubleType variance = new DoubleType();
 		op("stats.variance").input(randomlyFilledImg).output(variance).compute();
-		Assert.assertEquals("Variance", 5438.4780362436, variance.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(5438.4780362436, variance.getRealDouble(), 0.00001d, "Variance");
 	}
 
 	@Test
 	public void testGeometricMean() {
 		final DoubleType geoMetricMean = new DoubleType();
 		op("stats.geometricMean").input(randomlyFilledImg).output(geoMetricMean).compute();
-		Assert.assertEquals("Geometric Mean", 0, geoMetricMean.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(0, geoMetricMean.getRealDouble(), 0.00001d, "Geometric Mean");
 	}
 
 	@Test
 	public void testHarmonicMean() {
 		final DoubleType harmonicMean = new DoubleType();
 		op("stats.harmonicMean").input(randomlyFilledImg).output(harmonicMean).compute();
-		Assert.assertEquals("Harmonic Mean", 0, harmonicMean.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(0, harmonicMean.getRealDouble(), 0.00001d, "Harmonic Mean");
 	}
 
 	@Test
 	public void testKurtosis() {
 		final DoubleType kurtosis = new DoubleType();
 		op("stats.kurtosis").input(randomlyFilledImg).output(kurtosis).compute();
-		Assert.assertEquals("Kurtosis", 1.794289587623922, kurtosis.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(1.794289587623922, kurtosis.getRealDouble(), 0.00001d, "Kurtosis");
 	}
 
 	@Test
 	public void testMoment1AboutMean() {
 		final DoubleType moment1 = new DoubleType();
 		op("stats.moment1AboutMean").input(randomlyFilledImg).output(moment1).compute();
-		Assert.assertEquals("Moment 1 About Mean", 0, moment1.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(0, moment1.getRealDouble(), 0.00001d, "Moment 1 About Mean");
 	}
 
 	@Test
 	public void testMoment2AboutMean() {
 		final DoubleType moment2 = new DoubleType();
 		op("stats.moment2AboutMean").input(randomlyFilledImg).output(moment2).compute();
-		Assert.assertEquals("Moment 2 About Mean", 5437.93418843998, moment2.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(5437.93418843998, moment2.getRealDouble(), 0.00001d, "Moment 2 About Mean");
 	}
 
 	@Test
 	public void testMoment3AboutMean() {
 		final DoubleType moment3 = new DoubleType();
 		op("stats.moment3AboutMean").input(randomlyFilledImg).output(moment3).compute();
-		Assert.assertEquals("Moment 3 About Mean", -507.810691261427, moment3.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(-507.810691261427, moment3.getRealDouble(), 0.00001d, "Moment 3 About Mean");
 	}
 
 	@Test
 	public void testMoment4AboutMean() {
 		final DoubleType moment4 = new DoubleType();
 		op("stats.moment4AboutMean").input(randomlyFilledImg).output(moment4).compute();
-		Assert.assertEquals("Moment 4 About Mean", 53069780.9168701, moment4.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(53069780.9168701, moment4.getRealDouble(), 0.00001d, "Moment 4 About Mean");
 	}
 
 	@Test
 	public void testPercentile() {
 		final DoubleType percentile = new DoubleType();
 		op("stats.percentile").input(randomlyFilledImg, 50d).output(percentile).compute();
-		Assert.assertEquals("50-th Percentile", 128d, percentile.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(128d, percentile.getRealDouble(), 0.00001d, "50-th Percentile");
 	}
 
 	@Test
 	public void testQuantile() {
 		final DoubleType quantile = new DoubleType();
 		op("stats.quantile").input(randomlyFilledImg, 0.5d).output(quantile).compute();
-		Assert.assertEquals("0.5-th Quantile", 128d, quantile.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(128d, quantile.getRealDouble(), 0.00001d, "0.5-th Quantile");
 	}
 
 	@Test
 	public void testSkewness() {
 		final DoubleType skewness = new DoubleType();
 		op("stats.skewness").input(randomlyFilledImg).output(skewness).compute();
-		Assert.assertEquals("Skewness", -0.0012661517853476312, skewness.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(-0.0012661517853476312, skewness.getRealDouble(), 0.00001d, "Skewness");
 	}
 
 	@Test
 	public void testSumOfInverses() {
 		final DoubleType sumOfInverses = new DoubleType();
 		op("stats.sumOfInverses").input(randomlyFilledImg).output(sumOfInverses).compute();
-		Assert.assertEquals("Sum Of Inverses", Double.POSITIVE_INFINITY, sumOfInverses.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(Double.POSITIVE_INFINITY, sumOfInverses.getRealDouble(), 0.00001d, "Sum Of Inverses");
 	}
 
 	@Test
 	public void testSumOfLogs() {
 		final DoubleType sumOfLogs = new DoubleType();
 		op("stats.sumOfLogs").input(randomlyFilledImg).output(sumOfLogs).compute();
-		Assert.assertEquals("Sum Of Logs", Double.NEGATIVE_INFINITY, sumOfLogs.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(Double.NEGATIVE_INFINITY, sumOfLogs.getRealDouble(), 0.00001d, "Sum Of Logs");
 	}
 
 	@Test
 	public void testSumOfSquares() {
 		final DoubleType sumOfSquares = new DoubleType();
 		op("stats.sumOfSquares").input(randomlyFilledImg).output(sumOfSquares).compute();
-		Assert.assertEquals("Sum Of Squares", 217588654, sumOfSquares.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(217588654, sumOfSquares.getRealDouble(), 0.00001d, "Sum Of Squares");
 	}
 
 }

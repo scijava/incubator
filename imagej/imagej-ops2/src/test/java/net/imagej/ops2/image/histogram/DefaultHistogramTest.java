@@ -7,8 +7,8 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.types.Nil;
 
@@ -34,15 +34,15 @@ public class DefaultHistogramTest extends AbstractOpTest {
 		Histogram1d<UnsignedByteType> histogram = op("image.histogram").input(img, 10)
 				.outType(new Nil<Histogram1d<UnsignedByteType>>() {}).apply();
 
-		Assert.assertEquals(false, histogram.hasTails());
-		Assert.assertEquals(0.078125, histogram.relativeFrequency(5, false), 0.00001d);
-		Assert.assertEquals(10, histogram.getBinCount());
+		Assertions.assertEquals(false, histogram.hasTails());
+		Assertions.assertEquals(0.078125, histogram.relativeFrequency(5, false), 0.00001d);
+		Assertions.assertEquals(10, histogram.getBinCount());
 
 		UnsignedByteType type = new UnsignedByteType();
 		histogram.getLowerBound(5, type);
-		Assert.assertEquals(64.0, type.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(64.0, type.getRealDouble(), 0.00001d);
 		histogram.getUpperBound(5, type);
-		Assert.assertEquals(76.0, type.getRealDouble(), 0.00001d);
+		Assertions.assertEquals(76.0, type.getRealDouble(), 0.00001d);
 	}
 
 }

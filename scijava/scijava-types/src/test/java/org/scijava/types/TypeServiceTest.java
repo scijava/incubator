@@ -40,9 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.Context;
 import org.scijava.types.ExampleTypes.Bag;
 import org.scijava.types.ExampleTypes.BlueThing;
@@ -58,12 +58,12 @@ public class TypeServiceTest {
 
 	private TypeService types;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		types = new Context(TypeService.class).service(TypeService.class);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		if (types != null) {
 			types.context().dispose();

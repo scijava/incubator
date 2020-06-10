@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.morphology.thin;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.ops2.features.AbstractFeatureTest;
@@ -37,10 +37,10 @@ import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.FloatType;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.scijava.types.Nil;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.test_util.AssertIterations;
+import org.scijava.types.Nil;
 
 /**
  * Tests for {@link net.imagej.ops2.Ops.Morphology} thinning ops.
@@ -52,7 +52,7 @@ public class ThinningTest extends AbstractOpTest {
 	private Img<BitType> in;
 	private Img<BitType> target;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		Img<FloatType> testImg = openFloatImg(AbstractFeatureTest.class, "3d_geometric_features_testlabel.tif");
 		in = op("create.img").input(testImg, new BitType()).outType(new Nil<Img<BitType>>() {}).apply();

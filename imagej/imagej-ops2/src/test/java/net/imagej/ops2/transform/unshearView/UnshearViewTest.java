@@ -28,7 +28,7 @@
  */
 package net.imagej.ops2.transform.unshearView;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
@@ -42,7 +42,7 @@ import net.imglib2.view.IntervalView;
 import net.imglib2.view.TransformView;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.function.Functions;

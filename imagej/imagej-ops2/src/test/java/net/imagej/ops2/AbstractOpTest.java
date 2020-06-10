@@ -46,8 +46,8 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.scijava.Context;
 import org.scijava.cache.CacheService;
 import org.scijava.ops.OpService;
@@ -70,13 +70,13 @@ public abstract class AbstractOpTest{
 	protected static Context context;
 	protected static OpService ops;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		context = new Context(OpService.class, CacheService.class, ThreadService.class);
 		ops = context.service(OpService.class);
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void tearDown() {
 		context.dispose();
 		context = null;

@@ -29,23 +29,12 @@
 
 package net.imagej.ops2.filter.vesselness;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.scif.img.IO;
 
 import java.net.URL;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.scijava.Context;
-import org.scijava.cache.CacheService;
-import org.scijava.ops.OpService;
-import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.script.ScriptService;
-import org.scijava.thread.ThreadService;
-
-import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
@@ -53,6 +42,16 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.scijava.Context;
+import org.scijava.cache.CacheService;
+import org.scijava.ops.OpService;
+import org.scijava.ops.core.builder.OpBuilder;
+import org.scijava.script.ScriptService;
+import org.scijava.thread.ThreadService;
 
 /**
  * Tests the Frangi Vesselness operation.
@@ -64,13 +63,13 @@ public class FrangiVesselnessTest{
 	protected static Context context;
 	protected static OpService ops;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		context = new Context(OpService.class, CacheService.class, ThreadService.class, ScriptService.class);
 		ops = context.service(OpService.class);
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void tearDown() {
 		context.dispose();
 		context = null;

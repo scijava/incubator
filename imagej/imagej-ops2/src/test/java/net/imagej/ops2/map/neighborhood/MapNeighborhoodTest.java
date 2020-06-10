@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.map.neighborhood;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Iterator;
 
@@ -39,8 +39,8 @@ import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Computers;
 
 /**
@@ -54,7 +54,7 @@ public class MapNeighborhoodTest extends AbstractOpTest {
 	private Img<ByteType> in;
 	private Img<ByteType> out;
 
-	@Before
+	@BeforeEach
 	public void initImg() {
 		in = TestImgGeneration.byteArray(true, 11, 10);
 		out = TestImgGeneration.byteArray(false, 11, 10);

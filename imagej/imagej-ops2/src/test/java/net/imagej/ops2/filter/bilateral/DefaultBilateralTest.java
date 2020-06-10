@@ -28,7 +28,7 @@
  */
 package net.imagej.ops2.filter.bilateral;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.test_util.TestImgGeneration;
@@ -37,7 +37,7 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DefaultBilateralTest extends AbstractOpTest {
 

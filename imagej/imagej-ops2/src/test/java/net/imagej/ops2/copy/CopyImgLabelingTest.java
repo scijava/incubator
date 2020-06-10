@@ -28,8 +28,8 @@
  */
 package net.imagej.ops2.copy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
@@ -38,8 +38,8 @@ import net.imglib2.roi.labeling.ImgLabeling;
 import net.imglib2.roi.labeling.LabelingType;
 import net.imglib2.type.numeric.integer.IntType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -52,7 +52,7 @@ public class CopyImgLabelingTest extends AbstractOpTest {
 	private ImgLabeling<String, IntType> input;
 	private ImgLabeling<String, IntType> copy;
 
-	@Before
+	@BeforeEach
 	public void createData() {
 		input = op("create.imgLabeling").input(new FinalDimensions(10, 10), new IntType())
 				.outType(new Nil<ImgLabeling<String, IntType>>() {}).apply();

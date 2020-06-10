@@ -28,12 +28,12 @@
  */
 package net.imagej.ops2.features.zernike;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.features.AbstractFeatureTest;
 import net.imglib2.type.numeric.real.DoubleType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -50,10 +50,12 @@ public class ZernikeFeatureTest extends AbstractFeatureTest {
 	@Test
 	public void testPhaseFeature() {
 
-		assertEquals("features.zernike.phase", 179.92297037263532,
-				 op("features.zernike.phase").input(ellipse, 4, 2).outType(new Nil<DoubleType>() {}).apply().get(), EPSILON);
-		assertEquals("features.zernike.phase", 0.0802239034925816,
-				 op("features.zernike.phase").input(rotatedEllipse, 4, 2).outType(new Nil<DoubleType>() {}).apply().get(), EPSILON);
+		assertEquals(179.92297037263532, op("features.zernike.phase").input(ellipse,
+			4, 2).outType(new Nil<DoubleType>()
+		{}).apply().get(), EPSILON, "features.zernike.phase");
+		assertEquals(0.0802239034925816, op("features.zernike.phase").input(
+			rotatedEllipse, 4, 2).outType(new Nil<DoubleType>()
+		{}).apply().get(), EPSILON, "features.zernike.phase");
 	}
 
 	@Test
@@ -64,10 +66,11 @@ public class ZernikeFeatureTest extends AbstractFeatureTest {
 		double v2 = op("features.zernike.magnitude").input(rotatedEllipse, 4, 2).outType(new Nil<DoubleType>() {})
 				.apply().get();
 
-		assertEquals("features.zernike.magnitude", 0.10985876611295191, v1, EPSILON);
+		assertEquals(0.10985876611295191, v1, EPSILON,
+			"features.zernike.magnitude");
 
 		// magnitude is the same after rotating the image
-		assertEquals("features.zernike.magnitude", v1, v2, 1e-3);
+		assertEquals(v1, v2, 1e-3, "features.zernike.magnitude");
 	}
 
 }

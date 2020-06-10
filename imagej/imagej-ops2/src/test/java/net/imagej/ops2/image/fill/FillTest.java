@@ -29,15 +29,15 @@
 
 package net.imagej.ops2.image.fill;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link net.imagej.ops2.Ops.Image.Fill}.
@@ -48,7 +48,7 @@ public class FillTest extends AbstractOpTest {
 
 	private Img<ByteType> out;
 
-	@Before
+	@BeforeEach
 	public void setUpMethod() {
 		super.setUp();
 		out = ArrayImgs.bytes(10, 10);

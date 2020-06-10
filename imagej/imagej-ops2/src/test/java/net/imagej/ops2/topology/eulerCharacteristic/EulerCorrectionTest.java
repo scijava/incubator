@@ -29,7 +29,7 @@
 package net.imagej.ops2.topology.eulerCharacteristic;
 
 import static net.imagej.ops2.topology.eulerCharacteristic.TestHelper.drawCube;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.ops2.topology.eulerCharacteristic.EulerCorrection.Traverser;
@@ -38,7 +38,8 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.DoubleType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link EulerCorrection}
@@ -46,12 +47,14 @@ import org.junit.Test;
  * @author Richard Domander (Royal Veterinary College, London)
  */
 public class EulerCorrectionTest extends AbstractOpTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConforms() throws Exception {
         final Img<BitType> img = ArrayImgs.bits(3, 3);
 
-        op("topology.eulerCorrection").input(img).apply();
-    }
+				Assertions.assertThrows(IllegalArgumentException.class, () -> {
+					op("topology.eulerCorrection").input(img).apply();
+				});
+	    }
 
     @Test
     public void testCube() throws Exception {
@@ -59,27 +62,27 @@ public class EulerCorrectionTest extends AbstractOpTest {
         final Traverser<BitType> traverser = new Traverser<>(cube);
 
         final int vertices = EulerCorrection.stackCorners(traverser);
-        assertEquals("Number of stack vertices is incorrect", 0, vertices);
+        assertEquals(0, vertices, "Number of stack vertices is incorrect");
 
         final long edges = EulerCorrection.stackEdges(traverser);
-        assertEquals("Number stack edge voxels is incorrect", 0, edges);
+        assertEquals(0, edges, "Number stack edge voxels is incorrect");
 
         final int faces = EulerCorrection.stackFaces(traverser);
-        assertEquals("Number stack face voxels is incorrect", 0, faces);
+        assertEquals(0, faces, "Number stack face voxels is incorrect");
 
         final long voxelEdgeIntersections = EulerCorrection.voxelEdgeIntersections(traverser);
-        assertEquals("Number intersections is incorrect", 0, voxelEdgeIntersections);
+        assertEquals(0, voxelEdgeIntersections, "Number intersections is incorrect");
 
         final long voxelFaceIntersections = EulerCorrection.voxelFaceIntersections(traverser);
-        assertEquals("Number intersections is incorrect", 0, voxelFaceIntersections);
+        assertEquals(0, voxelFaceIntersections, "Number intersections is incorrect");
 
         final long voxelEdgeFaceIntersections = EulerCorrection.voxelEdgeFaceIntersections(traverser);
-        assertEquals("Number intersections is incorrect", 0, voxelEdgeFaceIntersections);
+        assertEquals(0, voxelEdgeFaceIntersections, "Number intersections is incorrect");
 
         DoubleType result = new DoubleType();
         op("topology.eulerCorrection").input(cube).output(result).compute();
 
-        assertEquals("Euler correction is incorrect", 0, result.get(), 1e-12);
+        assertEquals(0, result.get(), 1e-12, "Euler correction is incorrect");
     }
 
     @Test
@@ -91,31 +94,31 @@ public class EulerCorrectionTest extends AbstractOpTest {
         final Traverser<BitType> traverser = new Traverser<>(cube);
 
         final int vertices = EulerCorrection.stackCorners(traverser);
-        assertEquals("Number of stack vertices is incorrect", 8, vertices);
+        assertEquals(8, vertices, "Number of stack vertices is incorrect");
 
         final long stackEdges = EulerCorrection.stackEdges(traverser);
-        assertEquals("Number stack edge voxels is incorrect", edges * edgeSize, stackEdges);
+        assertEquals(edges * edgeSize, stackEdges, "Number stack edge voxels is incorrect");
 
         final int faces = EulerCorrection.stackFaces(traverser);
-        assertEquals("Number stack face voxels is incorrect", 6 * edgeSize * edgeSize, faces);
+        assertEquals(6 * edgeSize * edgeSize, faces, "Number stack face voxels is incorrect");
 
         final long voxelEdgeIntersections = EulerCorrection.voxelEdgeIntersections(traverser);
         // you can fit n - 1 2x1 edges on edges whose size is n
         final long expectedVEIntersections = edges * (cubeSize - 1);
-        assertEquals("Number intersections is incorrect", expectedVEIntersections, voxelEdgeIntersections);
+        assertEquals(expectedVEIntersections, voxelEdgeIntersections, "Number intersections is incorrect");
 
         final long xyVFIntersections = (cubeSize + 1) * (cubeSize + 1);
         final long yzVFIntersections = (cubeSize - 1) * (cubeSize + 1);
         final long xzVFIntersections = (cubeSize - 1) * (cubeSize - 1);
         final long expectedVFIntersections = xyVFIntersections * 2 + yzVFIntersections * 2 + xzVFIntersections * 2;
         final long voxelFaceIntersections = EulerCorrection.voxelFaceIntersections(traverser);
-        assertEquals("Number intersections is incorrect", expectedVFIntersections, voxelFaceIntersections);
+        assertEquals(expectedVFIntersections, voxelFaceIntersections, "Number intersections is incorrect");
 
         final long voxelEdgeFaceIntersections = EulerCorrection.voxelEdgeFaceIntersections(traverser);
-        assertEquals("Number intersections is incorrect", 108, voxelEdgeFaceIntersections);
+        assertEquals(108, voxelEdgeFaceIntersections, "Number intersections is incorrect");
 
         DoubleType result = new DoubleType();
         op("topology.eulerCorrection").input(cube).output(result).compute();
-        assertEquals("Euler contribution is incorrect", 1, result.get(), 1e-12);
+        assertEquals(1, result.get(), 1e-12, "Euler contribution is incorrect");
     }
 }

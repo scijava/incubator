@@ -30,7 +30,7 @@
 
 package net.imagej.ops2.coloc.maxTKendallTau;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiFunction;
@@ -46,7 +46,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;

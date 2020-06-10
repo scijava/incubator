@@ -29,11 +29,12 @@
 
 package net.imagej.ops2.segment.detectRidges;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 import net.imagej.ops2.AbstractOpTest;
@@ -52,7 +53,7 @@ import net.imglib2.type.numeric.real.FloatType;
  */
 public class DefaultDetectRidgesTest extends AbstractOpTest {
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testTooFewDimensions() {
 		Img<FloatType> input = TestImgGeneration.floatArray(false, 30);
 
@@ -60,13 +61,15 @@ public class DefaultDetectRidgesTest extends AbstractOpTest {
 		int ridgeLengthMin = 4;
 		double width = 1, lowerThreshold = 2, higherThreshold = 4;
 
-		@SuppressWarnings("unused")
-		List<DefaultWritablePolyline> polylines = op("segment.detectRidges")
-				.input(input, width, lowerThreshold, higherThreshold, ridgeLengthMin)
-				.outType(new Nil<List<DefaultWritablePolyline>>() {}).apply();
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			@SuppressWarnings("unused")
+			List<DefaultWritablePolyline> polylines = op("segment.detectRidges")
+					.input(input, width, lowerThreshold, higherThreshold, ridgeLengthMin)
+					.outType(new Nil<List<DefaultWritablePolyline>>() {}).apply();
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testTooManyDimensions() {
 		Img<FloatType> input = TestImgGeneration.floatArray(false, 30, 30, 30, 30);
 
@@ -74,10 +77,12 @@ public class DefaultDetectRidgesTest extends AbstractOpTest {
 		int ridgeLengthMin = 4;
 		double width = 1, lowerThreshold = 2, higherThreshold = 4;
 
-		@SuppressWarnings("unused")
-		List<DefaultWritablePolyline> polylines = op("segment.detectRidges")
-				.input(input, width, lowerThreshold, higherThreshold, ridgeLengthMin)
-				.outType(new Nil<List<DefaultWritablePolyline>>() {}).apply();
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			@SuppressWarnings("unused")
+			List<DefaultWritablePolyline> polylines = op("segment.detectRidges")
+					.input(input, width, lowerThreshold, higherThreshold, ridgeLengthMin)
+					.outType(new Nil<List<DefaultWritablePolyline>>() {}).apply();
+		});
 	}
 
 	@Test

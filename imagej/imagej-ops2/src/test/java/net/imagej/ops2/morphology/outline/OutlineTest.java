@@ -29,11 +29,11 @@
 
 package net.imagej.ops2.morphology.outline;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.IterableInterval;
@@ -45,7 +45,7 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -84,7 +84,8 @@ public class OutlineTest extends AbstractOpTest {
 				.outType(new Nil<Img<BitType>>() {}).apply();
 
 		// VERIFY
-		assertEquals("Output should contain no foreground", 0, countForeground(result));
+		assertEquals(0, countForeground(result),
+			"Output should contain no foreground");
 	}
 
 	/** Test the op with an interval that's full of foreground elements */
@@ -99,7 +100,7 @@ public class OutlineTest extends AbstractOpTest {
 				.outType(new Nil<Img<BitType>>() {}).apply();
 
 		// VERIFY
-		assertEquals("Output should contain no foreground", 0, countForeground(result));
+		assertEquals(0, countForeground(result), "Output should contain no foreground");
 	}
 
 	/** Test the op with a 2x2 square. The square is in the middle of a 4x4 img */
@@ -115,10 +116,12 @@ public class OutlineTest extends AbstractOpTest {
 				.outType(new Nil<Img<BitType>>() {}).apply();
 
 		// VERIFY
-		assertEquals("Wrong number of foreground elements in interval", 4, countForeground(result));
-		final IntervalView<BitType> resultSquare = Views.offsetInterval(result, new long[] { 1, 1 },
-				new long[] { 2, 2 });
-		assertTrue("Wrong number of foreground elements in object", allForeground(resultSquare));
+		assertEquals(4, countForeground(result),
+			"Wrong number of foreground elements in interval");
+		final IntervalView<BitType> resultSquare = Views.offsetInterval(result,
+			new long[] { 1, 1 }, new long[] { 2, 2 });
+		assertTrue(allForeground(resultSquare),
+			"Wrong number of foreground elements in object");
 	}
 
 	/**
@@ -140,10 +143,12 @@ public class OutlineTest extends AbstractOpTest {
 				.outType(new Nil<Img<BitType>>() {}).apply();
 
 		// VERIFY
-		assertEquals("Wrong number of foreground elements in interval", 8, countForeground(result));
-		final IntervalView<BitType> resultSquare = Views.offsetInterval(result, new long[] { 1, 1 },
-				new long[] { 3, 3 });
-		assertEquals("Wrong number of foreground elements in object", 8, countForeground(resultSquare));
+		assertEquals(8, countForeground(result),
+			"Wrong number of foreground elements in interval");
+		final IntervalView<BitType> resultSquare = Views.offsetInterval(result,
+			new long[] { 1, 1 }, new long[] { 3, 3 });
+		assertEquals(8, countForeground(resultSquare),
+			"Wrong number of foreground elements in object");
 		assertPositionBackground(result, new long[] { 2, 2 });
 	}
 
@@ -166,10 +171,12 @@ public class OutlineTest extends AbstractOpTest {
 				.outType(new Nil<Img<BitType>>() {}).apply();
 
 		// VERIFY
-		assertEquals("Wrong number of foreground elements in interval", 7, countForeground(result));
-		final IntervalView<BitType> resultSquare = Views.offsetInterval(result, new long[] { 0, 1 },
-				new long[] { 3, 3 });
-		assertEquals("Wrong number of foreground elements in object", 7, countForeground(resultSquare));
+		assertEquals(7, countForeground(result),
+			"Wrong number of foreground elements in interval");
+		final IntervalView<BitType> resultSquare = Views.offsetInterval(result,
+			new long[] { 0, 1 }, new long[] { 3, 3 });
+		assertEquals(7, countForeground(resultSquare),
+			"Wrong number of foreground elements in object");
 		assertPositionBackground(result, new long[] { 0, 2 });
 		assertPositionBackground(result, new long[] { 1, 2 });
 	}
@@ -192,10 +199,12 @@ public class OutlineTest extends AbstractOpTest {
 		final Img<BitType> result = op("morphology.outline").input(img, Boolean.FALSE)
 				.outType(new Nil<Img<BitType>>() {}).apply();
 
-		assertEquals("Wrong number of foreground elements in interval", 8, countForeground(result));
-		final IntervalView<BitType> resultSquare = Views.offsetInterval(result, new long[] { 0, 1 },
-				new long[] { 3, 3 });
-		assertEquals("Wrong number of foreground elements in object", 8, countForeground(resultSquare));
+		assertEquals(8, countForeground(result),
+			"Wrong number of foreground elements in interval");
+		final IntervalView<BitType> resultSquare = Views.offsetInterval(result,
+			new long[] { 0, 1 }, new long[] { 3, 3 });
+		assertEquals(8, countForeground(resultSquare),
+			"Wrong number of foreground elements in object");
 		assertPositionBackground(result, new long[] { 1, 2 });
 	}
 
@@ -216,10 +225,12 @@ public class OutlineTest extends AbstractOpTest {
 				.outType(new Nil<Img<BitType>>() {}).apply();
 
 		// VERIFY
-		assertEquals("Wrong number of foreground elements in interval", 80, countForeground(result));
-		final IntervalView<BitType> resultHyperCube = Views.offsetInterval(result, new long[] { 1, 1, 1, 1 },
-				new long[] { 3, 3, 3, 3 });
-		assertEquals("Wrong number of foreground elements in object", 80, countForeground(resultHyperCube));
+		assertEquals(80, countForeground(result),
+			"Wrong number of foreground elements in interval");
+		final IntervalView<BitType> resultHyperCube = Views.offsetInterval(result,
+			new long[] { 1, 1, 1, 1 }, new long[] { 3, 3, 3, 3 });
+		assertEquals(80, countForeground(resultHyperCube),
+			"Wrong number of foreground elements in object");
 		assertPositionBackground(result, new long[] { 2, 2, 2, 2 });
 	}
 
@@ -244,7 +255,7 @@ public class OutlineTest extends AbstractOpTest {
 	private void assertPositionBackground(final RandomAccessibleInterval<BitType> interval, final long[] position) {
 		final RandomAccess<BitType> access = interval.randomAccess();
 		access.setPosition(position);
-		assertFalse("Element should be background", access.get().get());
+		assertFalse(access.get().get(), "Element should be background");
 	}
 	// endregion
 }

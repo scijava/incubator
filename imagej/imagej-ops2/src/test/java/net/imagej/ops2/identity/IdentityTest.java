@@ -29,11 +29,11 @@
 
 package net.imagej.ops2.identity;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import net.imagej.ops2.AbstractOpTest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link IdentityOp}.

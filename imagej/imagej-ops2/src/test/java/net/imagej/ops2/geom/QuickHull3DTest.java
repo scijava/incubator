@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.geom;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.Random;
@@ -43,7 +43,7 @@ import net.imagej.ops2.AbstractOpTest;
 import net.imagej.ops2.geom.geom3d.DefaultConvexHull3D;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 
 /**

@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.image.integral;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.test_util.TestImgGeneration;
@@ -46,8 +46,8 @@ import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
 
@@ -65,7 +65,7 @@ public class IntegralImgTest extends AbstractOpTest {
 	 *
 	 * @throws Exception
 	 */
-	@Before
+	@BeforeEach
 	public void before() throws Exception {
 		in = TestImgGeneration.byteArray(true, new long[] { 10, 10 });
 		out1 = TestImgGeneration.doubleArray(true, new long[] { 10, 10 });

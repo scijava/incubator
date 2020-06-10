@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.linalg.rotate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import net.imagej.ops2.AbstractOpTest;
 
@@ -38,7 +38,7 @@ import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.builder.OpBuilder;
 
 /**
@@ -60,7 +60,7 @@ public class Rotate3fTest extends AbstractOpTest {
 
 		final Vector3f result = op("linalg.rotate").input(in, axisAngle).outType(Vector3f.class).apply();
 
-		assertEquals("Rotation is incorrect", expected, result);
+		assertEquals(expected, result, "Rotation is incorrect");
 	}
 
 	@Test
@@ -70,8 +70,8 @@ public class Rotate3fTest extends AbstractOpTest {
 
 		final Vector3f result = op("linalg.rotate").input(in, IDENTITY).outType(Vector3f.class).apply();
 
-		assertNotSame("Op should create a new object for output", in, result);
-		assertEquals("Rotation is incorrect", xAxis, result);
+		assertNotSame(in, result, "Op should create a new object for output");
+		assertEquals(xAxis, result, "Rotation is incorrect");
 	}
 
 	//TODO: X -> Inplaces transformers

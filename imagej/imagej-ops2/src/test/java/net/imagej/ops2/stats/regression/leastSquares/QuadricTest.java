@@ -30,7 +30,7 @@
 package net.imagej.ops2.stats.regression.leastSquares;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -40,7 +40,8 @@ import net.imagej.ops2.AbstractOpTest;
 import org.joml.Matrix4d;
 import org.joml.Matrix4dc;
 import org.joml.Vector3d;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link Quadric}.
@@ -74,34 +75,37 @@ public class QuadricTest extends AbstractOpTest {
 		for (final Vector3d p : unitSpherePoints) {
 			final double polynomial = a * p.x * p.x + b * p.y * p.y + c * p.z * p.z + 2 * d * p.x * p.y
 					+ 2 * e * p.x * p.z + 2 * f * p.y * p.z + 2 * g * p.x + 2 * h * p.y + 2 * i * p.z;
-			assertEquals("The matrix does not solve the polynomial equation", 1.0, polynomial, 1e-12);
+			assertEquals(1.0, polynomial, 1e-12,
+				"The matrix does not solve the polynomial equation");
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testMatchingFailsIfTooFewPoints() {
 		final int nPoints = Math.max(0, Quadric.MIN_DATA - 1);
 		final List<Vector3d> points = Stream.generate(Vector3d::new).limit(nPoints).collect(toList());
 
-		op("stats.leastSquares").input(points).outType(Matrix4d.class).apply();
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			op("stats.leastSquares").input(points).outType(Matrix4d.class).apply();
+		});
 	}
 
 	@Test
 	public void testMatrixElements() {
 		final Matrix4dc solution = op("stats.leastSquares").input(unitSpherePoints).outType(Matrix4d.class).apply();
 
-		assertEquals("The matrix element is incorrect", 1.0, solution.m00(), 1e-12);
-		assertEquals("The matrix element is incorrect", 1.0, solution.m11(), 1e-12);
-		assertEquals("The matrix element is incorrect", 1.0, solution.m22(), 1e-12);
-		assertEquals("The matrix element is incorrect", 0.0, solution.m01(), 1e-12);
-		assertEquals("The matrix element is incorrect", 0.0, solution.m02(), 1e-12);
-		assertEquals("The matrix element is incorrect", 0.0, solution.m03(), 1e-12);
-		assertEquals("The matrix element is incorrect", 0.0, solution.m12(), 1e-12);
-		assertEquals("The matrix element is incorrect", 0.0, solution.m13(), 1e-12);
-		assertEquals("The matrix element is incorrect", 0.0, solution.m23(), 1e-12);
-		assertEquals("The matrix element is incorrect", -1.0, solution.m33(), 1e-12);
+		assertEquals(1.0, solution.m00(), 1e-12, "The matrix element is incorrect");
+		assertEquals(1.0, solution.m11(), 1e-12, "The matrix element is incorrect");
+		assertEquals(1.0, solution.m22(), 1e-12, "The matrix element is incorrect");
+		assertEquals(0.0, solution.m01(), 1e-12, "The matrix element is incorrect");
+		assertEquals(0.0, solution.m02(), 1e-12, "The matrix element is incorrect");
+		assertEquals(0.0, solution.m03(), 1e-12, "The matrix element is incorrect");
+		assertEquals(0.0, solution.m12(), 1e-12, "The matrix element is incorrect");
+		assertEquals(0.0, solution.m13(), 1e-12, "The matrix element is incorrect");
+		assertEquals(0.0, solution.m23(), 1e-12, "The matrix element is incorrect");
+		assertEquals(-1.0, solution.m33(), 1e-12, "The matrix element is incorrect");
 		final Matrix4d transposed = new Matrix4d();
 		solution.transpose(transposed);
-		assertEquals("Matrix is not symmetric", solution, transposed);
+		assertEquals(solution, transposed, "Matrix is not symmetric");
 	}
 }

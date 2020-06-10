@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.threshold.apply;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.ops2.threshold.ApplyThresholdMethodLocal.LocalHuang;
@@ -75,7 +75,8 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Pair;
 
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
 
@@ -98,7 +99,7 @@ public class LocalThresholdTest extends AbstractOpTest {
 	 *
 	 * @throws Exception
 	 */
-	@Before
+	@BeforeEach
 	public void before() throws Exception {
 		in = TestImgGeneration.byteArray(true, new long[] { 10, 10 });
 		Pair<ByteType, ByteType> minMax = op("stats.minMax").input(in).outType(new Nil<Pair<ByteType, ByteType>>() {})

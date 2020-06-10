@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.project;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imagej.test_util.TestImgGeneration;
@@ -37,8 +37,8 @@ import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
 
@@ -51,7 +51,7 @@ public class ProjectTest extends AbstractOpTest {
 	private Img<UnsignedByteType> out2;
 	private Computers.Arity1<Iterable<UnsignedByteType>, UnsignedByteType> op;
 
-	@Before
+	@BeforeEach
 	public void initImg() {
 		in = TestImgGeneration.unsignedByteArray(false, 10, 10, 10);
 

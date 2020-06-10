@@ -29,13 +29,13 @@
 //
 //package net.imagej.ops2.geom;
 //
-//import static org.junit.Assert.assertEquals;
+//import static org.junit.jupiter.api.Assertions.assertEquals;
 //
 //import net.imagej.ops2.AbstractOpTest;
 //import net.imagej.ops2.geom.geom3d.mesh.BitTypeVertexInterpolator;
 //import net.imagej.ops2.geom.geom3d.mesh.DefaultVertexInterpolator;
 //
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 ///**
 // * This class tests the {@link BitTypeVertexInterpolator}.

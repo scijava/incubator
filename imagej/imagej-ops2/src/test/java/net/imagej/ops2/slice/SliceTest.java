@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.slice;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Iterator;
 
@@ -48,12 +48,12 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
-import org.scijava.types.Nil;
 import org.scijava.plugin.Plugin;
+import org.scijava.types.Nil;
 
 /**
  * Testing functionality of SlicingIterableIntervals
@@ -68,7 +68,7 @@ public class SliceTest<I extends RealType<I>, O extends RealType<O>> extends Abs
 
 	private ArrayImg<ByteType, ByteArray> out;
 
-	@Before
+	@BeforeEach
 	public void setUpTest() {
 		super.setUp();
 

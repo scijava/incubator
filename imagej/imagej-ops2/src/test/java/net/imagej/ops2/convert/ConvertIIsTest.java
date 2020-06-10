@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.convert;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
@@ -40,8 +40,8 @@ import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.type.numeric.integer.ShortType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -54,7 +54,7 @@ public class ConvertIIsTest extends AbstractOpTest {
 	private IterableInterval<ShortType> in;
 	private Img<ByteType> out;
 
-	@Before
+	@BeforeEach
 	public void createImages() {
 		final FinalDimensions dims = FinalDimensions.wrap(new long[] {10, 10});
 		in = op("create.img").input(dims, new ShortType()).outType(new Nil<IterableInterval<ShortType>>() {}).apply();

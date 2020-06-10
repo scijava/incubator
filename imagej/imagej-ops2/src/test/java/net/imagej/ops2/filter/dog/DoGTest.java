@@ -44,7 +44,8 @@ import net.imglib2.outofbounds.OutOfBoundsMirrorFactory.Boundary;
 import net.imglib2.type.numeric.integer.ByteType;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
 
@@ -78,7 +79,7 @@ public class DoGTest extends AbstractOpTest {
 		final Cursor<ByteType> out2Cursor = out2.cursor();
 
 		while (out1Cursor.hasNext()) {
-			org.junit.Assert.assertEquals(out1Cursor.next().getRealDouble(), out2Cursor.next().getRealDouble(), 0);
+			Assertions.assertEquals(out1Cursor.next().getRealDouble(), out2Cursor.next().getRealDouble(), 0);
 		}
 	}
 
@@ -92,6 +93,6 @@ public class DoGTest extends AbstractOpTest {
 		op("filter.DoG").input(TestImgGeneration.byteArray(true, new long[] { 10, 10 }), 1., 2., outOfBounds, es)
 				.output(res).compute();
 
-		org.junit.Assert.assertNotNull(res);
+		Assertions.assertNotNull(res);
 	}
 }

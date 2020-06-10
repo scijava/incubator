@@ -28,8 +28,8 @@
  */
 package net.imagej.ops2.copy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.Cursor;
@@ -40,8 +40,8 @@ import net.imglib2.img.planar.PlanarImgFactory;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.type.numeric.real.FloatType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 import org.scijava.util.MersenneTwisterFast;
 
@@ -54,7 +54,7 @@ public class CopyIITest extends AbstractOpTest {
 
 	private Img<DoubleType> input;
 
-	@Before
+	@BeforeEach
 	public void createData() {
 		input = new PlanarImgFactory<>(new DoubleType()).create(new int[] { 120, 100 });
 
@@ -89,7 +89,8 @@ public class CopyIITest extends AbstractOpTest {
 		Img<FloatType> output = op("copy.iterableInterval").input(inputFloat)
 				.outType(new Nil<Img<FloatType>>() {}).apply();
 
-		assertTrue("Should be FloatType.", output.firstElement() instanceof FloatType);
+		assertTrue(output.firstElement() instanceof FloatType,
+			"Should be FloatType.");
 	}
 
 	@Test

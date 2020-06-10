@@ -29,7 +29,7 @@
 package net.imagej.ops2.topology.eulerCharacteristic;
 
 import static net.imagej.ops2.topology.eulerCharacteristic.TestHelper.drawCube;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.RandomAccess;
@@ -38,7 +38,8 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.DoubleType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link EulerCharacteristic26NFloating} class
@@ -46,12 +47,15 @@ import org.junit.Test;
  * @author Richard Domander (Royal Veterinary College, London)
  */
 public class EulerCharacteristic26NFloatingTest extends AbstractOpTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConforms() throws AssertionError {
         final Img<BitType> img = ArrayImgs.bits(3, 3);
 
-        op("topology.eulerCharacteristic26NFloating").input(img).outType(Double.class).apply();
-    }
+				Assertions.assertThrows(IllegalArgumentException.class, () -> {
+					op("topology.eulerCharacteristic26NFloating").input(img).outType(
+						Double.class).apply();
+				});
+	    }
 
     /**
      * Test with a single voxel (=solid cube) that floats in the middle of a 3x3x3 space
@@ -67,7 +71,7 @@ public class EulerCharacteristic26NFloatingTest extends AbstractOpTest {
         final DoubleType result = new DoubleType();
         op("topology.eulerCharacteristic26NFloating").input(img).output(result).compute();
 
-        assertEquals("Euler characteristic (χ) is incorrect", 1.0, result.get(), 1e-12);
+        assertEquals(1.0, result.get(), 1e-12, "Euler characteristic (χ) is incorrect");
     }
 
     /**
@@ -83,7 +87,7 @@ public class EulerCharacteristic26NFloatingTest extends AbstractOpTest {
         final DoubleType result = new DoubleType();
         op("topology.eulerCharacteristic26NFloating").input(img).output(result).compute();
 
-        assertEquals("Euler characteristic (χ) is incorrect", 1.0, result.get(), 1e-12);
+        assertEquals(1.0, result.get(), 1e-12, "Euler characteristic (χ) is incorrect");
     }
 
     /**
@@ -104,7 +108,7 @@ public class EulerCharacteristic26NFloatingTest extends AbstractOpTest {
         final DoubleType result = new DoubleType();
         op("topology.eulerCharacteristic26NFloating").input(img).output(result).compute();
 
-        assertEquals("Euler characteristic (χ) is incorrect", 2.0, result.get(), 1e-12);
+        assertEquals(2.0, result.get(), 1e-12, "Euler characteristic (χ) is incorrect");
     }
 
     /**
@@ -135,6 +139,6 @@ public class EulerCharacteristic26NFloatingTest extends AbstractOpTest {
         final DoubleType result = new DoubleType();
         op("topology.eulerCharacteristic26NFloating").input(cube).output(result).compute();
 
-        assertEquals("Euler characteristic (χ) is incorrect", 0.0, result.get(), 1e-12);
+        assertEquals(0.0, result.get(), 1e-12, "Euler characteristic (χ) is incorrect");
     }
 }

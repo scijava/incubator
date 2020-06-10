@@ -29,13 +29,14 @@
 
 package net.imagej.ops2.threshold;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 
+import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.RandomAccess;
 import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.histogram.Histogram1d;
@@ -44,10 +45,9 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
-import org.junit.Before;
-import net.imagej.ops2.AbstractOpTest;
-import org.scijava.types.Nil;
+import org.junit.jupiter.api.BeforeEach;
 import org.scijava.ops.function.Functions;
+import org.scijava.types.Nil;
 import org.scijava.util.ListUtils;
 
 /**
@@ -65,7 +65,7 @@ public class AbstractThresholdTest extends AbstractOpTest {
 	
 	private BiFunction<Img<UnsignedShortType>, Integer, Histogram1d<UnsignedShortType>> createFunc;
 
-	@Before
+	@BeforeEach
 	public void initialize() {
 		final long[] dimensions = new long[] { xSize, ySize };
 

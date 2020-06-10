@@ -36,13 +36,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.Context;
 import org.scijava.convert.ConvertService;
 import org.scijava.convert.Converter;
-import org.scijava.types.Types;
 
 /**
  * Tests {@link NilConverter}.
@@ -54,7 +53,7 @@ public class NilConverterTest {
 	private ConvertService convert;
 
 	/** Sets up a SciJava context and injects needed services. */
-	@Before
+	@BeforeEach
 	public void setUp() {
 		convert = new Context(ConvertService.class).service(ConvertService.class);
 	}
@@ -62,7 +61,7 @@ public class NilConverterTest {
 	/**
 	 * Disposes of the {@link Context} that was initialized in {@link #setUp()}.
 	 */
-	@After
+	@AfterEach
 	public synchronized void cleanUp() {
 		if (convert != null) {
 			convert.context().dispose();

@@ -29,8 +29,8 @@
 
 package net.imagej.ops2.create;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -56,7 +56,7 @@ import net.imglib2.util.Intervals;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import net.imagej.ops2.AbstractOpTest;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
@@ -98,8 +98,8 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 			});
 			final Img<?> img = createFunc.apply(new FinalInterval(min, max));
 
-			assertArrayEquals("Image Minimum:", min, Intervals.minAsLongArray(img));
-			assertArrayEquals("Image Maximum:", max, Intervals.maxAsLongArray(img));
+			assertArrayEquals(min, Intervals.minAsLongArray(img), "Image Minimum:");
+			assertArrayEquals(max, Intervals.maxAsLongArray(img), "Image Maximum:");
 		}
 	}
 
@@ -127,7 +127,7 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 			@SuppressWarnings("unchecked")
 			final Img<DoubleType> img = createFunc.apply(new FinalDimensions(dim), new DoubleType());
 
-			assertArrayEquals("Image Dimensions:", dim, Intervals.dimensionsAsLongArray(img));
+			assertArrayEquals(dim, Intervals.dimensionsAsLongArray(img), "Image Dimensions:");
 		}
 	}
 
@@ -165,13 +165,13 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 		@SuppressWarnings("unchecked")
 		final Img<DoubleType> arrayImg = createFunc.apply(dim, new DoubleType(), new ArrayImgFactory<>(new DoubleType()));
 		final Class<?> arrayFactoryClass = arrayImg.factory().getClass();
-		assertEquals("Image Factory: ", ArrayImgFactory.class, arrayFactoryClass);
+		assertEquals(ArrayImgFactory.class, arrayFactoryClass, "Image Factory: ");
 
 		@SuppressWarnings("unchecked")
 		final Img<DoubleType> cellImg = createFunc.apply(dim, new DoubleType(),
 				new CellImgFactory<>(new DoubleType()));
 		final Class<?> cellFactoryClass = cellImg.factory().getClass();
-		assertEquals("Image Factory: ", CellImgFactory.class, cellFactoryClass);
+		assertEquals(CellImgFactory.class, cellFactoryClass, "Image Factory: ");
 	}
 
 	@Test
@@ -180,23 +180,23 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 		
 		BiFunction<Dimensions, T, Img<T>> createFunc = Functions.match(ops, "create.img", new Nil<Dimensions>() {}, new Nil<T>() {}, new Nil<Img<T>>() {});
 
-		assertEquals("Image Type: ", BitType.class,
-				((Img<?>) createFunc.apply(dim, (T) new BitType())).firstElement().getClass());
+		assertEquals(BitType.class, ((Img<?>) createFunc.apply(dim,
+			(T) new BitType())).firstElement().getClass(), "Image Type: ");
 
-		assertEquals("Image Type: ", ByteType.class,
-				((Img<?>) createFunc.apply(dim, (T) new ByteType())).firstElement().getClass());
+		assertEquals(ByteType.class,
+				((Img<?>) createFunc.apply(dim, (T) new ByteType())).firstElement().getClass(), "Image Type: ");
 
-		assertEquals("Image Type: ", UnsignedByteType.class,
-				((Img<?>) createFunc.apply(dim, (T) new UnsignedByteType())).firstElement().getClass());
+		assertEquals(UnsignedByteType.class,
+				((Img<?>) createFunc.apply(dim, (T) new UnsignedByteType())).firstElement().getClass(), "Image Type: ");
 
-		assertEquals("Image Type: ", IntType.class,
-				((Img<?>) createFunc.apply(dim, (T) new IntType())).firstElement().getClass());
+		assertEquals(IntType.class,
+				((Img<?>) createFunc.apply(dim, (T) new IntType())).firstElement().getClass(), "Image Type: ");
 
-		assertEquals("Image Type: ", FloatType.class,
-				((Img<?>) createFunc.apply(dim, (T) new FloatType())).firstElement().getClass());
+		assertEquals(FloatType.class,
+				((Img<?>) createFunc.apply(dim, (T) new FloatType())).firstElement().getClass(), "Image Type: ");
 
-		assertEquals("Image Type: ", DoubleType.class,
-				((Img<?>) createFunc.apply(dim, (T)new DoubleType())).firstElement().getClass());
+		assertEquals(DoubleType.class,
+				((Img<?>) createFunc.apply(dim, (T)new DoubleType())).firstElement().getClass(), "Image Type: ");
 	}
 
 	@Test
@@ -209,10 +209,10 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 				});
 		final Img<?> res = createFunc.apply(input, input.firstElement().createVariable());
 
-		assertEquals("Image Type: ", ByteType.class, res.firstElement().getClass());
-		assertArrayEquals("Image Dimensions: ", Intervals.dimensionsAsLongArray(input),
-				Intervals.dimensionsAsLongArray(res));
-		assertEquals("Image Factory: ", input.factory().getClass(), res.factory().getClass());
+		assertEquals(ByteType.class, res.firstElement().getClass(), "Image Type: ");
+		assertArrayEquals(Intervals.dimensionsAsLongArray(input),
+				Intervals.dimensionsAsLongArray(res), "Image Dimensions: ");
+		assertEquals(input.factory().getClass(), res.factory().getClass(), "Image Factory: ");
 	}
 
 	@Test
@@ -225,10 +225,10 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 				});
 		final Img<?> res = createFunc.apply(input, new ShortType());
 
-		assertEquals("Image Type: ", ShortType.class, res.firstElement().getClass());
-		assertArrayEquals("Image Dimensions: ", Intervals.dimensionsAsLongArray(input),
-				Intervals.dimensionsAsLongArray(res));
-		assertEquals("Image Factory: ", input.factory().getClass(), res.factory().getClass());
+		assertEquals(ShortType.class, res.firstElement().getClass(), "Image Type: ");
+		assertArrayEquals(Intervals.dimensionsAsLongArray(input),
+				Intervals.dimensionsAsLongArray(res), "Image Dimensions: ");
+		assertEquals(input.factory().getClass(), res.factory().getClass(), "Image Factory: ");
 	}
 
 	@Test
@@ -244,12 +244,12 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 
 		final Img<?> res = createFunc.apply(input, new ShortType());
 
-		assertEquals("Image Type: ", ShortType.class, res.firstElement().getClass());
+		assertEquals(ShortType.class, res.firstElement().getClass(), "Image Type: ");
 
-		assertArrayEquals("Image Dimensions: ", Intervals.dimensionsAsLongArray(input),
-				Intervals.dimensionsAsLongArray(res));
+		assertArrayEquals(Intervals.dimensionsAsLongArray(input),
+				Intervals.dimensionsAsLongArray(res), "Image Dimensions: ");
 
-		assertEquals("Image Factory: ", ArrayImgFactory.class, res.factory().getClass());
+		assertEquals(ArrayImgFactory.class, res.factory().getClass(), "Image Factory: ");
 	}
 
 	/**
@@ -266,7 +266,7 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 		final Img<?> res = createFunc.apply(dims);
 
 		for (int i = 0; i < dims.length; i++) {
-			assertEquals("Image Dimension " + i + ": ", dims[i].longValue(), res.dimension(i));
+			assertEquals(dims[i].longValue(), res.dimension(i), "Image Dimension " + i + ": ");
 		}
 	}
 
@@ -284,7 +284,7 @@ public class CreateImgTest<T extends RealType<T>> extends AbstractOpTest {
 		final Img<?> res = createFunc.apply(dims);
 
 		for (int i = 0; i < dims.length; i++) {
-			assertEquals("Image Dimension " + i + ": ", dims[i].longValue(), res.dimension(i));
+			assertEquals(dims[i].longValue(), res.dimension(i), "Image Dimension " + i + ": ");
 		}
 	}
 

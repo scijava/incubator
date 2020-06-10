@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.coloc.pValue;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -41,7 +41,7 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.real.FloatType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 import org.scijava.thread.ThreadService;
 

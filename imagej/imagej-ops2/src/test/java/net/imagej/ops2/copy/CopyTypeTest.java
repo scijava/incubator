@@ -28,13 +28,13 @@
  */
 package net.imagej.ops2.copy;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.type.numeric.real.DoubleType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test {@link CopyType}.
@@ -46,7 +46,7 @@ public class CopyTypeTest extends AbstractOpTest {
 
 	private DoubleType dt;
 
-	@Before
+	@BeforeEach
 	public void createData() {
 		dt = new DoubleType(2);
 	}

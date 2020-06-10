@@ -29,7 +29,7 @@
 
 package net.imagej.ops2.labeling;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.FinalInterval;
@@ -40,9 +40,8 @@ import net.imglib2.roi.labeling.LabelingType;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -56,7 +55,7 @@ public class MergeLabelingTest extends AbstractOpTest {
 	private ImgLabeling<Integer, ByteType> in2;
 	private ImgLabeling<Integer, ByteType> out;
 
-	@Before
+	@BeforeEach
 	public void setUpTest() {
 		super.setUp();
 		in1 = op("create.imgLabeling").input(new FinalInterval(2, 2), new ByteType())

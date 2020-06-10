@@ -28,7 +28,7 @@
  */
 package net.imagej.ops2.copy;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Iterator;
 
@@ -40,8 +40,8 @@ import net.imglib2.roi.labeling.LabelingMapping;
 import net.imglib2.roi.labeling.LabelingType;
 import net.imglib2.type.numeric.integer.IntType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.scijava.types.Nil;
 
 /**
@@ -54,7 +54,7 @@ public class CopyLabelingMappingTest extends AbstractOpTest {
 
 	private LabelingMapping<String> input;
 
-	@Before
+	@BeforeEach
 	public void createData() {
 		final ImgLabeling<String, IntType> imgL = op("create.imgLabeling")
 				.input(new FinalDimensions(10, 10), new IntType()) //

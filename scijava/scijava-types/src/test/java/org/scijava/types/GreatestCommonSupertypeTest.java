@@ -1,13 +1,13 @@
 package org.scijava.types;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GreatestCommonSupertypeTest {
 
@@ -71,12 +71,12 @@ public class GreatestCommonSupertypeTest {
 		Type t2 = new Nil<List<Double>>() {}.getType();
 		Type superType = Types.greatestCommonSuperType(new Type[] { t1, t2 }, false);
 		assertTrue(superType.equals(new Nil<List<Double>>() {}.getType()));
-		assertFalse("Class Double should take precedence over Object",
-				superType.equals(new Nil<List<Object>>() {}.getType()));
-		assertFalse("Class Double should be discernable over wildcard",
-				superType.equals(new Nil<List<?>>() {}.getType()));
-		assertFalse("Class Double should be discernable, rawtype should not be returned",
-				superType.equals(new Nil<List>() {}.getType()));
+		assertFalse(superType.equals(new Nil<List<Object>>() {}.getType()),
+			"Class Double should take precedence over Object");
+		assertFalse(superType.equals(new Nil<List<?>>() {}.getType()),
+			"Class Double should be discernable over wildcard");
+		assertFalse(superType.equals(new Nil<List>() {}.getType()),
+			"Class Double should be discernable, rawtype should not be returned");
 	}
 
 	@Test
@@ -129,7 +129,8 @@ public class GreatestCommonSupertypeTest {
 		Type t4 = new Nil<YThing>() {}.getType();
 		Type superType = Types.greatestCommonSuperType(new Type[] { t3, t4 }, false);
 		Type expected = Types.wildcard(new Type[] { new Nil<Thing>() {}.getType() }, new Type[] {});
-		assertFalse("Greatest common type should not be a wildcard", superType.equals(expected));
+		assertFalse(superType.equals(expected),
+			"Greatest common type should not be a wildcard");
 		assertTrue(superType.equals(new Nil<Thing>() {}.getType()));
 	}
 
@@ -139,7 +140,7 @@ public class GreatestCommonSupertypeTest {
 		Type t4 = new Nil<XThing>() {}.getType();
 		Type superType = Types.greatestCommonSuperType(new Type[] { t3, t4 }, false);
 		assertTrue(superType.equals(new Nil<Base>() {}.getType()));
-		assertFalse("Non-Object classes should take precedence over interfaces",
-				superType.equals(new Nil<Thing>() {}.getType()));
+		assertFalse(superType.equals(new Nil<Thing>() {}.getType()),
+			"Non-Object classes should take precedence over interfaces");
 	}
 }
