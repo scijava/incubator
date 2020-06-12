@@ -8,16 +8,15 @@ import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Functions;
-import org.scijava.ops.monitor.DefaultOpMonitor;
-import org.scijava.ops.monitor.OpMonitor;
-import org.scijava.types.Nil;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;
+import org.scijava.types.Nil;
 
 /**
  * Tests correct functionality of {@link OpMonitor}
@@ -59,7 +58,7 @@ public class OpMonitorTest extends AbstractTestEnvironment {
 			future.get();
 		} catch (ExecutionException exc) {
 			Throwable cancellationException = exc.getCause();
-			assert cancellationException instanceof CancellationException;
+			Assert.assertTrue(cancellationException instanceof CancellationException);
 			throw (CancellationException) cancellationException;
 		}
 	}
@@ -79,8 +78,8 @@ public class OpMonitorTest extends AbstractTestEnvironment {
 			progress = monitor.getProgress();
 		}
 		BigInteger bi = future.get();
-		assert bi.equals(target);
-		assert progress == 1;
+		Assert.assertTrue(bi.equals(target));
+		Assert.assertEquals(monitor.getProgress(), 1, 0);
 	}
 
 }
