@@ -35,7 +35,6 @@ import java.util.List;
 
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.matcher.OpCandidate;
 
 /**
  * Base class for help operations.
@@ -45,14 +44,6 @@ import org.scijava.ops.matcher.OpCandidate;
 public abstract class AbstractHelp {
 
 	protected String help;
-
-	protected void help(final List<OpCandidate> candidates) {
-		final ArrayList<OpInfo> infos = new ArrayList<>();
-		for (final OpCandidate candidate : candidates) {
-			infos.add(candidate.opInfo());
-		}
-		help(infos);
-	}
 
 	protected void help(final Iterable<? extends OpInfo> infos) {
 		Iterator<? extends OpInfo> itr = infos.iterator();
