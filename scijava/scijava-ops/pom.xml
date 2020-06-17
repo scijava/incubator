@@ -95,27 +95,27 @@
 		<license.copyrightOwners>SciJava developers.</license.copyrightOwners>
 	</properties>
 
-  	<build>
-        <plugins>
-            <plugin>
-            	<groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>union-metadata-indices</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                        	<goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${basedir}/unionPluginInfo.sh</executable>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.gmaven</groupId>
+				<artifactId>groovy-maven-plugin</artifactId>
+				<version>2.1.1</version>
+				<executions>
+					<execution>
+						<id>union-metadata-indices</id>
+						<phase>process-test-classes</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<source>./unionPluginInfo.groovy</source>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<!-- SciJava dependencies -->
 		<dependency>
