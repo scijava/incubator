@@ -417,139 +417,166 @@ public final class MatchingUtils {
 	private static <M> boolean containsNull(M[] arr) {
 		return !Arrays.stream(arr).noneMatch(m -> m == null);
 	}
-
+	
 	/**
 	 * Tries to infer type vars contained in types from corresponding types from
 	 * inferFrom, putting them into the specified map.
 	 *
-	 * @param types
-	 * @param inferFrom
-	 * @param typeAssigns
+	 * @param types - the types containing {@link TypeVariable}s
+	 * @param inferFroms - the types used to infer the {@link TypeVariable}s
+	 *          within {@code types}
+	 * @param typeVarAssigns - the mapping of {@link TypeVariable}s to
+	 *          {@link Type}s
 	 * @throws TypeInferenceException
 	 */
-	protected static void inferTypeVariables(Type[] types, Type[] inferFrom, Map<TypeVariable<?>, Type> typeAssigns)
-			throws TypeInferenceException {
-		if (typeAssigns == null)
+	protected static void inferTypeVariables(Type[] types, Type[] inferFroms,
+		Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException
+	{
+		if (typeVarAssigns == null)
 			throw new IllegalArgumentException();
 		// TODO: is this the correct place to put this? We could get a marginal increase
 		// in Type Variable information if we put this farther into the loop.
-		if (types.length != inferFrom.length)
+		if (types.length != inferFroms.length)
 			throw new TypeInferenceException();
-		// Check all pairs of types
-		for (int i = 0; i < types.length; i++) {
-			if (types[i] instanceof TypeVariable) {
-				TypeVariable<?> varType = (TypeVariable<?>) types[i];
-				Type from = inferFrom[i];
 
-				Type current = typeAssigns.putIfAbsent(varType, from);
-				// If current is not null then we have already encountered that
-				// variable. If so, we require them to be exactly the same, and throw a
-				// TypeInferenceException if they are not.
-				if (current != null) {
-					if (Objects.equal(current, from))
-						continue;
-					if (current instanceof Any) {
-						typeAssigns.put(varType, from);
-						continue;
-					}
+		for (int i = 0; i < types.length; i++) {
+			inferTypeVariables(types[i], inferFroms[i], typeVarAssigns);
+		}
+	}
+	
+	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
+		Type current = typeVarAssigns.putIfAbsent(type, inferFrom);
+		// If current is not null then we have already encountered that
+		// variable. If so, we require them to be exactly the same, and throw a
+		// TypeInferenceException if they are not.
+		if (current != null) {
+			if (Objects.equal(current, inferFrom))
+				return;
+			if (current instanceof Any) {
+				typeVarAssigns.put(type, inferFrom);
+				return;
+			}
+			throw new TypeInferenceException();
+		}
+
+		// Bounds could also contain type vars, hence possibly go into
+		// recursion
+		for (Type bound : type.getBounds()) {
+			if (bound instanceof TypeVariable && typeVarAssigns.get(bound) != null) {
+				// If the bound of the current var (let's call it A) to
+				// infer is also a var (let's call it B):
+				// If we already encountered B, we check if the current
+				// type to infer from is assignable to
+				// the already inferred type for B. In this case we do
+				// not require equality as one var is
+				// bounded by another and it is not the same. E.g.
+				// assume we want to infer the types of vars:
+				// - - - A extends Number, B extends A
+				// From types:
+				// - - - Number, Double
+				// First A is bound to Number, next B to Double. Then we
+				// check the bounds for B. We encounter A,
+				// for which we already inferred Number. Hence, it
+				// suffices to check whether Double can be assigned
+				// to Number, it does not have to be equal as it is just
+				// a transitive bound for B.
+				Type typeAssignForBound = typeVarAssigns.get(bound);
+				if (!Types.isAssignable(inferFrom, typeAssignForBound)) {
 					throw new TypeInferenceException();
 				}
-
-				// Bounds could also contain type vars, hence possibly go into
-				// recursion
-				for (Type bound : varType.getBounds()) {
-					if (bound instanceof TypeVariable && typeAssigns.get(bound) != null) {
-						// If the bound of the current var (let's call it A) to
-						// infer is also a var (let's call it B):
-						// If we already encountered B, we check if the current
-						// type to infer from is assignable to
-						// the already inferred type for B. In this case we do
-						// not require equality as one var is
-						// bounded by another and it is not the same. E.g.
-						// assume we want to infer the types of vars:
-						// - - - A extends Number, B extends A
-						// From types:
-						// - - - Number, Double
-						// First A is bound to Number, next B to Double. Then we
-						// check the bounds for B. We encounter A,
-						// for which we already inferred Number. Hence, it
-						// suffices to check whether Double can be assigned
-						// to Number, it does not have to be equal as it is just
-						// a transitive bound for B.
-						Type typeAssignForBound = typeAssigns.get(bound);
-						if (!Types.isAssignable(from, typeAssignForBound)) {
+			} else {
+				// Else go into recursion as we encountered a new var.
+				inferTypeVariables( bound, inferFrom, typeVarAssigns);
+			}	
+		}
+	}
+	
+	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
+	// Recursively follow parameterized types
+		if (!(inferFrom instanceof ParameterizedType)) {
+			Type[] fromType = { type };
+			fromType = Types.mapVarToTypes(fromType, typeVarAssigns);
+			if( inferFrom instanceof TypeVariable<?>){
+				// If current type var is absent put it to the map. Otherwise,
+				// we already encountered that var.
+				// Hence, we require them to be exactly the same.
+				if(Types.isAssignable(fromType[0], inferFrom, typeVarAssigns)) {
+					Type current = typeVarAssigns.putIfAbsent((TypeVariable<?>) inferFrom, fromType[0]);
+					if (current != null) {
+						if (current instanceof Any) {
+							typeVarAssigns.put((TypeVariable<?>) fromType[0], type);
+						}
+						else if (!Objects.equal(type, current)) {
 							throw new TypeInferenceException();
-						}
-					} else {
-						// Else go into recursion as we encountered a new var.
-						inferTypeVariables(new Type[] { bound }, new Type[] { from }, typeAssigns);
-					}
-				}
-			} else if (types[i] instanceof ParameterizedType) {
-				// Recursively follow parameterized types
-				if (!(inferFrom[i] instanceof ParameterizedType)) {
-					Type[] fromType = { types[i] };
-					fromType = Types.mapVarToTypes(fromType, typeAssigns);
-					if( inferFrom[i] instanceof TypeVariable<?>){
-						// If current type var is absent put it to the map. Otherwise,
-						// we already encountered that var.
-						// Hence, we require them to be exactly the same.
-						if(Types.isAssignable(fromType[0], inferFrom[i], typeAssigns)) {
-							Type current = typeAssigns.putIfAbsent((TypeVariable<?>) inferFrom[i], fromType[0]);
-							if (current != null) {
-								if (current instanceof Any) {
-									typeAssigns.put((TypeVariable<?>) fromType[0], types[i]);
-								}
-								else if (!Objects.equal(types[i], current)) {
-									throw new TypeInferenceException();
-								}
-							}
-						}
-					}
-					else if (!Types.isAssignable(inferFrom[i], fromType[0], typeAssigns)) {
-						throw new TypeInferenceException();
-					}
-				} else {
-					ParameterizedType paramType = (ParameterizedType) types[i];
-
-					// Finding the supertype here is really important. Suppose that we are
-					// inferring from a StrangeThing<Long> extends Thing<Double> and our
-					// Op requires a Thing<T>. We need to ensure that T gets
-					// resolved to a Double and NOT a Long.
-					ParameterizedType paramInferFrom = (ParameterizedType) Types
-						.getExactSuperType(inferFrom[i], Types.raw(paramType));
-					if (paramInferFrom == null) throw new TypeInferenceException();
-
-					inferTypeVariables(paramType.getActualTypeArguments(), paramInferFrom.getActualTypeArguments(),
-							typeAssigns);
-				}
-			} else if (types[i] instanceof WildcardType) {
-				// TODO Do we need to specifically handle Wildcards? Or are they
-				// sufficiently handled by Types.satisfies below?
-				
-				
-			} else if (types[i] instanceof Class) {
-				if( inferFrom[i] instanceof TypeVariable<?>){
-					// If current type var is absent put it to the map. Otherwise,
-					// we already encountered that var.
-					// Hence, we require them to be exactly the same.
-					if(Types.isAssignable(types[i], inferFrom[i], typeAssigns)) {
-					Type current = typeAssigns.putIfAbsent((TypeVariable<?>) inferFrom[i], types[i]);
-						if (current != null) {
-							if (current instanceof Any) {
-								typeAssigns.put((TypeVariable<?>) inferFrom[i], types[i]);
-							}
-							else if (!Objects.equal(types[i], current)) {
-								throw new TypeInferenceException();
-							}
 						}
 					}
 				}
 			}
+			else if (!Types.isAssignable(inferFrom, fromType[0], typeVarAssigns)) {
+				throw new TypeInferenceException();
+			}
+		} else {
+			// Finding the supertype here is really important. Suppose that we are
+			// inferring from a StrangeThing<Long> extends Thing<Double> and our
+			// Op requires a Thing<T>. We need to ensure that T gets
+			// resolved to a Double and NOT a Long.
+			ParameterizedType paramInferFrom = (ParameterizedType) Types
+				.getExactSuperType(inferFrom, Types.raw(type));
+			if (paramInferFrom == null) throw new TypeInferenceException();
+
+			inferTypeVariables(type.getActualTypeArguments(), paramInferFrom.getActualTypeArguments(),
+					typeVarAssigns);
+		}	
+	}
+	
+	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
+		if( inferFrom instanceof TypeVariable<?>){
+			// If current type var is absent put it to the map. Otherwise,
+			// we already encountered that var.
+			// Hence, we require them to be exactly the same.
+			if(Types.isAssignable(type, inferFrom, typeVarAssigns)) {
+			Type current = typeVarAssigns.putIfAbsent((TypeVariable<?>) inferFrom, type);
+				if (current != null) {
+					if (current instanceof Any) {
+						typeVarAssigns.put((TypeVariable<?>) inferFrom, type);
+					}
+					else if (!Objects.equal(type, current)) {
+						throw new TypeInferenceException();
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Tries to infer type vars contained in types from corresponding types from
+	 * inferFrom, putting them into the specified map.
+	 *
+	 * @param type
+	 * @param inferFrom
+	 * @param typeVarAssigns
+	 * @throws TypeInferenceException
+	 */
+	protected static void inferTypeVariables(Type type, Type inferFrom,
+		Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException
+	{
+		if (type instanceof TypeVariable) {
+			inferTypeVariables((TypeVariable<?>) type, inferFrom, typeVarAssigns);
+		}
+		else if (type instanceof ParameterizedType) {
+			inferTypeVariables((ParameterizedType) type, inferFrom, typeVarAssigns);
+		}
+		else if (type instanceof WildcardType) {
+			// TODO Do we need to specifically handle Wildcards? Or are they
+			// sufficiently handled by Types.satisfies below?
 
 		}
+		else if (type instanceof Class) {
+			inferTypeVariables((Class<?>) type, inferFrom, typeVarAssigns);
+		}
+
 		// Check if the inferred types satisfy their bounds
-		if (!Types.typesSatisfyVariables(typeAssigns)) {
+		if (!Types.typesSatisfyVariables(typeVarAssigns)) {
 			throw new TypeInferenceException();
 		}
 	}
