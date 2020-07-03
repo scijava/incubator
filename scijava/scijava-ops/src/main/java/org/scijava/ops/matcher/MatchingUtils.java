@@ -34,6 +34,7 @@ package org.scijava.ops.matcher;
 
 import com.google.common.base.Objects;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -548,6 +549,17 @@ public final class MatchingUtils {
 		}
 	}
 	
+	private static void inferTypeVariables(GenericArrayType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
+		if (inferFrom instanceof Class<?> && ((Class<?>) inferFrom).isArray()) {
+			Type componentType = type.getGenericComponentType();
+			Type componentInferFrom = ((Class<?>) inferFrom).getComponentType();
+			inferTypeVariables(componentType, componentInferFrom, typeVarAssigns);
+		}
+		else {
+			if (! Types.isAssignable(inferFrom, type, typeVarAssigns)) throw new TypeInferenceException();
+		}
+	}
+
 	/**
 	 * Tries to infer type vars contained in types from corresponding types from
 	 * inferFrom, putting them into the specified map.
@@ -570,6 +582,9 @@ public final class MatchingUtils {
 			// TODO Do we need to specifically handle Wildcards? Or are they
 			// sufficiently handled by Types.satisfies below?
 
+		}
+		else if (type instanceof GenericArrayType) {
+			inferTypeVariables((GenericArrayType) type, inferFrom, typeVarAssigns);
 		}
 		else if (type instanceof Class) {
 			inferTypeVariables((Class<?>) type, inferFrom, typeVarAssigns);
