@@ -43,6 +43,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.scijava.ops.matcher.MatchingUtils.TypeInferenceException;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
@@ -419,6 +420,58 @@ public class MatchingUtilsTest {
 
 		assertAll(Wildcards.class, true, y1);
 		assertAll(Wildcards.class, false, n1, n2, n3, n4);
+	}
+
+	/**
+	 * Suppose we have a
+	 *
+	 * <pre>
+	 * class Foo&lt;I extends Number&gt implements Function&lt;I[], Double&gt;
+	 * </pre>
+	 *
+	 * It is legal to write
+	 *
+	 * <pre>
+	 *
+	 * Function&lt;Double[], Double[]&gt; fooFunc = new Foo&lt;&gt;();
+	 * </pre>
+	 *
+	 * If we instead have a
+	 *
+	 * <pre>
+	 * class Bar implements Function&lt;O[], Double&gt;
+	 * </pre>
+	 *
+	 * where <code>O extends Number</code>, is <strong>not</strong> legal to write
+	 *
+	 * <pre>
+	 *
+	 * Function&lt;Double[], Double[]&gt; barFunc = new Bar&lt;&gt;();
+	 * </pre>
+	 *
+	 * @param <I>
+	 * @param <O>
+	 */
+	@Test
+	public <O extends Number> void testGenericArrayFunction() {
+		class Foo<I extends Number> implements Function<I[], Double> {
+			@Override
+			public Double apply(I[] t) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		}
+
+		class Bar implements Function<O[], Double> {
+			@Override
+			public Double apply(O[] t) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		}
+		Nil<Function<Double[], Double>> doubleFunction = new Nil<>() {};
+		assertAll(Foo.class, true, doubleFunction);
+		assertAll(Bar.class, false, doubleFunction);
 	}
 
 	@Test(expected = NullPointerException.class)
