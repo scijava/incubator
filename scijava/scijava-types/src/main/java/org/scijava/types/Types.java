@@ -3362,6 +3362,12 @@ public final class Types {
 						.getUpperBounds())).withLowerBounds(unrollBounds(typeArguments, wild
 							.getLowerBounds())).build();
 				}
+				if (type instanceof GenericArrayType) {
+					final GenericArrayType genArrType = (GenericArrayType) type;
+					final Type componentType = genArrType.getGenericComponentType();
+					final Type unrolledComponent = unrollVariables(typeArguments, componentType, followTypeVars);
+					return array(unrolledComponent);
+				}
 			}
 			return type;
 		}
