@@ -3416,6 +3416,11 @@ public final class Types {
 					wild)[0]) || containsTypeVariables(TypeUtils.getImplicitUpperBounds(
 						wild)[0]);
 			}
+			if (type instanceof GenericArrayType) {
+				// if this type contains type vars, they will be in the component type
+				final GenericArrayType genArrType = (GenericArrayType) type;
+				return containsTypeVariables(genArrType.getGenericComponentType());
+			}
 			return false;
 		}
 
