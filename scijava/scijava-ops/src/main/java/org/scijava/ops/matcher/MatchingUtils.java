@@ -301,29 +301,6 @@ public final class MatchingUtils {
 	}
 
 	/**
-	 * @param srcTypes
-	 *            the Type arguments for the source Type
-	 * @param destTypes
-	 *            the Type arguments for the destination Type
-	 * @param src
-	 *            the type for which assignment should be checked from
-	 * @param dest
-	 *            the parameterized type for which assignment should be checked to
-	 * @param safeAssignability
-	 *            used to determine if we want to check if the src->dest assignment
-	 *            would be safely assignable even though it would cause a compiler
-	 *            error if we explicitly tried to do this (useful pretty much only
-	 *            for Op matching)
-	 * @return whether and assignment of source to destination would be a legal java
-	 *         statement
-	 */
-	private static boolean checkGenericAssignability(Type[] srcTypes, Type[] destTypes, Type src, Type dest,
-			boolean safeAssignability) {
-		return checkGenericAssignability(srcTypes, destTypes, src, dest, new HashMap<TypeVariable<?>, Type>(),
-				safeAssignability);
-	}
-
-	/**
 	 * 
 	 * @param srcTypes
 	 *            the Type arguments for the source Type
