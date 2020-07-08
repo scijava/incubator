@@ -236,7 +236,7 @@ public final class MatchingUtils {
 	 */
 	public static boolean checkGenericAssignability(Type src, ParameterizedType dest,
 			Map<TypeVariable<?>, Type> typeVarAssigns, boolean safeAssignability) {
-		// check raw assignability
+		// fail fast when raw types are not assignable
 		if (!Types.isAssignable(Types.raw(src), Types.raw(dest)))
 			return false;
 
