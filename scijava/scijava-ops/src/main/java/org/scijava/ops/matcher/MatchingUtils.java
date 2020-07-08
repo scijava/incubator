@@ -245,8 +245,11 @@ public final class MatchingUtils {
 
 		if (src instanceof Class  || src instanceof ParameterizedType) {
 			destTypes = dest.getActualTypeArguments();
-			Type superType = Types.getExactSuperType(src, Types.raw(dest));
-			if (superType instanceof ParameterizedType)
+			Type superType = superType(src, Types.raw(dest));
+			if (superType == null) {
+				return false;
+			}
+			else if (superType instanceof ParameterizedType)
 				srcTypes = ((ParameterizedType) superType).getActualTypeArguments();
 			else
 				srcTypes = getParams(Types.raw(src), Types.raw(dest));
@@ -255,6 +258,29 @@ public final class MatchingUtils {
 		}
 
 		return checkGenericAssignability(srcTypes, destTypes, src, dest, typeVarAssigns, safeAssignability);
+	}
+
+	/**
+	 * This method is designed to handle edge cases when calling
+	 * {@link Types#getExactSuperType(Type, Class)}. When
+	 * {@code getExactSuperType} returns an error, this usually implies some funny
+	 * business going on with the {@link Type} that was passed to it. We are not
+	 * interested in supporting this business, since it usually results from poor
+	 * practice in Class construction. TODO: determine some way of conveying to
+	 * the user that GenTyRef doesn't like their inputs.
+	 *
+	 * @param src
+	 * @param superClass
+	 * @return - the supertype of {@code src} with rawtype {@code superClass}, or
+	 *         {@code null} if no such supertype exists.
+	 */
+	private static Type superType(Type src, Class<?> superClass) {
+			try {
+				return Types.getExactSuperType(src, superClass);
+			} catch (AssertionError e) {
+				// can be thrown when
+				return null;
+			}
 	}
 
 	/**
