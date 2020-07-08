@@ -404,12 +404,14 @@ public final class MatchingUtils {
 
 	/**
 	 * Map type vars in specified type list to types using the specified map. In
-	 * doing so, type vars mapping to other type vars will not be followed but just
-	 * repalced.
+	 * doing so, type vars mapping to other type vars will not be followed but
+	 * just replaced.
 	 *
 	 * @param typesToMap
 	 * @param typeAssigns
-	 * @return
+	 * @return a copy of {@code typesToMap} in which the {@link TypeVariable}s
+	 *         (that are present in {@code typeAssigns}) are mapped to the
+	 *         associated values within the {@code Map}.
 	 */
 	private static Type[] mapVarToTypes(Type[] typesToMap, Map<TypeVariable<?>, Type> typeAssigns) {
 		return Arrays.stream(typesToMap).map(type -> Types.unrollVariables(typeAssigns, type, false))
