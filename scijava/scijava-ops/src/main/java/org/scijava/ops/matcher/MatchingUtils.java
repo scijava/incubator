@@ -360,8 +360,6 @@ public final class MatchingUtils {
 	 * NORMALLY MATCH UP but WE KNOW IT WILL BE SAFE TO ASSIGN. This method attempts
 	 * to tease those situations out as a last resort.
 	 * 
-	 * @param srcTypes
-	 *            - the array of Parameterized types of the potential match
 	 * @param destTypes
 	 *            - the array of Parameterized types of the OpInfo we called the
 	 *            matcher on (in the case of ops.run(), it is a Type array of the
