@@ -60,9 +60,9 @@ public final class MatchingUtils {
 	}
 
 	/**
-	 * Checks for raw assignability. TODO This method is not yet fully implemented.
-	 * The correct behavior should be as follows. Suppose we have a generic typed
-	 * method like:
+	 * Checks for raw assignability. TODO This method is not yet fully
+	 * implemented. The correct behavior should be as follows. Suppose we have a
+	 * generic typed method like:
 	 *
 	 * <pre>
 	 *public static &lt;N&gt; List&lt;N&gt; foo(N in) {
@@ -103,9 +103,11 @@ public final class MatchingUtils {
 	 * @param froms
 	 * @param tos
 	 * @param typeBounds
-	 * @return
+	 * @return the index {@code i} such that {@code from[i]} cannot be assigned to
+	 *         {@code to[i]}, or {@code -1} iff {@code from[i]} can be assigned to
+	 *         {@code to[i]} for all {@code 0 <= i < from.length}.
 	 */
-	public static int checkGenericOutputsAssignability(Type[] froms, Type[] tos,
+	static int checkGenericOutputsAssignability(Type[] froms, Type[] tos,
 			HashMap<TypeVariable<?>, TypeVarInfo> typeBounds) {
 		for (int i = 0; i < froms.length; i++) {
 			Type from = froms[i];
