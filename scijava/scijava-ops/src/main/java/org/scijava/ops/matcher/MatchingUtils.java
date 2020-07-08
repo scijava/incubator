@@ -418,10 +418,6 @@ public final class MatchingUtils {
 				.toArray(Type[]::new);
 	}
 
-	private static <M> boolean containsNull(M[] arr) {
-		return !Arrays.stream(arr).noneMatch(m -> m == null);
-	}
-	
 	/**
 	 * Tries to infer type vars contained in types from corresponding types from
 	 * inferFrom, putting them into the specified map.
