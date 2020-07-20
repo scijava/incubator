@@ -442,12 +442,12 @@ public final class MatchingUtils {
 	protected static void inferTypeVariables(Type[] types, Type[] inferFroms,
 		Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException
 	{
-		if (typeVarAssigns == null)
-			throw new IllegalArgumentException();
-		// TODO: is this the correct place to put this? We could get a marginal increase
-		// in Type Variable information if we put this farther into the loop.
-		if (types.length != inferFroms.length)
-			throw new TypeInferenceException();
+		// Ensure that the user has not passed a null map
+		if (typeVarAssigns == null) throw new IllegalArgumentException(
+			"Type Variable map is null, cannot store mappings of TypeVariables to Types!");
+
+		if (types.length != inferFroms.length) throw new TypeInferenceException(
+			"Could not infer type variables: Type arrays must be of the same size");
 
 		for (int i = 0; i < types.length; i++) {
 			inferTypeVariables(types[i], inferFroms[i], typeVarAssigns);
