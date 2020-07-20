@@ -487,6 +487,7 @@ public final class MatchingUtils {
 		else if (type instanceof WildcardType) {
 			// TODO Do we need to specifically handle Wildcards? Or are they
 			// sufficiently handled by Types.satisfies below?
+			inferTypeVariables((WildcardType) type, inferFrom, typeVarAssigns);
 
 		}
 		else if (type instanceof GenericArrayType) {
@@ -585,6 +586,13 @@ public final class MatchingUtils {
 			inferTypeVariables(type.getActualTypeArguments(), paramInferFrom.getActualTypeArguments(),
 					typeVarAssigns);
 		}	
+	}
+	
+	private static void inferTypeVariables(WildcardType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) {
+		Type[] upperBounds = type.getUpperBounds();
+		for (Type upperBound : upperBounds) {
+			if (!(upperBound instanceof TypeVariable<?>)) continue;
+		}
 	}
 
 	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {

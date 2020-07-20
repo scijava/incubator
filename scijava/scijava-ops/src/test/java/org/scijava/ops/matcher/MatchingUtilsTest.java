@@ -38,6 +38,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -401,7 +402,7 @@ public class MatchingUtilsTest {
 		assertAll(DoubleVarBoundedAndWildcard.class, true, y1, y2);
 		assertAll(DoubleVarBoundedAndWildcard.class, false, n1, n2, n3, n4, n5, n6);
 	}
-
+	
 	@Test
 	public void genericAssignabilityWildcards() {
 		abstract class Wildcards implements Function<List<? extends Number>, List<? extends Number>> {
@@ -420,6 +421,22 @@ public class MatchingUtilsTest {
 
 		assertAll(Wildcards.class, true, y1);
 		assertAll(Wildcards.class, false, n1, n2, n3, n4);
+	}
+	
+	@Test
+	public void genericAssignabilityWildcardExtendingTypeVar() {
+		abstract class StrangeConsumer<T extends Number> implements
+			BiConsumer<List<? extends T>, T>
+		{}
+		
+		Nil<BiConsumer<List<? extends Number>, Number>> y1 = new Nil<>() {};
+		Nil<BiConsumer<List<? extends Integer>, Integer>> y2 = new Nil<>() {};
+
+		Nil<BiConsumer<List<? extends Integer>, Double>> n1 = new Nil<>() {};
+		
+		assertAll(StrangeConsumer.class, true, y1, y2);
+		assertAll(StrangeConsumer.class, false, n1);
+		
 	}
 
 	/**
@@ -522,6 +539,26 @@ public class MatchingUtilsTest {
 		expected.put((TypeVariable<?>) ((ParameterizedType) tArgs[1])
 			.getActualTypeArguments()[0], Double.class);
 
+		assertEquals(typeAssigns, expected);
+	}
+	
+	@Test
+	public <T> void testWildcardTypeInference() throws TypeInferenceException {
+		final Type t = new Nil<T>() {}.getType();
+		final Type listWild = new Nil<List<? extends T>>() {}.getType();
+		final Type integer = new Nil<Integer>() {}.getType();
+		final Type listDouble = new Nil<List<Double>>() {}.getType();
+		
+		final Type[] types = {listWild, t};
+		final Type[] inferFroms = {listDouble, integer};
+		
+		final Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
+		MatchingUtils.inferTypeVariables(types, inferFroms, typeAssigns);
+		
+		// We expect T=Number
+		final Map<TypeVariable<?>, Type> expected = new HashMap<>();
+		expected.put((TypeVariable<?>) t, Number.class);
+		
 		assertEquals(typeAssigns, expected);
 	}
 	
