@@ -402,6 +402,14 @@ public final class MatchingUtils {
 		 *
 		 */
 		private static final long serialVersionUID = 7147530827546663700L;
+		
+		public TypeInferenceException() {
+			super();
+		}
+		
+		public TypeInferenceException(String message) {
+			super(message);
+		}
 	}
 
 	/**
