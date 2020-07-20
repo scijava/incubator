@@ -453,7 +453,43 @@ public final class MatchingUtils {
 			inferTypeVariables(types[i], inferFroms[i], typeVarAssigns);
 		}
 	}
-	
+
+	/**
+	 * Tries to infer type vars contained in types from corresponding types from
+	 * inferFrom, putting them into the specified map.
+	 *
+	 * @param type
+	 * @param inferFrom
+	 * @param typeVarAssigns
+	 * @throws TypeInferenceException
+	 */
+	protected static void inferTypeVariables(Type type, Type inferFrom,
+		Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException
+	{
+		if (type instanceof TypeVariable) {
+			inferTypeVariables((TypeVariable<?>) type, inferFrom, typeVarAssigns);
+		}
+		else if (type instanceof ParameterizedType) {
+			inferTypeVariables((ParameterizedType) type, inferFrom, typeVarAssigns);
+		}
+		else if (type instanceof WildcardType) {
+			// TODO Do we need to specifically handle Wildcards? Or are they
+			// sufficiently handled by Types.satisfies below?
+
+		}
+		else if (type instanceof GenericArrayType) {
+			inferTypeVariables((GenericArrayType) type, inferFrom, typeVarAssigns);
+		}
+		else if (type instanceof Class) {
+			inferTypeVariables((Class<?>) type, inferFrom, typeVarAssigns);
+		}
+
+		// Check if the inferred types satisfy their bounds
+		if (!Types.typesSatisfyVariables(typeVarAssigns)) {
+			throw new TypeInferenceException();
+		}
+	}
+
 	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
 		Type current = typeVarAssigns.putIfAbsent(type, inferFrom);
 		// If current is not null then we have already encountered that
@@ -500,7 +536,7 @@ public final class MatchingUtils {
 			}	
 		}
 	}
-	
+
 	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
 	// Recursively follow parameterized types
 		if (!(inferFrom instanceof ParameterizedType)) {
@@ -538,7 +574,7 @@ public final class MatchingUtils {
 					typeVarAssigns);
 		}	
 	}
-	
+
 	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
 		if( inferFrom instanceof TypeVariable<?>){
 			// If current type var is absent put it to the map. Otherwise,
@@ -557,7 +593,7 @@ public final class MatchingUtils {
 			}
 		}
 	}
-	
+
 	private static void inferTypeVariables(GenericArrayType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
 		if (inferFrom instanceof Class<?> && ((Class<?>) inferFrom).isArray()) {
 			Type componentType = type.getGenericComponentType();
@@ -566,42 +602,6 @@ public final class MatchingUtils {
 		}
 		else {
 			if (! Types.isAssignable(inferFrom, type, typeVarAssigns)) throw new TypeInferenceException();
-		}
-	}
-
-	/**
-	 * Tries to infer type vars contained in types from corresponding types from
-	 * inferFrom, putting them into the specified map.
-	 *
-	 * @param type
-	 * @param inferFrom
-	 * @param typeVarAssigns
-	 * @throws TypeInferenceException
-	 */
-	protected static void inferTypeVariables(Type type, Type inferFrom,
-		Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException
-	{
-		if (type instanceof TypeVariable) {
-			inferTypeVariables((TypeVariable<?>) type, inferFrom, typeVarAssigns);
-		}
-		else if (type instanceof ParameterizedType) {
-			inferTypeVariables((ParameterizedType) type, inferFrom, typeVarAssigns);
-		}
-		else if (type instanceof WildcardType) {
-			// TODO Do we need to specifically handle Wildcards? Or are they
-			// sufficiently handled by Types.satisfies below?
-
-		}
-		else if (type instanceof GenericArrayType) {
-			inferTypeVariables((GenericArrayType) type, inferFrom, typeVarAssigns);
-		}
-		else if (type instanceof Class) {
-			inferTypeVariables((Class<?>) type, inferFrom, typeVarAssigns);
-		}
-
-		// Check if the inferred types satisfy their bounds
-		if (!Types.typesSatisfyVariables(typeVarAssigns)) {
-			throw new TypeInferenceException();
 		}
 	}
 
