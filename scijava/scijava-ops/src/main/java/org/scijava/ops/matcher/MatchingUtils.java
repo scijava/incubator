@@ -236,30 +236,42 @@ public final class MatchingUtils {
 	 * @return whether and assignment of source to destination would be a legal java
 	 *         statement
 	 */
-	public static boolean checkGenericAssignability(Type src, ParameterizedType dest,
-			Map<TypeVariable<?>, Type> typeVarAssigns, boolean safeAssignability) {
+	public static boolean checkGenericAssignability(Type src,
+		ParameterizedType dest, Map<TypeVariable<?>, Type> typeVarAssigns,
+		boolean safeAssignability)
+	{
 		// fail fast when raw types are not assignable
-		if (!Types.isAssignable(Types.raw(src), Types.raw(dest)))
-			return false;
+		if (!Types.isAssignable(Types.raw(src), Types.raw(dest))) return false;
 
-		Type[] destTypes;
-		Type[] srcTypes;
+		// when raw types are assignable, check the type variables of src and dest
+		Type[] srcTypes = typeParamsAgainstClass(src, Types.raw(dest));
+		Type[] destTypes = dest.getActualTypeArguments();
 
-		if (src instanceof Class  || src instanceof ParameterizedType) {
-			destTypes = dest.getActualTypeArguments();
-			Type superType = superType(src, Types.raw(dest));
-			if (superType == null) {
-				return false;
-			}
-			else if (superType instanceof ParameterizedType)
-				srcTypes = ((ParameterizedType) superType).getActualTypeArguments();
-			else
-				srcTypes = getParams(Types.raw(src), Types.raw(dest));
-		} else {
-			return Types.isAssignable(src, dest);
-		}
+		// if there are no type parameters in src (w.r.t. dest), do a basic
+		// assignability check.
+		if (srcTypes.length == 0) return Types.isAssignable(src, dest);
+		// if there are type parameters, do a more complicated assignability check.
+		return checkGenericAssignability(srcTypes, destTypes, src, dest,
+			typeVarAssigns, safeAssignability);
+	}
 
-		return checkGenericAssignability(srcTypes, destTypes, src, dest, typeVarAssigns, safeAssignability);
+	/**
+	 * Obtains the type parameters of {@link Type} {@code src} <b>with respect
+	 * to</b> the {@link Class} {@code dest}. When {@code src} has no type
+	 * parameters (or is not a subclass of {@code dest}), an empty array is
+	 * returned.
+	 *
+	 * @param src - the {@code Type} whose type parameters will be returned.
+	 * @param superclass - the {@code Class} against which we want the type parameters of {@code src}
+	 * @return an array of {@code Type}s denoting the type
+	 */
+	private static Type[] typeParamsAgainstClass(Type src, Class<?> superclass) {
+		// only classes and ParameterizedTypes can have type parameters
+		if (!(src instanceof Class || src instanceof ParameterizedType)) return new Type[0];
+		Type superSrc = superType(src, superclass);
+		if (superSrc == null) return new Type[0];
+		if (superSrc instanceof ParameterizedType) return ((ParameterizedType) superSrc).getActualTypeArguments();
+		return getParams(Types.raw(src), superclass);
 	}
 
 	/**
