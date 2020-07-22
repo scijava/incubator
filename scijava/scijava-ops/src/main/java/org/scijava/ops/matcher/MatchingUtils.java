@@ -442,7 +442,9 @@ public final class MatchingUtils {
 
 	/**
 	 * Tries to infer type vars contained in types from corresponding types from
-	 * inferFrom, putting them into the specified map.
+	 * inferFrom, putting them into the specified map. <b>When a
+	 * {@link TypeInferenceException} is thrown, the caller should assume that
+	 * some of the mappings within {@code typeVarAssigns} are incorrect.</b>
 	 *
 	 * @param types - the types containing {@link TypeVariable}s
 	 * @param inferFroms - the types used to infer the {@link TypeVariable}s
@@ -468,7 +470,9 @@ public final class MatchingUtils {
 
 	/**
 	 * Tries to infer type vars contained in types from corresponding types from
-	 * inferFrom, putting them into the specified map.
+	 * inferFrom, putting them into the specified map. <b>When a
+	 * {@link TypeInferenceException} is thrown, the caller should assume that
+	 * some of the mappings within {@code typeVarAssigns} are incorrect.</b>
 	 *
 	 * @param type
 	 * @param inferFrom
