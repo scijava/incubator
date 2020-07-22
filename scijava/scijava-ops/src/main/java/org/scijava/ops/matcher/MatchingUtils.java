@@ -554,16 +554,11 @@ public final class MatchingUtils {
 	// Recursively follow parameterized types
 		if (!(inferFrom instanceof ParameterizedType)) {
 			Type mappedType = Types.mapVarToTypes(type, typeVarAssigns);
-			if( inferFrom instanceof TypeVariable<?>){
-				// Use isAssignable to attempt to infer the type variables present in type using the BOUNDS of inferFrom
-				if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
-					throw new TypeInferenceException(inferFrom +
-						" cannot be implicitly cast to " + mappedType +
-						", thus it is impossible to infer type variables for " + inferFrom);
-				}
-			}
-			else if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
-				throw new TypeInferenceException();
+			// Use isAssignable to attempt to infer the type variables present in type
+			if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
+				throw new TypeInferenceException(inferFrom +
+					" cannot be implicitly cast to " + mappedType +
+					", thus it is impossible to infer type variables for " + inferFrom);
 			}
 		} else {
 			// Finding the supertype here is really important. Suppose that we are
