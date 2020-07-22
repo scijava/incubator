@@ -580,6 +580,21 @@ public class MatchingUtilsTest {
 		assertEquals(expected, typeAssigns);
 	}
 
+	// TODO: Use JUnit5
+	@Test(expected = TypeInferenceException.class)
+	public <T extends Number> void testInferTypeVarInconsistentMapping()
+		throws TypeInferenceException
+	{
+
+		final Type t = new Nil<T>() {}.getType();
+
+		final Type[] tArr = { t, t };
+		final Type[] badInferFrom = { Integer.class, Double.class };
+
+		MatchingUtils.inferTypeVariables(tArr, badInferFrom, new HashMap<>());
+
+	}
+
 	class Thing<T> {}
 	
 	class StrangeThing<N extends Number, T> extends Thing<T> {}

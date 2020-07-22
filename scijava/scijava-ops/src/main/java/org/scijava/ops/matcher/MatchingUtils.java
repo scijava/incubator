@@ -515,7 +515,10 @@ public final class MatchingUtils {
 				typeVarAssigns.put(type, inferFrom);
 				return;
 			}
-			throw new TypeInferenceException();
+			throw new TypeInferenceException(
+				"Cannot infer the type of TypeVariable " + type +
+					": this TypeVariable has already been mapped to " + current +
+					" and cannot be mapped to a " + inferFrom);
 		}
 
 		// Bounds could also contain type vars, hence possibly go into
