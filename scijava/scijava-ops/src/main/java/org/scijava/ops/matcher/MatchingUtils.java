@@ -551,16 +551,8 @@ public final class MatchingUtils {
 	}
 
 	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
-	// Recursively follow parameterized types
-		if (!(inferFrom instanceof ParameterizedType)) {
-			Type mappedType = Types.mapVarToTypes(type, typeVarAssigns);
-			// Use isAssignable to attempt to infer the type variables present in type
-			if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
-				throw new TypeInferenceException(inferFrom +
-					" cannot be implicitly cast to " + mappedType +
-					", thus it is impossible to infer type variables for " + inferFrom);
-			}
-		} else {
+		// Recursively follow parameterized types
+		if (inferFrom instanceof ParameterizedType) {
 			// Finding the supertype here is really important. Suppose that we are
 			// inferring from a StrangeThing<Long> extends Thing<Double> and our
 			// Op requires a Thing<T>. We need to ensure that T gets
@@ -569,9 +561,18 @@ public final class MatchingUtils {
 				.getExactSuperType(inferFrom, Types.raw(type));
 			if (paramInferFrom == null) throw new TypeInferenceException();
 
-			inferTypeVariables(type.getActualTypeArguments(), paramInferFrom.getActualTypeArguments(),
-					typeVarAssigns);
-		}	
+			inferTypeVariables(type.getActualTypeArguments(), paramInferFrom
+				.getActualTypeArguments(), typeVarAssigns);
+		}
+		else {
+			Type mappedType = Types.mapVarToTypes(type, typeVarAssigns);
+			// Use isAssignable to attempt to infer the type variables present in type
+			if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
+				throw new TypeInferenceException(inferFrom +
+					" cannot be implicitly cast to " + mappedType +
+					", thus it is impossible to infer type variables for " + inferFrom);
+			}
+		}
 	}
 	
 	private static void inferTypeVariables(WildcardType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) {
