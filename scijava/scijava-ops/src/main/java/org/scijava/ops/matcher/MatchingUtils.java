@@ -553,25 +553,16 @@ public final class MatchingUtils {
 	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, Type> typeVarAssigns) throws TypeInferenceException {
 	// Recursively follow parameterized types
 		if (!(inferFrom instanceof ParameterizedType)) {
-			Type[] fromType = { type };
-			fromType = Types.mapVarToTypes(fromType, typeVarAssigns);
+			Type mappedType = Types.mapVarToTypes(type, typeVarAssigns);
 			if( inferFrom instanceof TypeVariable<?>){
-				// If current type var is absent put it to the map. Otherwise,
-				// we already encountered that var.
-				// Hence, we require them to be exactly the same.
-				if(Types.isAssignable(fromType[0], inferFrom, typeVarAssigns)) {
-					Type current = typeVarAssigns.putIfAbsent((TypeVariable<?>) inferFrom, fromType[0]);
-					if (current != null) {
-						if (current instanceof Any) {
-							typeVarAssigns.put((TypeVariable<?>) fromType[0], type);
-						}
-						else if (!Objects.equal(type, current)) {
-							throw new TypeInferenceException();
-						}
-					}
+				// Use isAssignable to attempt to infer the type variables present in type using the BOUNDS of inferFrom
+				if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
+					throw new TypeInferenceException(inferFrom +
+						" cannot be implicitly cast to " + mappedType +
+						", thus it is impossible to infer type variables for " + inferFrom);
 				}
 			}
-			else if (!Types.isAssignable(inferFrom, fromType[0], typeVarAssigns)) {
+			else if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
 				throw new TypeInferenceException();
 			}
 		} else {
