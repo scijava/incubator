@@ -1286,9 +1286,16 @@ public final class Types {
 	 * @return
 	 */
 	public static Type[] mapVarToTypes(Type[] typesToMap, Map<TypeVariable<?>, Type> typeAssigns) {
-		return Arrays.stream(typesToMap).map(type -> Types.unrollVariables(typeAssigns, type, false))
-				.toArray(Type[]::new);
+		return Arrays.stream(typesToMap).map(type -> mapVarToTypes(type,
+			typeAssigns)).toArray(Type[]::new);
 	}
+
+	public static Type mapVarToTypes(Type typeToMap,
+		Map<TypeVariable<?>, Type> typeAssigns)
+	{
+		return Types.unrollVariables(typeAssigns, typeToMap, false);
+	}
+
 	/**
 	 * Converts the given string value to an enumeration constant of the specified
 	 * type.
