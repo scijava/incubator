@@ -561,7 +561,25 @@ public class MatchingUtilsTest {
 		
 		assertEquals(typeAssigns, expected);
 	}
-	
+
+	@Test
+	public <T, U extends Comparable<Double>> void testInferFromTypeVar()
+		throws TypeInferenceException
+	{
+		final Type compT = new Nil<Comparable<T>>() {}.getType();
+		final Type u = new Nil<U>() {}.getType();
+
+		final Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
+		MatchingUtils.inferTypeVariables(compT, u, typeAssigns);
+
+		// We expect T=Double
+		final Type t = new Nil<T>() {}.getType();
+		final Map<TypeVariable<?>, Type> expected = new HashMap<>();
+		expected.put((TypeVariable<?>) t, Double.class);
+
+		assertEquals(expected, typeAssigns);
+	}
+
 	class Thing<T> {}
 	
 	class StrangeThing<N extends Number, T> extends Thing<T> {}
