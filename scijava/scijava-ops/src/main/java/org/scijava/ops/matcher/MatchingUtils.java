@@ -34,7 +34,10 @@ package org.scijava.ops.matcher;
 
 import com.google.common.base.Objects;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -528,7 +531,7 @@ public final class MatchingUtils {
 		// variable. If so, we require them to be exactly the same, and throw a
 		// TypeInferenceException if they are not.
 		if (typeData != null) {
-			typeData.accomodateType(inferFrom, malleable);
+			typeData.refine(inferFrom, malleable);
 		}
 		typeVarAssigns.put(type, new MappedType(type, inferFrom, malleable));
 
@@ -603,7 +606,7 @@ public final class MatchingUtils {
 	
 	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType, Map<TypeVariable<?>, MappedType> typeVarAssigns, boolean malleability) throws TypeInferenceException {
 		if (typeVarAssigns.containsKey(typeVar)) {
-			typeVarAssigns.get(typeVar).accomodateType(newType, malleability);
+			typeVarAssigns.get(typeVar).refine(newType, malleability);
 		} else {
 			typeVarAssigns.put(typeVar, new MappedType(typeVar, newType, malleability));
 		}
@@ -744,20 +747,16 @@ public final class MatchingUtils {
 		return -1;
 	}
 	
-	private static Map<TypeVariable<?>, Type> generateTypeMap(Map<TypeVariable<?>, MappedType> map) {
-		return new TypeVarDataMap(map);
-	}
-	
 	/**
 	 * A data structure retaining information about the mapping of a
 	 * {@link TypeVariable} to a {@link Type} within a type-inferring context.
 	 * 
 	 * @author Gabriel Selzer
 	 */
-	static class MappedType implements Type {
+	static abstract class MappedType<T extends Type> implements Type {
 
 		final TypeVariable<?> typeVar;
-		Type mappedType;
+		T mappedType;
 
 		/**
 		 * A boolean describing whether {@code mappedType} can be mutated in within
@@ -765,13 +764,13 @@ public final class MatchingUtils {
 		 * {@link Type} <b>cannot</b> be mutated is when it is a type parameter of a
 		 * {@link ParameterizedType}. Once {@code malleable} is set to
 		 * {@code false}, {@code mappedType} <b>cannot</b> change, and
-		 * {@link MappedType#accomodateType(Type, boolean)} will throw a
+		 * {@link MappedType#refine(Type, boolean)} will throw a
 		 * {@link TypeInferenceException} so long as {@code newType} is not the
 		 * exact same {@code Type} as {@mappedType}.
 		 */
 		boolean malleable;
 
-		public MappedType(TypeVariable<?> typeVar, Type mappedType,
+		public MappedType(TypeVariable<?> typeVar, T mappedType,
 			boolean malleable)
 		{
 			this.typeVar = typeVar;
@@ -789,38 +788,33 @@ public final class MatchingUtils {
 		 * will become the new {@link mappedType} after the method ends;
 		 * {@link mappedType} could be a supertype of these two {@link Type}s.
 		 * 
-		 * @param newType - the type that will be accomodated into {@link mapped}
+		 * @param otherType - the type that will be accomodated into {@link mapped}
 		 * @param newTypeMalleability - the malleability of {@code newType},
 		 *          determined by the context from which {@code newType} came.
 		 * @throws TypeInferenceException
 		 */
-		public MappedType accomodateType(Type newType, boolean newTypeMalleability)
+		public MappedType<?> refine(Type otherType, boolean newTypeMalleability)
 			throws TypeInferenceException
 		{
 			malleable &= newTypeMalleability;
 			if (mappedType instanceof Any) {
-				mappedType = newType;
-				return;
+				return updatedMappedType(otherType);
 			}
 			if (malleable) {
 				// TODO: consider the correct value of that boolean
-				Type superType = Types.greatestCommonSuperType(new Type[] { newType,
+				Type superType = Types.greatestCommonSuperType(new Type[] { otherType,
 					mappedType }, false);
 				if (Types.isAssignable(superType, typeVar)) {
-					mappedType = superType;
+					return updatedMappedType(superType);
 				}
-				else {
-					throw new TypeInferenceException(typeVar +
-						" cannot simultaneoustly be mapped to " + newType + " and " +
-						mappedType);
-				}
-			}
-			else {
-				if (Objects.equal(mappedType, newType)) return;
 				throw new TypeInferenceException(typeVar +
-					" cannot simultaneoustly be mapped to " + newType + " and " +
+					" cannot simultaneoustly be mapped to " + otherType + " and " +
 					mappedType);
 			}
+			if (Objects.equal(mappedType, otherType)) return this;
+			throw new TypeInferenceException(typeVar +
+				" cannot simultaneoustly be mapped to " + otherType + " and " +
+				mappedType);
 		}
 
 		/**
@@ -829,6 +823,190 @@ public final class MatchingUtils {
 		public Type getType() {
 			return mappedType;
 		}
+		
+		protected MappedType<?> updatedMappedType(Type newType) {
+			if (newType instanceof ParameterizedType) {
+				return new MappedParameterizedType(typeVar, (ParameterizedType) newType, malleable);
+			}
+			if (newType instanceof TypeVariable) {
+				return new MappedTypeVariable<>(typeVar, (TypeVariable<?>) newType, malleable);
+			}
+			if (newType instanceof WildcardType) {
+				return new MappedWildcardType(typeVar, (WildcardType<?>) newType, malleable);
+			}
+			if (newType instanceof GenericArrayType) {
+				return new MappedGenericArrayType(typeVar, (GenericArrayType) newType, malleable);
+			}
+			if (newType instanceof Class) {
+				return new MappedClass<>(typeVar, (Class<?>) newType, malleable);
+			}
+			if (newType instanceof Any) {
+				return new MappedAnyType(typeVar, (Any) newType, malleable);
+			}
+			throw new TypeInferenceException(
+				"Could not create new MappedType with unsupported type " + newType +
+					"!");
+		}
+	}
+	
+	static class MappedParameterizedType extends MappedType<ParameterizedType> implements ParameterizedType {
+		
+		public MappedParameterizedType(TypeVariable<?> typeVar, ParameterizedType mappedType,
+			boolean malleable)
+		{
+			super(typeVar, mappedType, malleable);
+		}
+
+		@Override
+		public Type[] getActualTypeArguments() {
+			return mappedType.getActualTypeArguments();
+		}
+
+		@Override
+		public Type getRawType() {
+			return mappedType.getRawType();
+		}
+
+		@Override
+		public Type getOwnerType() {
+			return mappedType.getOwnerType();
+		}
+
+		@Override
+		protected MappedType<?> updatedMappedType(
+			Type newType)
+		{
+			if (newType instanceof ParameterizedType) {
+				mappedType = (ParameterizedType) newType;
+				return this;
+			}
+			return super.updatedMappedType(newType);
+		}
+		
+	}
+	
+	static class MappedTypeVariable<D extends GenericDeclaration> extends MappedType<TypeVariable<D>> implements TypeVariable<D> {
+
+		public MappedTypeVariable(TypeVariable<?> typeVar,
+			TypeVariable<D> mappedType, boolean malleable)
+		{
+			super(typeVar, mappedType, malleable);
+		}
+
+		@Override
+		public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+			return mappedType.getAnnotation(annotationClass);
+		}
+
+		@Override
+		public Annotation[] getAnnotations() {
+			return mappedType.getAnnotations();
+		}
+
+		@Override
+		public Annotation[] getDeclaredAnnotations() {
+			return mappedType.getDeclaredAnnotations();
+		}
+
+		@Override
+		public Type[] getBounds() {
+			return mappedType.getBounds();
+		}
+
+		@Override
+		public D getGenericDeclaration() {
+			return mappedType.getGenericDeclaration();
+		}
+
+		@Override
+		public String getName() {
+			return mappedType.getName();
+		}
+
+		@Override
+		public AnnotatedType[] getAnnotatedBounds() {
+			return mappedType.getAnnotatedBounds();
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		protected MappedType<?> updatedMappedType(
+			Type newType)
+		{
+			if (newType instanceof TypeVariable) {
+				mappedType = (TypeVariable<D>) newType;
+				return this;
+			}
+			return super.updatedMappedType(newType);
+		}
+		
+	}
+	
+	static class MappedWildcardType extends MappedType<WildcardType> implements WildcardType {
+
+		public MappedWildcardType(TypeVariable<?> typeVar, WildcardType mappedType,
+			boolean malleable)
+		{
+			super(typeVar, mappedType, malleable);
+		}
+
+		@Override
+		public Type[] getUpperBounds() {
+			return mappedType.getUpperBounds();
+		}
+
+		@Override
+		public Type[] getLowerBounds() {
+			return mappedType.getLowerBounds();
+		}
+		
+		@Override
+		protected MappedType<?> updatedMappedType(
+			Type newType)
+		{
+			if (newType instanceof WildcardType) {
+				mappedType = (WildcardType) newType;
+				return this;
+			}
+			return super.updatedMappedType(newType);
+		}
+
+	}
+	
+	static class MappedGenericArrayType extends MappedType<GenericArrayType> implements GenericArrayType {
+
+		public MappedGenericArrayType(TypeVariable<?> typeVar,
+			GenericArrayType mappedType, boolean malleable)
+		{
+			super(typeVar, mappedType, malleable);
+		}
+
+		@Override
+		public Type getGenericComponentType() {
+			return mappedType.getGenericComponentType();
+		}
+		
+		@Override
+		protected MappedType<?> updatedMappedType(
+			Type newType)
+		{
+			if (newType instanceof GenericArrayType) {
+				mappedType = (GenericArrayType) newType;
+				return this;
+			}
+			return super.updatedMappedType(newType);
+		}
+
+	}
+	
+	static class MappedClass<T> extends MappedType<Class<T>> implements Class<T> {
+
+		public MappedClass(TypeVariable<?> typeVar, Class<T> mappedType,
+			boolean malleable)
+		{
+			super(typeVar, mappedType, malleable);
+		}
+		
 	}
 	
 	static class TypeVarDataMap implements Map<TypeVariable<?>, Type> {
