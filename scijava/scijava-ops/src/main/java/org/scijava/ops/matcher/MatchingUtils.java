@@ -53,8 +53,6 @@ import org.scijava.types.Types;
 import org.scijava.types.Types.TypeVarFromParameterizedTypeInfo;
 import org.scijava.types.Types.TypeVarInfo;
 
-import sun.security.action.PutAllAction;
-
 public final class MatchingUtils {
 
 	private MatchingUtils() {
@@ -239,7 +237,7 @@ public final class MatchingUtils {
 	 *         statement
 	 */
 	public static boolean checkGenericAssignability(Type src,
-		ParameterizedType dest, Map<TypeVariable<?>, Type> typeVarAssigns,
+		ParameterizedType dest, Map<TypeVariable<?>, TypeVarData> typeVarAssigns,
 		boolean safeAssignability)
 	{
 		// fail fast when raw types are not assignable
@@ -313,7 +311,7 @@ public final class MatchingUtils {
 	 *         statement
 	 */
 	public static boolean checkGenericAssignability(Type src, ParameterizedType dest, boolean safeAssignability) {
-		return checkGenericAssignability(src, dest, new HashMap<TypeVariable<?>, Type>(), safeAssignability);
+		return checkGenericAssignability(src, dest, new HashMap<TypeVariable<?>, TypeVarData>(), safeAssignability);
 	}
 
 	/**
@@ -338,12 +336,14 @@ public final class MatchingUtils {
 	 *         statement
 	 */
 	private static boolean checkGenericAssignability(Type[] srcTypes, Type[] destTypes, Type src, Type dest,
-			Map<TypeVariable<?>, Type> typeVarAssigns, boolean safeAssignability) {
+			Map<TypeVariable<?>, TypeVarData> typeVarAssigns, boolean safeAssignability) {
 		// if the number of type arguments does not match, the types can't be
 		// assignable
 		if (srcTypes.length != destTypes.length) {
 			return false;
 		}
+		
+		TypeVarDataMap typeMap = new TypeVarDataMap(typeVarAssigns);
 
 		Type[] mappedSrcTypes = null;
 		try {
@@ -351,18 +351,18 @@ public final class MatchingUtils {
 			// sry
 			inferTypeVariables(srcTypes, destTypes, typeVarAssigns);
 			// Map the vars to the inferred types
-			mappedSrcTypes = mapVarToTypes(srcTypes, typeVarAssigns);
+			mappedSrcTypes = mapVarToTypes(srcTypes, typeMap);
 		} catch (TypeInferenceException e) {
 			// types can't be inferred
-			return safeAssignability && isSafeAssignable(destTypes, typeVarAssigns, src, dest);
+			return safeAssignability && isSafeAssignable(destTypes, typeMap, src, dest);
 		}
 
 		// Build a new parameterized type from inferred types and check
 		// assignability
 		Class<?> matchingRawType = Types.raw(dest);
 		Type inferredSrcType = Types.parameterize(matchingRawType, mappedSrcTypes);
-		if (!Types.isAssignable(inferredSrcType, dest, typeVarAssigns)) {
-			if (!safeAssignability || !isSafeAssignable(destTypes, typeVarAssigns, src, dest))
+		if (!Types.isAssignable(inferredSrcType, dest, typeMap)) {
+			if (!safeAssignability || !isSafeAssignable(destTypes, typeMap, src, dest))
 				return false;
 		}
 		return true;
@@ -501,39 +501,34 @@ public final class MatchingUtils {
 		else if (type instanceof WildcardType) {
 			// TODO Do we need to specifically handle Wildcards? Or are they
 			// sufficiently handled by Types.satisfies below?
-			inferTypeVariables((WildcardType) type, inferFrom, typeVarAssigns, malleable);
+			inferTypeVariables((WildcardType) type, inferFrom, typeVarAssigns);
 
 		}
 		else if (type instanceof GenericArrayType) {
-			inferTypeVariables((GenericArrayType) type, inferFrom, typeVarAssigns, malleable);
+			inferTypeVariables((GenericArrayType) type, inferFrom, typeVarAssigns);
 		}
 		else if (type instanceof Class) {
-			inferTypeVariables((Class<?>) type, inferFrom, typeVarAssigns, malleable);
+			inferTypeVariables((Class<?>) type, inferFrom, typeVarAssigns);
 		}
 
 		// Check if the inferred types satisfy their bounds
-		if (!Types.typesSatisfyVariables(typeVarAssigns)) {
+		// TODO: can we do this in an efficient manner?
+		TypeVarDataMap typeMap = new TypeVarDataMap(typeVarAssigns);
+		if (!Types.typesSatisfyVariables(typeMap)) {
 			throw new TypeInferenceException();
 		}
 	}
 
 	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, TypeVarData> typeVarAssigns, boolean malleable) throws TypeInferenceException {
-		Type current = typeVarAssigns.putIfAbsent(type, inferFrom);
+		TypeVarData typeData = typeVarAssigns.get(type);
+//		Type current = typeVarAssigns.putIfAbsent(type, new TypeVarData);
 		// If current is not null then we have already encountered that
 		// variable. If so, we require them to be exactly the same, and throw a
 		// TypeInferenceException if they are not.
-		if (current != null) {
-			if (Objects.equal(current, inferFrom))
-				return;
-			if (current instanceof Any) {
-				typeVarAssigns.put(type, inferFrom);
-				return;
-			}
-			throw new TypeInferenceException(
-				"Cannot infer the type of TypeVariable " + type +
-					": this TypeVariable has already been mapped to " + current +
-					" and cannot be mapped to a " + inferFrom);
+		if (typeData != null) {
+			typeData.accomodateType(inferFrom, malleable);
 		}
+		typeVarAssigns.put(type, new TypeVarData(type, inferFrom, malleable));
 
 		// Bounds could also contain type vars, hence possibly go into
 		// recursion
@@ -748,7 +743,7 @@ public final class MatchingUtils {
 	}
 	
 	private static Map<TypeVariable<?>, Type> generateTypeMap(Map<TypeVariable<?>, TypeVarData> map) {
-		
+		return new TypeVarDataMap(map);
 	}
 	
 	/**
@@ -757,7 +752,7 @@ public final class MatchingUtils {
 	 * 
 	 * @author Gabriel Selzer
 	 */
-	class TypeVarData {
+	static class TypeVarData {
 
 		final TypeVariable<?> typeVar;
 		Type mappedType;
@@ -801,6 +796,10 @@ public final class MatchingUtils {
 			throws TypeInferenceException
 		{
 			malleable = malleable & newTypeMalleability;
+			if (mappedType instanceof Any) {
+				mappedType = newType;
+				return;
+			}
 			if (malleable) {
 				// TODO: consider the correct value of that boolean
 				Type superType = Types.greatestCommonSuperType(new Type[] { newType,
@@ -830,7 +829,7 @@ public final class MatchingUtils {
 		}
 	}
 	
-	class TypeVarDataMap extends HashMap<TypeVariable<?>, Type> {
+	static class TypeVarDataMap extends HashMap<TypeVariable<?>, Type> {
 		Map<TypeVariable<?>, TypeVarData> typeMap;
 		boolean malleable;
 		
