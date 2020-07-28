@@ -532,11 +532,13 @@ public class MatchingUtilsTest {
 		MatchingUtils.inferTypeVariables(tArgs, destArgs, typeAssigns);
 
 		// We expect I=String, O=Double
-		final Map<TypeVariable<?>, Type> expected = new HashMap<>();
-		expected.put((TypeVariable<?>) ((ParameterizedType) tArgs[0])
-			.getActualTypeArguments()[0], String.class);
-		expected.put((TypeVariable<?>) ((ParameterizedType) tArgs[1])
-			.getActualTypeArguments()[0], Double.class);
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected = new HashMap<>();
+		TypeVariable<?> typeVarI = (TypeVariable<?>) ((ParameterizedType) tArgs[0])
+			.getActualTypeArguments()[0];
+		expected.put(typeVarI, new TypeMapping(typeVarI, String.class, false));
+		TypeVariable<?> typeVarO = (TypeVariable<?>) ((ParameterizedType) tArgs[1])
+			.getActualTypeArguments()[0];
+		expected.put(typeVarO, new TypeMapping(typeVarO, Double.class, false));
 
 		assertEquals(typeAssigns, expected);
 	}
@@ -574,14 +576,14 @@ public class MatchingUtilsTest {
 
 		// We expect T=Double
 		final Type t = new Nil<T>() {}.getType();
-		final Map<TypeVariable<?>, Type> expected = new HashMap<>();
-		expected.put((TypeVariable<?>) t, Double.class);
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected = new HashMap<>();
+		TypeVariable<?> typeVarT = (TypeVariable<?>) t;
+		expected.put(typeVarT, new TypeMapping(typeVarT, Double.class, false));
 
 		assertEquals(expected, typeAssigns);
 	}
 
-	// TODO: Use JUnit5
-	@Test(expected = TypeInferenceException.class)
+	@Test
 	public <T extends Number> void testInferTypeVarInconsistentMapping()
 		throws TypeInferenceException
 	{
@@ -591,10 +593,17 @@ public class MatchingUtilsTest {
 		final Type[] tArr = { t, t };
 		final Type[] badInferFrom = { Integer.class, Double.class };
 
-		MatchingUtils.inferTypeVariables(tArr, badInferFrom, new HashMap<>());
-
+		Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns = new HashMap<>();
+		MatchingUtils.inferTypeVariables(tArr, badInferFrom, typeAssigns);
+		
+		// We expect T=Number
+		TypeVariable<?> typeVarT = (TypeVariable<?>) t;
+		Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected = new HashMap<>();
+		expected.put(typeVarT, new TypeMapping(typeVarT, Number.class, true));
+		
+		assertEquals(expected, typeAssigns);
 	}
-
+	
 	class Thing<T> {}
 	
 	class StrangeThing<N extends Number, T> extends Thing<T> {}
