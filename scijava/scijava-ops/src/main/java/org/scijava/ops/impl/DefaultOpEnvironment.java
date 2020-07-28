@@ -382,7 +382,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 
 		for (final OpInfo adaptor : infos("adapt")) {
 			Type adaptTo = adaptor.output().getType();
-			Map<TypeVariable<?>, MappedType> map = new HashMap<>();
+			Map<TypeVariable<?>, Type> map = new HashMap<>();
 			// make sure that the adaptor outputs the correct type
 			if (!adaptOpOutputSatisfiesRefTypes(adaptTo, map, ref)) continue;
 			// make sure that the adaptor is a Function (so we can cast it later)

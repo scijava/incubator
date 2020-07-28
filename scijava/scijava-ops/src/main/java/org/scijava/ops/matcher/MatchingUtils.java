@@ -34,10 +34,7 @@ package org.scijava.ops.matcher;
 
 import com.google.common.base.Objects;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -51,6 +48,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.scijava.types.Any;
 import org.scijava.types.Nil;
@@ -160,15 +158,16 @@ public final class MatchingUtils {
 	 * sense of empty angle brackets when a new object is created:
 	 *
 	 * <pre>
+	 * 
 	 * List&lt;Integer&gt; listOfInts = new ArrayList&lt;&gt;();
 	 * </pre>
 	 *
 	 * Hence, the types to put between the brackets are tried to be determined.
 	 * Inference will be done by simple matching of an encountered
 	 * {@link TypeVariable} in the source to the corresponding type in the
-	 * parameters of the destination. If an {@link TypeVariable} is encountered more
-	 * than once, the corresponding type in the destination needs to perfectly
-	 * match. Else, false will be returned.</br>
+	 * parameters of the destination. If an {@link TypeVariable} is encountered
+	 * more than once, the corresponding type in the destination needs to
+	 * perfectly match. Else, false will be returned.</br>
 	 * </br>
 	 * Examples:
 	 * <ul>
@@ -197,8 +196,8 @@ public final class MatchingUtils {
 	 * </ul>
 	 * </ul>
 	 * <ul>
-	 * Here, the parameter {@code <M extends Number>} can be inferred to be of type
-	 * {@code Double} from the type {@code Supplier<Double>}
+	 * Here, the parameter {@code <M extends Number>} can be inferred to be of
+	 * type {@code Double} from the type {@code Supplier<Double>}
 	 * </ul>
 	 * <ul>
 	 * Consequently the following will return false:
@@ -226,25 +225,29 @@ public final class MatchingUtils {
 	 * {@code Integer} are ambiguous for {@code M}.
 	 * </ul>
 	 *
-	 * @param src
-	 *            the type for which assignment should be checked from
-	 * @param dest
-	 *            the parameterized type for which assignment should be checked to
-	 * @param typeVarAssigns
-	 *            the map of TypeVariables to Types that would occur in this
-	 *            scenario
-	 * @param safeAssignability
-	 *            used to determine if we want to check if the src->dest assignment
-	 *            would be safely assignable even though it would cause a compiler
-	 *            error if we explicitly tried to do this (useful pretty much only
-	 *            for Op matching)
-	 * @return whether and assignment of source to destination would be a legal java
-	 *         statement
+	 * @param src the type for which assignment should be checked from
+	 * @param dest the parameterized type for which assignment should be checked
+	 *          to
+	 * @param typeVarAssigns the map of {@link TypeVariable}s to {@link Type}s to
+	 *          populate with what would occur in this scenario; must be empty or
+	 *          null
+	 * @param safeAssignability used to determine if we want to check if the
+	 *          src->dest assignment would be safely assignable even though it
+	 *          would cause a compiler error if we explicitly tried to do this
+	 *          (useful pretty much only for Op matching)
+	 * @return whether and assignment of source to destination would be a legal
+	 *         java statement
 	 */
 	public static boolean checkGenericAssignability(Type src,
-		ParameterizedType dest, Map<TypeVariable<?>, MappedType> typeVarAssigns,
+		ParameterizedType dest, Map<TypeVariable<?>, Type> typeVarAssigns,
 		boolean safeAssignability)
 	{
+		if (typeVarAssigns != null && !typeVarAssigns.isEmpty()) {
+			throw new IllegalArgumentException(
+				"Expected empty typeVarAssigns but contained " + typeVarAssigns.size() +
+					" entries");
+		}
+
 		// fail fast when raw types are not assignable
 		if (!Types.isAssignable(Types.raw(src), Types.raw(dest))) return false;
 
@@ -256,8 +259,13 @@ public final class MatchingUtils {
 		// assignability check.
 		if (srcTypes.length == 0) return Types.isAssignable(src, dest);
 		// if there are type parameters, do a more complicated assignability check.
-		return checkGenericAssignability(srcTypes, destTypes, src, dest,
-			typeVarAssigns, safeAssignability);
+		Map<TypeVariable<?>, TypeMapping> typeMappings = new HashMap<>();
+		boolean result = checkGenericAssignability(srcTypes, destTypes, src, dest,
+			typeMappings, safeAssignability);
+		if (typeVarAssigns != null) {
+			typeVarAssigns.putAll(new TypeVarAssigns(typeMappings));
+		}
+		return result;
 	}
 
 	/**
@@ -316,58 +324,52 @@ public final class MatchingUtils {
 	 *         statement
 	 */
 	public static boolean checkGenericAssignability(Type src, ParameterizedType dest, boolean safeAssignability) {
-		return checkGenericAssignability(src, dest, new HashMap<TypeVariable<?>, MappedType>(), safeAssignability);
+		return checkGenericAssignability(src, dest, null, safeAssignability);
 	}
 
 	/**
-	 * 
-	 * @param srcTypes
-	 *            the Type arguments for the source Type
-	 * @param destTypes
-	 *            the Type arguments for the destination Type
-	 * @param src
-	 *            the type for which assignment should be checked from
-	 * @param dest
-	 *            the parameterized type for which assignment should be checked to
-	 * @param typeVarAssigns
-	 *            the map of TypeVariables to Types that would occur in this
-	 *            scenario
-	 * @param safeAssignability
-	 *            used to determine if we want to check if the src->dest assignment
-	 *            would be safely assignable even though it would cause a compiler
-	 *            error if we explicitly tried to do this (useful pretty much only
-	 *            for Op matching)
-	 * @return whether and assignment of source to destination would be a legal java
-	 *         statement
+	 * @param srcTypes the Type arguments for the source Type
+	 * @param destTypes the Type arguments for the destination Type
+	 * @param src the type for which assignment should be checked from
+	 * @param dest the parameterized type for which assignment should be checked
+	 *          to
+	 * @param typeMappings the map of {@link TypeVariable}s to
+	 *          {@link TypeMapping}s that would occur in this scenario
+	 * @param safeAssignability used to determine if we want to check if the
+	 *          src->dest assignment would be safely assignable even though it
+	 *          would cause a compiler error if we explicitly tried to do this
+	 *          (useful pretty much only for Op matching)
+	 * @return whether and assignment of source to destination would be a legal
+	 *         java statement
 	 */
 	private static boolean checkGenericAssignability(Type[] srcTypes, Type[] destTypes, Type src, Type dest,
-			Map<TypeVariable<?>, MappedType> typeVarAssigns, boolean safeAssignability) {
+			Map<TypeVariable<?>, TypeMapping> typeMappings, boolean safeAssignability) {
 		// if the number of type arguments does not match, the types can't be
 		// assignable
 		if (srcTypes.length != destTypes.length) {
 			return false;
 		}
 		
-		TypeVarDataMap typeMap = new TypeVarDataMap(typeVarAssigns);
+		TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
 
 		Type[] mappedSrcTypes = null;
 		try {
 			// Try to infer type variables contained in the type arguments of
 			// sry
-			inferTypeVariables(srcTypes, destTypes, typeVarAssigns);
+			inferTypeVariables(srcTypes, destTypes, typeMappings);
 			// Map the vars to the inferred types
-			mappedSrcTypes = mapVarToTypes(srcTypes, typeMap);
+			mappedSrcTypes = mapVarToTypes(srcTypes, typeVarAssigns);
 		} catch (TypeInferenceException e) {
 			// types can't be inferred
-			return safeAssignability && isSafeAssignable(destTypes, typeMap, src, dest);
+			return safeAssignability && isSafeAssignable(destTypes, typeVarAssigns, src, dest);
 		}
 
 		// Build a new parameterized type from inferred types and check
 		// assignability
 		Class<?> matchingRawType = Types.raw(dest);
 		Type inferredSrcType = Types.parameterize(matchingRawType, mappedSrcTypes);
-		if (!Types.isAssignable(inferredSrcType, dest, typeMap)) {
-			if (!safeAssignability || !isSafeAssignable(destTypes, typeMap, src, dest))
+		if (!Types.isAssignable(inferredSrcType, dest, typeVarAssigns)) {
+			if (!safeAssignability || !isSafeAssignable(destTypes, typeVarAssigns, src, dest))
 				return false;
 		}
 		return true;
@@ -416,7 +418,7 @@ public final class MatchingUtils {
 	/**
 	 * Exception indicating that type vars could not be inferred.
 	 */
-	protected static class TypeInferenceException extends Exception {
+	static class TypeInferenceException extends Exception {
 		/**
 		 *
 		 */
@@ -451,31 +453,31 @@ public final class MatchingUtils {
 	 * Tries to infer type vars contained in types from corresponding types from
 	 * inferFrom, putting them into the specified map. <b>When a
 	 * {@link TypeInferenceException} is thrown, the caller should assume that
-	 * some of the mappings within {@code typeVarAssigns} are incorrect.</b>
+	 * some of the mappings within {@code typeMappings} are incorrect.</b>
 	 *
 	 * @param types - the types containing {@link TypeVariable}s
 	 * @param inferFroms - the types used to infer the {@link TypeVariable}s
 	 *          within {@code types}
-	 * @param typeVarAssigns - the mapping of {@link TypeVariable}s to
+	 * @param typeMappings - the mapping of {@link TypeVariable}s to
 	 *          {@link Type}s
 	 * @throws TypeInferenceException
 	 */
-	protected static void inferTypeVariables(Type[] types, Type[] inferFroms, Map<TypeVariable<?>, MappedType> typeVarAssigns) throws TypeInferenceException {
-		inferTypeVariables(types, inferFroms, typeVarAssigns, true);
+	static void inferTypeVariables(Type[] types, Type[] inferFroms, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+		inferTypeVariables(types, inferFroms, typeMappings, true);
 	}
 	
 	private static void inferTypeVariables(Type[] types, Type[] inferFroms,
-		Map<TypeVariable<?>, MappedType> typeVarAssigns, boolean malleable) throws TypeInferenceException
+		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) throws TypeInferenceException
 	{
 		// Ensure that the user has not passed a null map
-		if (typeVarAssigns == null) throw new IllegalArgumentException(
+		if (typeMappings == null) throw new IllegalArgumentException(
 			"Type Variable map is null, cannot store mappings of TypeVariables to Types!");
 
 		if (types.length != inferFroms.length) throw new TypeInferenceException(
 			"Could not infer type variables: Type arrays must be of the same size");
 
 		for (int i = 0; i < types.length; i++) {
-			inferTypeVariables(types[i], inferFroms[i], typeVarAssigns, malleable);
+			inferTypeVariables(types[i], inferFroms[i], typeMappings, malleable);
 		}
 	}
 	
@@ -483,62 +485,61 @@ public final class MatchingUtils {
 	 * Tries to infer type vars contained in types from corresponding types from
 	 * inferFrom, putting them into the specified map. <b>When a
 	 * {@link TypeInferenceException} is thrown, the caller should assume that
-	 * some of the mappings within {@code typeVarAssigns} are incorrect.</b>
+	 * some of the mappings within {@code typeMappings} are incorrect.</b>
 	 *
 	 * @param type
 	 * @param inferFrom
-	 * @param typeVarAssigns
+	 * @param typeMappings
 	 * @throws TypeInferenceException
 	 */
-	protected static void inferTypeVariables(Type type, Type inferFrom, Map<TypeVariable<?>, MappedType> typeVarAssigns) throws TypeInferenceException {
-		inferTypeVariables(type, inferFrom, typeVarAssigns, true);
+	static void inferTypeVariables(Type type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+		inferTypeVariables(type, inferFrom, typeMappings, true);
 	}
 
 	private static void inferTypeVariables(Type type, Type inferFrom,
-		Map<TypeVariable<?>, MappedType> typeVarAssigns, boolean malleable) throws TypeInferenceException
+		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) throws TypeInferenceException
 	{
 		if (type instanceof TypeVariable) {
-			inferTypeVariables((TypeVariable<?>) type, inferFrom, typeVarAssigns, malleable);
+			inferTypeVariables((TypeVariable<?>) type, inferFrom, typeMappings, malleable);
 		}
 		else if (type instanceof ParameterizedType) {
-			inferTypeVariables((ParameterizedType) type, inferFrom, typeVarAssigns);
+			inferTypeVariables((ParameterizedType) type, inferFrom, typeMappings);
 		}
 		else if (type instanceof WildcardType) {
 			// TODO Do we need to specifically handle Wildcards? Or are they
 			// sufficiently handled by Types.satisfies below?
-			inferTypeVariables((WildcardType) type, inferFrom, typeVarAssigns);
+			inferTypeVariables((WildcardType) type, inferFrom, typeMappings);
 
 		}
 		else if (type instanceof GenericArrayType) {
-			inferTypeVariables((GenericArrayType) type, inferFrom, typeVarAssigns);
+			inferTypeVariables((GenericArrayType) type, inferFrom, typeMappings);
 		}
 		else if (type instanceof Class) {
-			inferTypeVariables((Class<?>) type, inferFrom, typeVarAssigns);
+			inferTypeVariables((Class<?>) type, inferFrom, typeMappings);
 		}
 
 		// Check if the inferred types satisfy their bounds
 		// TODO: can we do this in an efficient manner?
-		TypeVarDataMap typeMap = new TypeVarDataMap(typeVarAssigns);
-		if (!Types.typesSatisfyVariables(typeMap)) {
+		TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
+		if (!Types.typesSatisfyVariables(typeVarAssigns)) {
 			throw new TypeInferenceException();
 		}
 	}
 
-	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, MappedType> typeVarAssigns, boolean malleable) throws TypeInferenceException {
-		MappedType typeData = typeVarAssigns.get(type);
-//		Type current = typeVarAssigns.putIfAbsent(type, new TypeVarData);
+	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) throws TypeInferenceException {
+		TypeMapping typeData = typeMappings.get(type);
 		// If current is not null then we have already encountered that
 		// variable. If so, we require them to be exactly the same, and throw a
 		// TypeInferenceException if they are not.
 		if (typeData != null) {
 			typeData.refine(inferFrom, malleable);
 		}
-		typeVarAssigns.put(type, new MappedType(type, inferFrom, malleable));
+		typeMappings.put(type, new TypeMapping(type, inferFrom, malleable));
 
 		// Bounds could also contain type vars, hence possibly go into
 		// recursion
 		for (Type bound : type.getBounds()) {
-			if (bound instanceof TypeVariable && typeVarAssigns.get(bound) != null) {
+			if (bound instanceof TypeVariable && typeMappings.get(bound) != null) {
 				// If the bound of the current var (let's call it A) to
 				// infer is also a var (let's call it B):
 				// If we already encountered B, we check if the current
@@ -556,18 +557,18 @@ public final class MatchingUtils {
 				// suffices to check whether Double can be assigned
 				// to Number, it does not have to be equal as it is just
 				// a transitive bound for B.
-				Type typeAssignForBound = typeVarAssigns.get(bound).getType();
+				Type typeAssignForBound = typeMappings.get(bound).getType();
 				if (!Types.isAssignable(inferFrom, typeAssignForBound)) {
 					throw new TypeInferenceException();
 				}
 			} else {
 				// Else go into recursion as we encountered a new var.
-				inferTypeVariables( bound, inferFrom, typeVarAssigns);
+				inferTypeVariables( bound, inferFrom, typeMappings);
 			}	
 		}
 	}
 
-	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, MappedType> typeVarAssigns) throws TypeInferenceException {
+	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
 		// Recursively follow parameterized types
 		if (inferFrom instanceof ParameterizedType) {
 			// Finding the supertype here is really important. Suppose that we are
@@ -579,13 +580,13 @@ public final class MatchingUtils {
 			if (paramInferFrom == null) throw new TypeInferenceException();
 
 			inferTypeVariables(type.getActualTypeArguments(), paramInferFrom
-				.getActualTypeArguments(), typeVarAssigns, false);
+				.getActualTypeArguments(), typeMappings, false);
 		}
 		else {
-			TypeVarDataMap typeMap = new TypeVarDataMap(typeVarAssigns);
-			Type mappedType = Types.mapVarToTypes(type, typeMap);
+			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
+			Type mappedType = Types.mapVarToTypes(type, typeVarAssigns);
 			// Use isAssignable to attempt to infer the type variables present in type
-			if (!Types.isAssignable(inferFrom, mappedType, typeMap)) {
+			if (!Types.isAssignable(inferFrom, mappedType, typeVarAssigns)) {
 				throw new TypeInferenceException(inferFrom +
 					" cannot be implicitly cast to " + mappedType +
 					", thus it is impossible to infer type variables for " + inferFrom);
@@ -593,50 +594,36 @@ public final class MatchingUtils {
 		}
 	}
 	
-	private static void inferTypeVariables(WildcardType type, Type inferFrom, Map<TypeVariable<?>, MappedType> typeVarAssigns) throws TypeInferenceException {
+	private static void inferTypeVariables(WildcardType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
 		Type[] upperBounds = type.getUpperBounds();
 		for (Type upperBound : upperBounds) {
 			// TODO: consider the various typings of inferFrom (i.e. what if inferFrom
 			// is a parameterizedType? TypeVar? Wildcard?
 			if (!(upperBound instanceof TypeVariable<?>)) continue;
 			TypeVariable<?> typeVar = (TypeVariable<?>) upperBound;
-			resolveTypeInMap(typeVar, inferFrom, typeVarAssigns, true);
+			resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
 		}
 	}
 	
-	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType, Map<TypeVariable<?>, MappedType> typeVarAssigns, boolean malleability) throws TypeInferenceException {
-		if (typeVarAssigns.containsKey(typeVar)) {
-			typeVarAssigns.get(typeVar).refine(newType, malleability);
+	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType, Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleability) throws TypeInferenceException {
+		if (typeMappings.containsKey(typeVar)) {
+			typeMappings.get(typeVar).refine(newType, malleability);
 		} else {
-			typeVarAssigns.put(typeVar, new MappedType(typeVar, newType, malleability));
+			typeMappings.put(typeVar, new TypeMapping(typeVar, newType, malleability));
 		}
-//			Type currType = typeVarAssigns.putIfAbsent(typeVar, newType);
-//			if (currType == null) return;
-//			// TODO: consider the correct value of that boolean
-//			Type superType = Types.greatestCommonSuperType(new Type[] { newType,
-//				currType }, false);
-//			if (Types.isAssignable(superType, typeVar)) {
-//				typeVarAssigns.put(typeVar, superType);
-//			}
-//			else {
-//				throw new TypeInferenceException(typeVar +
-//					" cannot simultaneoustly be mapped to " + newType + " and " +
-//					currType);
-//			}
 	}
 
-	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, MappedType> typeVarAssigns) throws TypeInferenceException {
+	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
 		if( inferFrom instanceof TypeVariable<?>){
-			TypeVarDataMap typeMap = new TypeVarDataMap(typeVarAssigns);
-			typeMap.setPutMalleability(false); // TODO: consider if this is correct
+			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
 			// If current type var is absent put it to the map. Otherwise,
 			// we already encountered that var.
 			// Hence, we require them to be exactly the same.
-			if(Types.isAssignable(type, inferFrom, typeMap)) {
-			Type current = typeMap.putIfAbsent((TypeVariable<?>) inferFrom, type);
+			if(Types.isAssignable(type, inferFrom, typeVarAssigns)) {
+			Type current = typeVarAssigns.putIfAbsent((TypeVariable<?>) inferFrom, type);
 				if (current != null) {
 					if (current instanceof Any) {
-						typeMap.put((TypeVariable<?>) inferFrom, type);
+						typeVarAssigns.put((TypeVariable<?>) inferFrom, type);
 					}
 					else if (!Objects.equal(type, current)) {
 						throw new TypeInferenceException();
@@ -646,16 +633,15 @@ public final class MatchingUtils {
 		}
 	}
 
-	private static void inferTypeVariables(GenericArrayType type, Type inferFrom, Map<TypeVariable<?>, MappedType> typeVarAssigns) throws TypeInferenceException {
+	private static void inferTypeVariables(GenericArrayType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
 		if (inferFrom instanceof Class<?> && ((Class<?>) inferFrom).isArray()) {
 			Type componentType = type.getGenericComponentType();
 			Type componentInferFrom = ((Class<?>) inferFrom).getComponentType();
-			inferTypeVariables(componentType, componentInferFrom, typeVarAssigns);
+			inferTypeVariables(componentType, componentInferFrom, typeMappings);
 		}
 		else {
-			TypeVarDataMap typeMap = new TypeVarDataMap(typeVarAssigns);
-			typeMap.setPutMalleability(false); // TODO: consider if this is correct
-			if (! Types.isAssignable(inferFrom, type, typeMap)) throw new TypeInferenceException();
+			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
+			if (! Types.isAssignable(inferFrom, type, typeVarAssigns)) throw new TypeInferenceException();
 		}
 	}
 
@@ -753,10 +739,10 @@ public final class MatchingUtils {
 	 * 
 	 * @author Gabriel Selzer
 	 */
-	static abstract class MappedType<T extends Type> implements Type {
+	static class TypeMapping {
 
-		final TypeVariable<?> typeVar;
-		T mappedType;
+		private final TypeVariable<?> typeVar;
+		private Type mappedType;
 
 		/**
 		 * A boolean describing whether {@code mappedType} can be mutated in within
@@ -764,13 +750,13 @@ public final class MatchingUtils {
 		 * {@link Type} <b>cannot</b> be mutated is when it is a type parameter of a
 		 * {@link ParameterizedType}. Once {@code malleable} is set to
 		 * {@code false}, {@code mappedType} <b>cannot</b> change, and
-		 * {@link MappedType#refine(Type, boolean)} will throw a
+		 * {@link TypeMapping#refine(Type, boolean)} will throw a
 		 * {@link TypeInferenceException} so long as {@code newType} is not the
 		 * exact same {@code Type} as {@mappedType}.
 		 */
 		boolean malleable;
 
-		public MappedType(TypeVariable<?> typeVar, T mappedType,
+		public TypeMapping(TypeVariable<?> typeVar, Type mappedType,
 			boolean malleable)
 		{
 			this.typeVar = typeVar;
@@ -779,39 +765,41 @@ public final class MatchingUtils {
 		}
 
 		/**
-		 * Attempts to accomodate {@code newType} into the current mapping between
+		 * Attempts to accommodate {@code newType} into the current mapping between
 		 * {@code typeVar} and {@code mappedType} <em>given</em> the existing
 		 * malleability of {@code mappedType} and the malleability imposed by
-		 * {@code newType}. If {@code newType} cannot be accomodated, a
+		 * {@code newType}. If {@code newType} cannot be accommodated, a
 		 * {@link TypeInferenceException} will be thrown. Note that it is not a
 		 * guarantee that either the existing {@code mappedType} or {@code newType}
-		 * will become the new {@link mappedType} after the method ends;
-		 * {@link mappedType} could be a supertype of these two {@link Type}s.
+		 * will become the new {@link #mappedType} after the method ends;
+		 * {@link #mappedType} could be a supertype of these two {@link Type}s.
 		 * 
-		 * @param otherType - the type that will be accomodated into {@link mapped}
-		 * @param newTypeMalleability - the malleability of {@code newType},
-		 *          determined by the context from which {@code newType} came.
+		 * @param otherType - the type that will be refined into {@link #mappedType}
+		 * @param newTypeMalleability - the malleability of {@code otherType},
+		 *          determined by the context from which {@code otherType} came.
 		 * @throws TypeInferenceException
 		 */
-		public MappedType<?> refine(Type otherType, boolean newTypeMalleability)
+		public void refine(Type otherType, boolean newTypeMalleability)
 			throws TypeInferenceException
 		{
 			malleable &= newTypeMalleability;
 			if (mappedType instanceof Any) {
-				return updatedMappedType(otherType);
+				mappedType = otherType;
+				return;
 			}
 			if (malleable) {
 				// TODO: consider the correct value of that boolean
 				Type superType = Types.greatestCommonSuperType(new Type[] { otherType,
 					mappedType }, false);
 				if (Types.isAssignable(superType, typeVar)) {
-					return updatedMappedType(superType);
+					mappedType = superType;
+					return;
 				}
 				throw new TypeInferenceException(typeVar +
 					" cannot simultaneoustly be mapped to " + otherType + " and " +
 					mappedType);
 			}
-			if (Objects.equal(mappedType, otherType)) return this;
+			if (Objects.equal(mappedType, otherType)) return;
 			throw new TypeInferenceException(typeVar +
 				" cannot simultaneoustly be mapped to " + otherType + " and " +
 				mappedType);
@@ -823,282 +811,130 @@ public final class MatchingUtils {
 		public Type getType() {
 			return mappedType;
 		}
-		
-		protected MappedType<?> updatedMappedType(Type newType) {
-			if (newType instanceof ParameterizedType) {
-				return new MappedParameterizedType(typeVar, (ParameterizedType) newType, malleable);
-			}
-			if (newType instanceof TypeVariable) {
-				return new MappedTypeVariable<>(typeVar, (TypeVariable<?>) newType, malleable);
-			}
-			if (newType instanceof WildcardType) {
-				return new MappedWildcardType(typeVar, (WildcardType<?>) newType, malleable);
-			}
-			if (newType instanceof GenericArrayType) {
-				return new MappedGenericArrayType(typeVar, (GenericArrayType) newType, malleable);
-			}
-			if (newType instanceof Class) {
-				return new MappedClass<>(typeVar, (Class<?>) newType, malleable);
-			}
-			if (newType instanceof Any) {
-				return new MappedAnyType(typeVar, (Any) newType, malleable);
-			}
-			throw new TypeInferenceException(
-				"Could not create new MappedType with unsupported type " + newType +
-					"!");
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(typeVar, mappedType, malleable);
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof TypeMapping)) return false;
+			final TypeMapping that = (TypeMapping) o;
+			return Objects.equal(typeVar, that.typeVar) && //
+				Objects.equal(mappedType, that.mappedType) && //
+				Objects.equal(malleable, that.malleable);
+		}
+
+		@Override
+		public String toString() {
+			return mappedType.toString();
 		}
 	}
 	
-	static class MappedParameterizedType extends MappedType<ParameterizedType> implements ParameterizedType {
-		
-		public MappedParameterizedType(TypeVariable<?> typeVar, ParameterizedType mappedType,
-			boolean malleable)
-		{
-			super(typeVar, mappedType, malleable);
+	/**
+	 * Adapter class wrapping a {@code Map<TypeVariable, TypeMapping>} into a
+	 * {@code Map<TypeVariable, Type>} for use with {@link Types} API.
+	 */
+	private static class TypeVarAssigns implements Map<TypeVariable<?>, Type> {
+
+		private Map<TypeVariable<?>, TypeMapping> map;
+
+		public TypeVarAssigns(Map<TypeVariable<?>, TypeMapping> map) {
+			this.map = map;
 		}
 
-		@Override
-		public Type[] getActualTypeArguments() {
-			return mappedType.getActualTypeArguments();
-		}
-
-		@Override
-		public Type getRawType() {
-			return mappedType.getRawType();
-		}
-
-		@Override
-		public Type getOwnerType() {
-			return mappedType.getOwnerType();
-		}
-
-		@Override
-		protected MappedType<?> updatedMappedType(
-			Type newType)
-		{
-			if (newType instanceof ParameterizedType) {
-				mappedType = (ParameterizedType) newType;
-				return this;
-			}
-			return super.updatedMappedType(newType);
-		}
-		
-	}
-	
-	static class MappedTypeVariable<D extends GenericDeclaration> extends MappedType<TypeVariable<D>> implements TypeVariable<D> {
-
-		public MappedTypeVariable(TypeVariable<?> typeVar,
-			TypeVariable<D> mappedType, boolean malleable)
-		{
-			super(typeVar, mappedType, malleable);
-		}
-
-		@Override
-		public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-			return mappedType.getAnnotation(annotationClass);
-		}
-
-		@Override
-		public Annotation[] getAnnotations() {
-			return mappedType.getAnnotations();
-		}
-
-		@Override
-		public Annotation[] getDeclaredAnnotations() {
-			return mappedType.getDeclaredAnnotations();
-		}
-
-		@Override
-		public Type[] getBounds() {
-			return mappedType.getBounds();
-		}
-
-		@Override
-		public D getGenericDeclaration() {
-			return mappedType.getGenericDeclaration();
-		}
-
-		@Override
-		public String getName() {
-			return mappedType.getName();
-		}
-
-		@Override
-		public AnnotatedType[] getAnnotatedBounds() {
-			return mappedType.getAnnotatedBounds();
-		}
-		
-		@SuppressWarnings("unchecked")
-		@Override
-		protected MappedType<?> updatedMappedType(
-			Type newType)
-		{
-			if (newType instanceof TypeVariable) {
-				mappedType = (TypeVariable<D>) newType;
-				return this;
-			}
-			return super.updatedMappedType(newType);
-		}
-		
-	}
-	
-	static class MappedWildcardType extends MappedType<WildcardType> implements WildcardType {
-
-		public MappedWildcardType(TypeVariable<?> typeVar, WildcardType mappedType,
-			boolean malleable)
-		{
-			super(typeVar, mappedType, malleable);
-		}
-
-		@Override
-		public Type[] getUpperBounds() {
-			return mappedType.getUpperBounds();
-		}
-
-		@Override
-		public Type[] getLowerBounds() {
-			return mappedType.getLowerBounds();
-		}
-		
-		@Override
-		protected MappedType<?> updatedMappedType(
-			Type newType)
-		{
-			if (newType instanceof WildcardType) {
-				mappedType = (WildcardType) newType;
-				return this;
-			}
-			return super.updatedMappedType(newType);
-		}
-
-	}
-	
-	static class MappedGenericArrayType extends MappedType<GenericArrayType> implements GenericArrayType {
-
-		public MappedGenericArrayType(TypeVariable<?> typeVar,
-			GenericArrayType mappedType, boolean malleable)
-		{
-			super(typeVar, mappedType, malleable);
-		}
-
-		@Override
-		public Type getGenericComponentType() {
-			return mappedType.getGenericComponentType();
-		}
-		
-		@Override
-		protected MappedType<?> updatedMappedType(
-			Type newType)
-		{
-			if (newType instanceof GenericArrayType) {
-				mappedType = (GenericArrayType) newType;
-				return this;
-			}
-			return super.updatedMappedType(newType);
-		}
-
-	}
-	
-	static class MappedClass<T> extends MappedType<Class<T>> implements Class<T> {
-
-		public MappedClass(TypeVariable<?> typeVar, Class<T> mappedType,
-			boolean malleable)
-		{
-			super(typeVar, mappedType, malleable);
-		}
-		
-	}
-	
-	static class TypeVarDataMap implements Map<TypeVariable<?>, Type> {
-		Map<TypeVariable<?>, MappedType> typeMap;
-		boolean malleable;
-		
-		public TypeVarDataMap(Map<TypeVariable<?>, MappedType> typeMap) {
-			this.typeMap = typeMap;
-		}
-		
 		@Override
 		public boolean containsKey( Object key) {
-			return typeMap.containsKey(key);
-		}
-		
-		@Override
-		public Type put(TypeVariable<?> typeVar, Type type) {
-			return typeMap.put(typeVar, new MappedType(typeVar, type, malleable)).getType();
-		}
-		
-		@Override
-		public Type putIfAbsent(TypeVariable<?> typeVar, Type type) {
-			if(!typeMap.containsKey(typeVar)) {
-				//TODO: how can we determine whether or not this should be malleable?
-				// Maybe we can declare that all should be malleable?
-				return put(typeVar, type);
-			}
-			return typeMap.get(typeVar).getType();
-		}
-		
-		@Override
-		public Type get(Object key) {
-			return typeMap.get(key).getType();
-		}
-		
-		public void setPutMalleability(boolean newMalleability) {
-			malleable = newMalleability;
+			return map.containsKey(key);
 		}
 
 		@Override
+		public Type put(TypeVariable<?> typeVar, Type type) {
+			final TypeMapping previousMapping = //
+				map.put(typeVar, new TypeMapping(typeVar, type, isMalleable(typeVar)));
+			return previousMapping == null ? null : previousMapping.getType();
+		}
+
+		@Override
+		public Type putIfAbsent(TypeVariable<?> typeVar, Type type) {
+			if (!map.containsKey(typeVar)) return put(typeVar, type);
+			return get(typeVar);
+		}
+
+		@Override
+		public Type get(Object key) {
+			return map.get(key).getType();
+		}
+		
+		@Override
 		public int size() {
-			// TODO Auto-generated method stub
-			return 0;
+			return map.size();
 		}
 
 		@Override
 		public boolean isEmpty() {
-			// TODO Auto-generated method stub
-			return false;
+			return map.isEmpty();
 		}
 
 		@Override
 		public boolean containsValue(Object value) {
-			// TODO Auto-generated method stub
-			return false;
+			return map.containsValue(value);
 		}
 
 		@Override
 		public Type remove(Object key) {
-			// TODO Auto-generated method stub
-			return null;
+			TypeMapping value = map.remove(key);
+			return value == null ? null : value.getType();
 		}
 
 		@Override
 		public void putAll(Map<? extends TypeVariable<?>, ? extends Type> m) {
-			// TODO Auto-generated method stub
-			
+			for (Map.Entry<? extends TypeVariable<?>, ? extends Type> e : m.entrySet()) {
+				put(e.getKey(), e.getValue());
+			}
 		}
 
 		@Override
 		public void clear() {
-			// TODO Auto-generated method stub
-			
+			map.clear();
 		}
 
 		@Override
 		public Set<TypeVariable<?>> keySet() {
-			// TODO Auto-generated method stub
-			return null;
+			return map.keySet();
 		}
 
 		@Override
 		public Collection<Type> values() {
-			// TODO Auto-generated method stub
-			return null;
+			return map.values().stream().map(v -> v.getType()).collect(Collectors.toList());
 		}
 
 		@Override
 		public Set<Entry<TypeVariable<?>, Type>> entrySet() {
-			// TODO Auto-generated method stub
-			return null;
+			return map.entrySet().stream().map(e -> {
+				return new Map.Entry<TypeVariable<?>, Type>() {
+
+					@Override
+					public TypeVariable<?> getKey() {
+						return e.getKey();
+					}
+
+					@Override
+					public Type getValue() {
+						return get(getKey());
+					}
+
+					@Override
+					public Type setValue(Type value) {
+						return put(getKey(), value);
+					}
+				};
+			}).collect(Collectors.toSet());
+		}
+
+		private boolean isMalleable(TypeVariable<?> typeVar) {
+			return map.containsKey(typeVar) && map.get(typeVar).malleable;
 		}
 	}
-	
 }

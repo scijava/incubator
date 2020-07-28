@@ -44,8 +44,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.scijava.ops.matcher.MatchingUtils.TypeInferenceException;
+import org.scijava.ops.matcher.MatchingUtils.TypeMapping;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
 
@@ -466,7 +466,6 @@ public class MatchingUtilsTest {
 	 * Function&lt;Double[], Double[]&gt; barFunc = new Bar&lt;&gt;();
 	 * </pre>
 	 *
-	 * @param <I>
 	 * @param <O>
 	 */
 	@Test
@@ -529,7 +528,7 @@ public class MatchingUtilsTest {
 			{}.getType();
 		final Type[] destArgs = ((ParameterizedType) dest).getActualTypeArguments();
 
-		final Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns = new HashMap<>();
 		MatchingUtils.inferTypeVariables(tArgs, destArgs, typeAssigns);
 
 		// We expect I=String, O=Double
@@ -552,14 +551,15 @@ public class MatchingUtilsTest {
 		final Type[] types = {listWild, t};
 		final Type[] inferFroms = {listDouble, integer};
 		
-		final Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns = new HashMap<>();
 		MatchingUtils.inferTypeVariables(types, inferFroms, typeAssigns);
 		
 		// We expect T=Number
-		final Map<TypeVariable<?>, Type> expected = new HashMap<>();
-		expected.put((TypeVariable<?>) t, Number.class);
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected = new HashMap<>();
+		TypeVariable<?> typeVar = (TypeVariable<?>) t;
+		expected.put(typeVar, new TypeMapping(typeVar, Number.class, true));
 		
-		assertEquals(typeAssigns, expected);
+		assertEquals(expected, typeAssigns);
 	}
 
 	@Test
@@ -569,7 +569,7 @@ public class MatchingUtilsTest {
 		final Type compT = new Nil<Comparable<T>>() {}.getType();
 		final Type u = new Nil<U>() {}.getType();
 
-		final Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns = new HashMap<>();
 		MatchingUtils.inferTypeVariables(compT, u, typeAssigns);
 
 		// We expect T=Double

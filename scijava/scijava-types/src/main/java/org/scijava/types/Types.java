@@ -2011,7 +2011,7 @@ public final class Types {
 			if (toType == null) {
 				throw new NullPointerException("Destination type is null");
 			}
-			return isAssignable(type, toType, null);
+			return isAssignable(type, toType, new HashMap<>());
 		}
 
 		/**
