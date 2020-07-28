@@ -534,7 +534,9 @@ public final class MatchingUtils {
 		if (typeData != null) {
 			typeData.refine(inferFrom, malleable);
 		}
-		typeMappings.put(type, new TypeMapping(type, inferFrom, malleable));
+		else {
+			typeMappings.put(type, new TypeMapping(type, inferFrom, malleable));
+		}
 
 		// Bounds could also contain type vars, hence possibly go into
 		// recursion
@@ -864,7 +866,8 @@ public final class MatchingUtils {
 
 		@Override
 		public Type get(Object key) {
-			return map.get(key).getType();
+			TypeMapping value = map.get(key);
+			return value == null ? null : value.getType();
 		}
 		
 		@Override
