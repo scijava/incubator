@@ -603,10 +603,35 @@ public final class MatchingUtils {
 			// is a parameterizedType? TypeVar? Wildcard?
 			if (!(upperBound instanceof TypeVariable<?>)) continue;
 			TypeVariable<?> typeVar = (TypeVariable<?>) upperBound;
-			resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
+//			if (inferFrom instanceof WildcardType) {
+//				WildcardType inferFromWildcardV = (WildcardType) inferFrom;
+//				Type inferFrom inferFromSuperType
+//				// HACK: while WildcardType API has the ability to support multiple
+//				// lower bounds, the Java language makes it impossible to specify
+//				// multiple lower bounds (i.e. it is not possible to write ? extends
+//				// Comparable<?> & String). Thus we assume that there is 
+//				Type inferFromLowerBound = ((WildcardType) inferFrom).getLowerBounds()[0];
+//			}
+			if (inferFrom instanceof WildcardType)
+				resolveWildcardTypeInMap(typeVar, (WildcardType) inferFrom, typeMappings, true);
+			else
+				resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
 		}
 	}
 	
+	private static void resolveWildcardTypeInMap(TypeVariable<?> typeVar,
+		WildcardType newType, Map<TypeVariable<?>, TypeMapping> typeMappings,
+		boolean malleability) throws TypeInferenceException
+	{
+		if (typeMappings.containsKey(typeVar)) {
+			typeMappings.get(typeVar).refine(newType, malleability);
+		}
+		else {
+			typeMappings.put(typeVar, new WildcardTypeMapping(typeVar, newType,
+				malleability));
+		}
+	}
+
 	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType, Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleability) throws TypeInferenceException {
 		if (typeMappings.containsKey(typeVar)) {
 			typeMappings.get(typeVar).refine(newType, malleability);
@@ -743,8 +768,8 @@ public final class MatchingUtils {
 	 */
 	static class TypeMapping {
 
-		private final TypeVariable<?> typeVar;
-		private Type mappedType;
+		protected final TypeVariable<?> typeVar;
+		protected Type mappedType;
 
 		/**
 		 * A boolean describing whether {@code mappedType} can be mutated in within
@@ -831,6 +856,74 @@ public final class MatchingUtils {
 		@Override
 		public String toString() {
 			return mappedType.toString();
+		}
+	}
+	
+	/**
+	 * A data structure retaining information about the mapping of a
+	 * {@link TypeVariable} to a {@link Type} bounded by a {@link WildcardType}
+	 * within a type-inferring context.
+	 * 
+	 * @author Gabriel Selzer
+	 */
+	static class WildcardTypeMapping extends TypeMapping {
+		
+		private Type lowerBound;
+
+		public WildcardTypeMapping(TypeVariable<?> typeVar, WildcardType mappedType,
+			boolean malleable)
+		{
+			super(typeVar, mappedType, malleable);
+			Type[] upperBounds = mappedType.getUpperBounds();
+			if (upperBounds.length == 0) {
+				this.mappedType = Object.class;
+			}
+			else {
+				// HACK: while WildcardType API has the ability to support multiple
+				// lower (and upper) bounds, the Java language makes it impossible to specify
+				// multiple lower bounds (i.e. it is not possible to write ? extends
+				// Comparable<?> & String). Thus we assume that there is only one
+				this.mappedType = upperBounds[0];
+			}
+			
+			Type[] lowerBounds = mappedType.getLowerBounds();
+			if (lowerBounds.length == 0) {
+				lowerBound = new Any();
+			}
+			else {
+				// HACK: while WildcardType API has the ability to support multiple
+				// lower bounds, the Java language makes it impossible to specify
+				// multiple lower bounds (i.e. it is not possible to write ? super
+				// Number & String). Thus we assume that there is only one.
+				lowerBound = lowerBounds[0];
+			}
+		}	
+		
+		/**
+		 * Attempts to accommodate {@code newType} into the current mapping between
+		 * {@code typeVar} and {@code mappedType} <em>given</em> the existing
+		 * malleability of {@code mappedType} and the malleability imposed by
+		 * {@code newType}. If {@code newType} cannot be accommodated, a
+		 * {@link TypeInferenceException} will be thrown. Note that it is not a
+		 * guarantee that either the existing {@code mappedType} or {@code newType}
+		 * will become the new {@link #mappedType} after the method ends;
+		 * {@link #mappedType} could be a supertype of these two {@link Type}s.
+		 * 
+		 * @param otherType - the type that will be refined into {@link #mappedType}
+		 * @param newTypeMalleability - the malleability of {@code otherType},
+		 *          determined by the context from which {@code otherType} came.
+		 * @throws TypeInferenceException
+		 */
+		@Override
+		public void refine(Type otherType, boolean newTypeMalleability)
+			throws TypeInferenceException
+		{
+			// TODO: consider what to do when otherType is ALSO a WildcardType
+			super.refine(otherType, newTypeMalleability);
+			if (!Types.isAssignable(lowerBound, mappedType))
+				throw new TypeInferenceException(typeVar +
+					" cannot simultaneoustly be mapped to " + otherType + " and " +
+					mappedType);
 		}
 	}
 	
