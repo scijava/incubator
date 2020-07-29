@@ -38,6 +38,18 @@ public class GreatestCommonSupertypeTest {
 	static class YThing implements Thing {
 
 	}
+	
+	static abstract class RecursiveThing<T extends RecursiveThing<T>> {
+		
+	}
+	
+	static class StrangeThing extends RecursiveThing<StrangeThing> {
+		
+	}
+	
+	static class WeirdThing extends RecursiveThing<WeirdThing> {
+		
+	}
 
 	@Test
 	public void DoubleTest() {
@@ -142,5 +154,13 @@ public class GreatestCommonSupertypeTest {
 		assertTrue(superType.equals(new Nil<Base>() {}.getType()));
 		assertFalse(superType.equals(new Nil<Thing>() {}.getType()),
 			"Non-Object classes should take precedence over interfaces");
+	}
+	
+	@Test
+	public void RecursiveThingTest() {
+		Type t1 = new Nil<StrangeThing>() {}.getType();
+		Type t2 = new Nil<WeirdThing>() {}.getType();
+		Type superType = Types.greatestCommonSuperType(new Type[] {t1, t2}, false);
+		assertTrue(superType.equals(Object.class));
 	}
 }
