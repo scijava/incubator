@@ -806,8 +806,13 @@ public final class Types {
 					for (int j = 0; j < typeVarsI.length; j++) {
 						typeVarsI[j] = castedTypes[j].getActualTypeArguments()[i];
 					}
-					resolvedTypeArgs[i] = wildcard(new Type[] { greatestCommonSuperType(typeVarsI, true) },
-							new Type[] {});
+					// If each of these types implements some recursive interface, e.g. Comparable,
+					// the best we can do is return an unbounded wildcard.
+					if (Arrays.equals(types, typeVarsI))
+						resolvedTypeArgs[i] = wildcard();
+					else
+						resolvedTypeArgs[i] = wildcard(new Type[] { greatestCommonSuperType(typeVarsI, true) },
+								new Type[] {});
 				}
 
 				// return supertype parameterized with the resolved type args

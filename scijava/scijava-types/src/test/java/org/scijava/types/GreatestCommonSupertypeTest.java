@@ -1,5 +1,6 @@
 package org.scijava.types;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -157,10 +158,11 @@ public class GreatestCommonSupertypeTest {
 	}
 	
 	@Test
-	public void RecursiveThingTest() {
+	public void RecursiveClassTest() {
 		Type t1 = new Nil<StrangeThing>() {}.getType();
 		Type t2 = new Nil<WeirdThing>() {}.getType();
 		Type superType = Types.greatestCommonSuperType(new Type[] {t1, t2}, false);
-		assertTrue(superType.equals(Object.class));
+		Nil<RecursiveThing<?>> expected = new Nil<>() {};
+		assertTrue(superType.equals(expected.getType()));
 	}
 }
