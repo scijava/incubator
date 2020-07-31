@@ -535,7 +535,11 @@ public final class MatchingUtils {
 			typeData.refine(inferFrom, malleable);
 		}
 		else {
-			typeMappings.put(type, new TypeMapping(type, inferFrom, malleable));
+			if (inferFrom instanceof WildcardType)
+				// NB wildcards are malleable
+				resolveWildcardTypeInMap(type, (WildcardType) inferFrom, typeMappings, true);
+			else
+				resolveTypeInMap(type, inferFrom, typeMappings, malleable);
 		}
 
 		// Bounds could also contain type vars, hence possibly go into
@@ -922,7 +926,13 @@ public final class MatchingUtils {
 		public void refine(Type otherType, boolean newTypeMalleability)
 			throws TypeInferenceException
 		{
-			// TODO: consider what to do when otherType is ALSO a WildcardType
+			// Just as we did with the initial wildcard, set otherType to the upper
+			// bound of otherType (or to Object if there is no upper bound)
+			if (otherType instanceof WildcardType) {
+				WildcardType otherWildcard = (WildcardType) otherType;
+				otherType = otherWildcard.getUpperBounds().length == 0 ? Object.class
+					: otherWildcard.getUpperBounds()[0];
+			}
 			super.refine(otherType, newTypeMalleability);
 			if (!Types.isAssignable(lowerBound, mappedType))
 				throw new TypeInferenceException(typeVar +
