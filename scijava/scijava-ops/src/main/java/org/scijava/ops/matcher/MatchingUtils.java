@@ -871,31 +871,35 @@ public final class MatchingUtils {
 		private Type lowerBound;
 
 		public WildcardTypeMapping(TypeVariable<?> typeVar, WildcardType mappedType,
-			boolean malleable)
+			boolean malleable) throws TypeInferenceException
 		{
 			super(typeVar, mappedType, malleable);
 			Type[] upperBounds = mappedType.getUpperBounds();
 			if (upperBounds.length == 0) {
 				this.mappedType = Object.class;
 			}
-			else {
-				// HACK: while WildcardType API has the ability to support multiple
-				// lower (and upper) bounds, the Java language makes it impossible to specify
-				// multiple lower bounds (i.e. it is not possible to write ? extends
-				// Comparable<?> & String). Thus we assume that there is only one
+			else if (upperBounds.length == 1) {
 				this.mappedType = upperBounds[0];
 			}
-			
+			else {
+				throw new TypeInferenceException(mappedType + //
+					" is an impossible WildcardType. " + //
+					"The Java language specification currently prevents multiple upper bounds " + //
+					Arrays.toString(upperBounds)); //
+			}
+
 			Type[] lowerBounds = mappedType.getLowerBounds();
 			if (lowerBounds.length == 0) {
 				lowerBound = new Any();
 			}
-			else {
-				// HACK: while WildcardType API has the ability to support multiple
-				// lower bounds, the Java language makes it impossible to specify
-				// multiple lower bounds (i.e. it is not possible to write ? super
-				// Number & String). Thus we assume that there is only one.
+			else if (lowerBounds.length == 1) {
 				lowerBound = lowerBounds[0];
+			}
+			else {
+				throw new TypeInferenceException(mappedType + //
+					" is an impossible WildcardType. " + //
+					"The Java language specification currently prevents multiple lower bounds " + //
+					Arrays.toString(lowerBounds)); //
 			}
 		}	
 		
