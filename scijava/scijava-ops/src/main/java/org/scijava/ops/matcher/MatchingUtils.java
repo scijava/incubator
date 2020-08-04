@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -589,6 +590,10 @@ public final class MatchingUtils {
 				.getActualTypeArguments(), typeMappings, false);
 		}
 		else {
+			if (inferFrom instanceof WildcardType) {
+				WildcardType inferFromWildcard = (WildcardType) inferFrom;
+				if (inferFromWildcard.getUpperBounds().length == 1) inferFrom = inferFromWildcard.getUpperBounds()[0];
+			}
 			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
 			Type mappedType = Types.mapVarToTypes(type, typeVarAssigns);
 			// Use isAssignable to attempt to infer the type variables present in type
@@ -605,21 +610,21 @@ public final class MatchingUtils {
 		for (Type upperBound : upperBounds) {
 			// TODO: consider the various typings of inferFrom (i.e. what if inferFrom
 			// is a parameterizedType? TypeVar? Wildcard?
-			if (!(upperBound instanceof TypeVariable<?>)) continue;
-			TypeVariable<?> typeVar = (TypeVariable<?>) upperBound;
-//			if (inferFrom instanceof WildcardType) {
-//				WildcardType inferFromWildcardV = (WildcardType) inferFrom;
-//				Type inferFrom inferFromSuperType
-//				// HACK: while WildcardType API has the ability to support multiple
-//				// lower bounds, the Java language makes it impossible to specify
-//				// multiple lower bounds (i.e. it is not possible to write ? extends
-//				// Comparable<?> & String). Thus we assume that there is 
-//				Type inferFromLowerBound = ((WildcardType) inferFrom).getLowerBounds()[0];
-//			}
-			if (inferFrom instanceof WildcardType)
-				resolveWildcardTypeInMap(typeVar, (WildcardType) inferFrom, typeMappings, true);
-			else
-				resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
+			if (upperBound instanceof TypeVariable<?>) {
+				TypeVariable<?> typeVar = (TypeVariable<?>) upperBound;
+				if (inferFrom instanceof WildcardType)
+					resolveWildcardTypeInMap(typeVar, (WildcardType) inferFrom, typeMappings, true);
+				else
+					resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
+			}
+			else if (upperBound instanceof ParameterizedType) {
+				ParameterizedType parameterizedUpperBound = (ParameterizedType) upperBound;
+				if (inferFrom instanceof WildcardType) {
+					inferFrom = getInferrableBound((WildcardType) inferFrom);
+				}
+				inferTypeVariables(parameterizedUpperBound, inferFrom, typeMappings, true);
+			}
+			else continue;
 		}
 	}
 	
@@ -664,16 +669,48 @@ public final class MatchingUtils {
 		}
 	}
 
-	private static void inferTypeVariables(GenericArrayType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+	private static void inferTypeVariables(GenericArrayType type, Type inferFrom,
+		Map<TypeVariable<?>, TypeMapping> typeMappings)
+		throws TypeInferenceException
+	{
 		if (inferFrom instanceof Class<?> && ((Class<?>) inferFrom).isArray()) {
 			Type componentType = type.getGenericComponentType();
 			Type componentInferFrom = ((Class<?>) inferFrom).getComponentType();
 			inferTypeVariables(componentType, componentInferFrom, typeMappings);
 		}
-		else {
-			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
-			if (! Types.isAssignable(inferFrom, type, typeVarAssigns)) throw new TypeInferenceException();
+		else if (inferFrom instanceof WildcardType) {
+			Type inferrableBound = getInferrableBound((WildcardType) inferFrom);
+			inferTypeVariables(type, inferrableBound, typeMappings);
 		}
+		else throw new TypeInferenceException(inferFrom +
+			" cannot be implicitly cast to " + type +
+			", thus it is impossible to infer type variables for " + inferFrom);
+	}
+
+	/**
+	 * Current java language specifications allow either:
+	 * <ul>
+	 * <li>one {@code Object} upper bound and one lower bound
+	 * <li>one (arbitrary) upper bound and no lower bounds
+	 * </ul>
+	 * We rely on this fact for the purposes of inferring type variables.
+	 *
+	 * @param type
+	 * @return the <b>singular</b> {@link Type} that bounds this
+	 *         {@link TypeVariable}. The returned {@code Type} could be
+	 *         <b>either</b> a lower <b>or</b> upper bound (we do not care for the
+	 *         sole purpose of type inference).
+	 */
+	private static Type getInferrableBound(WildcardType type) {
+		Type[] lBounds = type.getLowerBounds();
+		Type[] uBounds = type.getUpperBounds();
+		if (lBounds.length == 1 && uBounds.length == 1 &&
+			uBounds[0] == Object.class) return lBounds[0];
+		else if (lBounds.length == 0 && uBounds.length == 1) return uBounds[0];
+		else throw new IllegalArgumentException(
+			"Illegal WildcardType: Current Java Language Specification does not allow " +
+				type + " to simultaneously have upper bounds " + uBounds +
+				" and lower bounds " + lBounds);
 	}
 
 	/**
@@ -872,7 +909,7 @@ public final class MatchingUtils {
 	 */
 	static class WildcardTypeMapping extends TypeMapping {
 		
-		private Type lowerBound;
+		private List<Type> lowerBoundList;
 
 		public WildcardTypeMapping(TypeVariable<?> typeVar, WildcardType mappedType,
 			boolean malleable) throws TypeInferenceException
@@ -893,13 +930,11 @@ public final class MatchingUtils {
 			}
 
 			Type[] lowerBounds = mappedType.getLowerBounds();
-			if (lowerBounds.length == 0) {
-				lowerBound = new Any();
+			lowerBoundList = new ArrayList<>();
+			if (lowerBounds.length == 1) {
+				lowerBoundList.add(lowerBounds[0]);
 			}
-			else if (lowerBounds.length == 1) {
-				lowerBound = lowerBounds[0];
-			}
-			else {
+			else if (lowerBounds.length > 1){
 				throw new TypeInferenceException(mappedType + //
 					" is an impossible WildcardType. " + //
 					"The Java language specification currently prevents multiple lower bounds " + //
@@ -926,18 +961,37 @@ public final class MatchingUtils {
 		public void refine(Type otherType, boolean newTypeMalleability)
 			throws TypeInferenceException
 		{
+			if (otherType instanceof WildcardType) {
+				refineWildcard((WildcardType) otherType, newTypeMalleability);
+			}
+			else {
+				super.refine(otherType, newTypeMalleability);
+			}
+			for (Type lowerBound : lowerBoundList) {
+				if (!Types.isAssignable(lowerBound, mappedType))
+					throw new TypeInferenceException(typeVar +
+						" cannot simultaneoustly be mapped to " + otherType + " and " +
+						mappedType);
+			}
+		}
+
+		private void refineWildcard(WildcardType otherType,
+			boolean newTypeMalleability) throws TypeInferenceException
+		{
+			if (otherType.getLowerBounds().length == 1) {
+				lowerBoundList.add(otherType.getLowerBounds()[0]);
+			}
 			// Just as we did with the initial wildcard, set otherType to the upper
 			// bound of otherType (or to Object if there is no upper bound)
-			if (otherType instanceof WildcardType) {
-				WildcardType otherWildcard = (WildcardType) otherType;
-				otherType = otherWildcard.getUpperBounds().length == 0 ? Object.class
-					: otherWildcard.getUpperBounds()[0];
+			else if (otherType.getLowerBounds().length > 1) {
+				throw new TypeInferenceException(otherType + //
+					" is an impossible WildcardType. " + //
+					"The Java language specification currently prevents multiple lower bounds " + //
+					Arrays.toString(otherType.getLowerBounds())); //
 			}
-			super.refine(otherType, newTypeMalleability);
-			if (!Types.isAssignable(lowerBound, mappedType))
-				throw new TypeInferenceException(typeVar +
-					" cannot simultaneoustly be mapped to " + otherType + " and " +
-					mappedType);
+			Type upperBound = otherType.getUpperBounds().length == 0 ? Object.class
+				: otherType.getUpperBounds()[0];
+			super.refine(upperBound, newTypeMalleability);
 		}
 	}
 	

@@ -35,8 +35,12 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -431,10 +435,11 @@ public class MatchingUtilsTest {
 		
 		Nil<BiConsumer<List<? extends Number>, Number>> y1 = new Nil<>() {};
 		Nil<BiConsumer<List<? extends Integer>, Integer>> y2 = new Nil<>() {};
+		Nil<BiConsumer<List<? extends Number>, ? extends Number>> y3 = new Nil<>() {};
 
 		Nil<BiConsumer<List<? extends Integer>, Double>> n1 = new Nil<>() {};
-		
-		assertAll(StrangeConsumer.class, true, y1, y2);
+
+		assertAll(StrangeConsumer.class, true, y1, y2, y3);
 		assertAll(StrangeConsumer.class, false, n1);
 		
 	}
@@ -490,6 +495,18 @@ public class MatchingUtilsTest {
 		assertAll(Bar.class, false, doubleFunction);
 	}
 
+	@Test
+	public void testGenericArrayToWildcardWithinParameterizedType() {
+		abstract class Foo<T extends Number> implements List<T[]> {}
+		final Nil<List<? extends Double[]>> upperType = new Nil<>() {};
+		final Nil<List<? super Double[]>> lowerType = new Nil<>() {};
+
+		// Since it is legal to write
+		// List<? extends Double[]> list = new Foo<>() {...};
+		// assertAll must return true
+		assertAll(Foo.class, true, upperType, lowerType);
+	}
+
 	@Test(expected = NullPointerException.class)
 	public void testIsAssignableNullToNull() {
 		MatchingUtils.checkGenericAssignability(null, null, false);
@@ -513,8 +530,8 @@ public class MatchingUtilsTest {
 		final Type listExtendsNumber = new Nil<List<? extends Number>>() {
 		}.getType();
 
-		assertAll(List.class, true, listT, listNumber, listInteger);
-		assertAll(List.class, false, listExtendsNumber, t);
+		assertAll(List.class, true, listT, listNumber, listInteger, listExtendsNumber);
+		assertAll(List.class, false, t);
 	}
 	
 	@Test
@@ -542,26 +559,52 @@ public class MatchingUtilsTest {
 
 		assertEquals(typeAssigns, expected);
 	}
-	
+
 	@Test
 	public <T> void testWildcardTypeInference() throws TypeInferenceException {
 		final Type t = new Nil<T>() {}.getType();
 		final Type listWild = new Nil<List<? extends T>>() {}.getType();
 		final Type integer = new Nil<Integer>() {}.getType();
 		final Type listDouble = new Nil<List<Double>>() {}.getType();
-		
-		final Type[] types = {listWild, t};
-		final Type[] inferFroms = {listDouble, integer};
-		
-		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns = new HashMap<>();
+
+		final Type[] types = { listWild, t };
+		final Type[] inferFroms = { listDouble, integer };
+
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns =
+			new HashMap<>();
 		MatchingUtils.inferTypeVariables(types, inferFroms, typeAssigns);
-		
+
 		// We expect T=Number
-		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected = new HashMap<>();
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected =
+			new HashMap<>();
 		TypeVariable<?> typeVar = (TypeVariable<?>) t;
 		expected.put(typeVar, new TypeMapping(typeVar, Number.class, true));
-		
+
 		assertEquals(expected, typeAssigns);
+
+		final Type[] types2 = { t, t };
+		final Type listWildcardNumber = new Nil<List<? extends Number>>() {}
+			.getType();
+		final Type wildcardNumber = ((ParameterizedType) listWildcardNumber)
+			.getActualTypeArguments()[0];
+		final Type listWildcardDouble = new Nil<List<? extends Double>>() {}
+			.getType();
+		final Type wildcardDouble = ((ParameterizedType) listWildcardDouble)
+			.getActualTypeArguments()[0];
+
+		final Type[] inferFroms2 = { wildcardNumber, wildcardDouble };
+
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns2 =
+			new HashMap<>();
+		MatchingUtils.inferTypeVariables(types2, inferFroms2, typeAssigns2);
+
+		// We expect T=Number
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected2 =
+			new HashMap<>();
+		TypeVariable<?> typeVar2 = (TypeVariable<?>) t;
+		expected2.put(typeVar2, new TypeMapping(typeVar, Number.class, true));
+
+		assertEquals(expected2, typeAssigns2);
 	}
 
 	@Test
@@ -603,7 +646,39 @@ public class MatchingUtilsTest {
 		
 		assertEquals(expected, typeAssigns);
 	}
+
+	@Test
+	public <T extends Number> void testInferGenericArrayTypeFromExtendingWildcardType() throws TypeInferenceException{
+		final Type type = new Nil<List<T[]>>() {}.getType();
+		final Type inferFrom = new Nil<List<? extends Double[]>>() {}.getType();
+
+		Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns = new HashMap<>();
+		MatchingUtils.inferTypeVariables(type, inferFrom, typeAssigns);
+
+		// We expect T=Double
+		TypeVariable<?> typeVarT = (TypeVariable<?>) new Nil<T>() {}.getType();
+		Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected = new HashMap<>();
+		expected.put(typeVarT, new TypeMapping(typeVarT, Double.class, true));
 	
+		assertEquals(expected, typeAssigns);
+	}
+
+	@Test
+	public <T extends Number> void testInferGenericArrayTypeFromSuperWildcardType() throws TypeInferenceException{
+		final Type type = new Nil<List<T[]>>() {}.getType();
+		final Type inferFrom = new Nil<List<? super Double[]>>() {}.getType();
+
+		Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns = new HashMap<>();
+		MatchingUtils.inferTypeVariables(type, inferFrom, typeAssigns);
+
+		// We expect T=Double
+		TypeVariable<?> typeVarT = (TypeVariable<?>) new Nil<T>() {}.getType();
+		Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected = new HashMap<>();
+		expected.put(typeVarT, new TypeMapping(typeVarT, Double.class, true));
+
+		assertEquals(expected, typeAssigns);
+	}
+
 	class Thing<T> {}
 	
 	class StrangeThing<N extends Number, T> extends Thing<T> {}
