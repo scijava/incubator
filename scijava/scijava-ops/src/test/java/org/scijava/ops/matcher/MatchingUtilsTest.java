@@ -69,9 +69,9 @@ public class MatchingUtilsTest {
 		}
 		abstract class SingleBounded<I extends Number> implements Supplier<I> {
 		}
-		Nil<Supplier<E>> y1 = new Nil<Supplier<E>>() {
+		Nil<Supplier<E>> y1 = new Nil<>() {
 		};
-		Nil<Supplier<N>> y2 = new Nil<Supplier<N>>() {
+		Nil<Supplier<N>> y2 = new Nil<>() {
 		};
 		Nil<Double> n1 = new Nil<>() {
 		};
@@ -87,9 +87,9 @@ public class MatchingUtilsTest {
 	public void genericAssignabilitySingleVar() {
 		abstract class Single<I> implements Supplier<I> {
 		}
-		Nil<Supplier<Double>> y1 = new Nil<Supplier<Double>>() {
+		Nil<Supplier<Double>> y1 = new Nil<>() {
 		};
-		Nil<Supplier<Number>> y2 = new Nil<Supplier<Number>>() {
+		Nil<Supplier<Number>> y2 = new Nil<>() {
 		};
 		Nil<Double> n1 = new Nil<>() {
 		};
@@ -103,11 +103,11 @@ public class MatchingUtilsTest {
 		abstract class SingleBounded<I extends Number> implements Supplier<I> {
 		}
 
-		Nil<Supplier<Double>> y1 = new Nil<Supplier<Double>>() {
+		Nil<Supplier<Double>> y1 = new Nil<>() {
 		};
 		Nil<Double> n1 = new Nil<>() {
 		};
-		Nil<String> n2 = new Nil<String>() {
+		Nil<String> n2 = new Nil<>() {
 		};
 
 		assertAll(SingleBounded.class, true, y1);
@@ -121,13 +121,13 @@ public class MatchingUtilsTest {
 
 		Nil<Double> n1 = new Nil<>() {
 		};
-		Nil<String> n2 = new Nil<String>() {
+		Nil<String> n2 = new Nil<>() {
 		};
-		Nil<Supplier<Double>> n3 = new Nil<Supplier<Double>>() {
+		Nil<Supplier<Double>> n3 = new Nil<>() {
 		};
-		Nil<Supplier<List<String>>> n4 = new Nil<Supplier<List<String>>>() {
+		Nil<Supplier<List<String>>> n4 = new Nil<>() {
 		};
-		Nil<Supplier<List<Double>>> y1 = new Nil<Supplier<List<Double>>>() {
+		Nil<Supplier<List<Double>>> y1 = new Nil<>() {
 		};
 
 		assertAll(SingleVarBoundedUsedNested.class, true, y1);
@@ -161,7 +161,7 @@ public class MatchingUtilsTest {
 		};
 		Nil<Function<Double, List<Double>>> n4 = new Nil<>() {
 		};
-		Nil<Function<List<String>, List<Double>>> n5 = new Nil<Function<List<String>, List<Double>>>() {
+		Nil<Function<List<String>, List<Double>>> n5 = new Nil<>() {
 		};
 		Nil<Function<List<Double>, List<String>>> n6 = new Nil<>() {
 		};
@@ -171,7 +171,7 @@ public class MatchingUtilsTest {
 
 		Nil<Function<Double, List<Double>>> n7 = new Nil<>() {
 		};
-		Nil<Function<List<String>, List<Double>>> n8 = new Nil<Function<List<String>, List<Double>>>() {
+		Nil<Function<List<String>, List<Double>>> n8 = new Nil<>() {
 		};
 		Nil<Function<List<Double>, List<String>>> n9 = new Nil<>() {
 		};
@@ -200,7 +200,7 @@ public class MatchingUtilsTest {
 		};
 		Nil<Function<Double, Double>> n1 = new Nil<>() {
 		};
-		Nil<Function<List<String>, String>> n2 = new Nil<Function<List<String>, String>>() {
+		Nil<Function<List<String>, String>> n2 = new Nil<>() {
 		};
 		Nil<Function<Iterable<Double>, Double>> n3 = new Nil<>() {
 		};
@@ -222,7 +222,7 @@ public class MatchingUtilsTest {
 		};
 		Nil<Function<Integer, List<Double>>> n7 = new Nil<>() {
 		};
-		Nil<Function<List<String>, List<Double>>> n8 = new Nil<Function<List<String>, List<Double>>>() {
+		Nil<Function<List<String>, List<Double>>> n8 = new Nil<>() {
 		};
 
 		assertAll(SingleVarBoundedNestedWildcardAndOther.class, true, y3, y4, y5);
@@ -242,13 +242,13 @@ public class MatchingUtilsTest {
 				implements Function<I, List<I>> {
 		}
 
-		Nil<Function<List<String>, List<String>>> y1 = new Nil<Function<List<String>, List<String>>>() {
+		Nil<Function<List<String>, List<String>>> y1 = new Nil<>() {
 		};
 		Nil<Function<Iterable<String>, Iterable<String>>> y2 = new Nil<>() {
 		};
-		Nil<Function<List<String>, List<Integer>>> n1 = new Nil<Function<List<String>, List<Integer>>>() {
+		Nil<Function<List<String>, List<Integer>>> n1 = new Nil<>() {
 		};
-		Nil<Function<List<String>, Double>> n2 = new Nil<Function<List<String>, Double>>() {
+		Nil<Function<List<String>, Double>> n2 = new Nil<>() {
 		};
 
 		assertAll(SingleVarBoundedNestedMultipleOccurence.class, true, y1, y2);
@@ -260,7 +260,7 @@ public class MatchingUtilsTest {
 		};
 		Nil<Function<Iterable<Double>, Iterable<Integer>>> n3 = new Nil<>() {
 		};
-		Nil<Function<List<String>, Integer>> n4 = new Nil<Function<List<String>, Integer>>() {
+		Nil<Function<List<String>, Integer>> n4 = new Nil<>() {
 		};
 
 		assertAll(SingleVarBoundedNestedWildcardMultipleOccurence.class, true, y3, y4);
@@ -289,26 +289,26 @@ public class MatchingUtilsTest {
 		abstract class DoubleVarBounded<I extends List<String>, B extends Number> implements Function<I, B> {
 		}
 
-		Nil<Function<List<String>, List<String>>> y1 = new Nil<Function<List<String>, List<String>>>() {
+		Nil<Function<List<String>, List<String>>> y1 = new Nil<>() {
 		};
 		Nil<Function<Iterable<String>, Iterable<String>>> y2 = new Nil<>() {
 		};
-		Nil<Function<List<String>, List<Integer>>> y3 = new Nil<Function<List<String>, List<Integer>>>() {
+		Nil<Function<List<String>, List<Integer>>> y3 = new Nil<>() {
 		};
-		Nil<Function<List<String>, Double>> y4 = new Nil<Function<List<String>, Double>>() {
+		Nil<Function<List<String>, Double>> y4 = new Nil<>() {
 		};
 
 		assertAll(DoubleVar.class, true, y1, y2, y3, y4);
 
-		Nil<Function<List<String>, Double>> y5 = new Nil<Function<List<String>, Double>>() {
+		Nil<Function<List<String>, Double>> y5 = new Nil<>() {
 		};
-		Nil<Function<List<String>, Float>> y6 = new Nil<Function<List<String>, Float>>() {
+		Nil<Function<List<String>, Float>> y6 = new Nil<>() {
 		};
 		Nil<Function<Iterable<String>, Double>> n1 = new Nil<>() {
 		};
 		Nil<Function<List<Double>, Integer>> n2 = new Nil<>() {
 		};
-		Nil<Function<List<String>, String>> n3 = new Nil<Function<List<String>, String>>() {
+		Nil<Function<List<String>, String>> n3 = new Nil<>() {
 		};
 
 		assertAll(DoubleVarBounded.class, true, y5, y6);
@@ -329,9 +329,9 @@ public class MatchingUtilsTest {
 		};
 		Nil<Function<Iterable<Integer>, Iterable<Integer>>> y3 = new Nil<>() {
 		};
-		Nil<Function<List<String>, List<Integer>>> n1 = new Nil<Function<List<String>, List<Integer>>>() {
+		Nil<Function<List<String>, List<Integer>>> n1 = new Nil<>() {
 		};
-		Nil<Function<List<String>, Double>> n2 = new Nil<Function<List<String>, Double>>() {
+		Nil<Function<List<String>, Double>> n2 = new Nil<>() {
 		};
 		Nil<Function<List<Integer>, List<Double>>> n3 = new Nil<>() {
 		};
@@ -511,16 +511,11 @@ public class MatchingUtilsTest {
 
 	@Test
 	public <T extends Number> void testIsAssignableT() {
-		final Type t = new Nil<T>() {
-		}.getType();
-		final Type listT = new Nil<List<T>>() {
-		}.getType();
-		final Type listNumber = new Nil<List<Number>>() {
-		}.getType();
-		final Type listInteger = new Nil<List<Integer>>() {
-		}.getType();
-		final Type listExtendsNumber = new Nil<List<? extends Number>>() {
-		}.getType();
+		final Nil<T> t = new Nil<>() {};
+		final Nil<List<T>> listT = new Nil<>() {};
+		final Nil<List<Number>> listNumber = new Nil<>() {};
+		final Nil<List<Integer>> listInteger = new Nil<>() {};
+		final Nil<List<? extends Number>> listExtendsNumber = new Nil<>() {};
 
 		assertAll(List.class, true, listT, listNumber, listInteger, listExtendsNumber);
 		assertAll(List.class, false, t);
