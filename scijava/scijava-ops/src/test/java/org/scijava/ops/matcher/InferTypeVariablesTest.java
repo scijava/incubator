@@ -6,6 +6,8 @@ import static org.junit.Assert.assertEquals;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +95,55 @@ public class InferTypeVariablesTest {
 		expected2.put(typeVar2, new TypeMapping(typeVar, Number.class, true));
 
 		assertEquals(expected2, typeAssigns2);
+	}
+
+	@Test
+	public <T extends Number> void
+		testInferFromWildcardExtendingParameterizedType()
+			throws TypeInferenceException
+	{
+		final Nil<List<? extends Comparable<T>>> listT = new Nil<>() {};
+		final Nil<List<? extends Comparable<Double>>> listWildcard = new Nil<>() {};
+
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns =
+			new HashMap<>();
+		MatchingUtils.inferTypeVariables(listT.getType(), listWildcard.getType(),
+			typeAssigns);
+
+		// We expect T=Double
+		final Type t = new Nil<T>() {}.getType();
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected =
+			new HashMap<>();
+		TypeVariable<?> typeVarT = (TypeVariable<?>) t;
+		expected.put(typeVarT, new TypeMapping(typeVarT, Double.class, false));
+
+		assertEquals(expected, typeAssigns);
+	}
+
+	@Test
+	public <T extends Number> void testInferFromWildcardExtendingClass()
+		throws TypeInferenceException
+	{
+		final Nil<List<? extends T>> listT = new Nil<>() {};
+		final Nil<List<? extends Double>> listWildcard = new Nil<>() {};
+
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns =
+			new HashMap<>();
+		MatchingUtils.inferTypeVariables(listT.getType(), listWildcard.getType(),
+			typeAssigns);
+
+		// We expect T= (? extends Double)
+		final Type t = new Nil<T>() {}.getType();
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected =
+			new HashMap<>();
+		TypeVariable<?> typeVarT = (TypeVariable<?>) t;
+		Type mappedType = ((ParameterizedType) listWildcard.getType())
+			.getActualTypeArguments()[0];
+		WildcardType mappedWildcard = (WildcardType) mappedType;
+		expected.put(typeVarT, new MatchingUtils.WildcardTypeMapping(typeVarT,
+			mappedWildcard, true));
+
+		assertEquals(expected, typeAssigns);
 	}
 
 	@Test
