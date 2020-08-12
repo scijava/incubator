@@ -536,11 +536,7 @@ public final class MatchingUtils {
 			typeData.refine(inferFrom, malleable);
 		}
 		else {
-			if (inferFrom instanceof WildcardType)
-				// NB wildcards are malleable
-				resolveWildcardTypeInMap(type, (WildcardType) inferFrom, typeMappings, true);
-			else
-				resolveTypeInMap(type, inferFrom, typeMappings, malleable);
+			resolveTypeInMap(type, inferFrom, typeMappings, malleable);
 		}
 
 		// Bounds could also contain type vars, hence possibly go into
@@ -612,10 +608,7 @@ public final class MatchingUtils {
 			// is a parameterizedType? TypeVar? Wildcard?
 			if (upperBound instanceof TypeVariable<?>) {
 				TypeVariable<?> typeVar = (TypeVariable<?>) upperBound;
-				if (inferFrom instanceof WildcardType)
-					resolveWildcardTypeInMap(typeVar, (WildcardType) inferFrom, typeMappings, true);
-				else
-					resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
+				resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
 			}
 			else if (upperBound instanceof ParameterizedType) {
 				ParameterizedType parameterizedUpperBound = (ParameterizedType) upperBound;
@@ -628,25 +621,27 @@ public final class MatchingUtils {
 		}
 	}
 	
-	private static void resolveWildcardTypeInMap(TypeVariable<?> typeVar,
-		WildcardType newType, Map<TypeVariable<?>, TypeMapping> typeMappings,
-		boolean malleability) throws TypeInferenceException
+	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType,
+		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleability)
+		throws TypeInferenceException
 	{
 		if (typeMappings.containsKey(typeVar)) {
 			typeMappings.get(typeVar).refine(newType, malleability);
 		}
 		else {
-			typeMappings.put(typeVar, new WildcardTypeMapping(typeVar, newType,
+			typeMappings.put(typeVar, suitableTypeMapping(typeVar, newType,
 				malleability));
 		}
 	}
-
-	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType, Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleability) throws TypeInferenceException {
-		if (typeMappings.containsKey(typeVar)) {
-			typeMappings.get(typeVar).refine(newType, malleability);
-		} else {
-			typeMappings.put(typeVar, new TypeMapping(typeVar, newType, malleability));
+	
+	private static TypeMapping suitableTypeMapping(TypeVariable<?> typeVar,
+		Type newType, boolean malleability) throws TypeInferenceException
+	{
+		if (newType instanceof WildcardType) {
+			return new WildcardTypeMapping(typeVar, (WildcardType) newType,
+				malleability);
 		}
+		return new TypeMapping(typeVar, newType, malleability);
 	}
 
 	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
