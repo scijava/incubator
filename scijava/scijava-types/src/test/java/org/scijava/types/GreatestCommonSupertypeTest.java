@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,6 +164,28 @@ public class GreatestCommonSupertypeTest {
 		Type t2 = new Nil<WeirdThing>() {}.getType();
 		Type superType = Types.greatestCommonSuperType(new Type[] {t1, t2}, false);
 		Nil<RecursiveThing<?>> expected = new Nil<>() {};
+		assertTrue(superType.equals(expected.getType()));
+	}
+
+	@Test
+	public <T extends Base> void typeVarTest() {
+		Type t1 = new Nil<T>() {}.getType();
+		Type t2 = new Nil<NThing>() {}.getType();
+		Type superType = Types.greatestCommonSuperType(new Type[] { t1, t2 },
+			false);
+		Nil<Base> expected = new Nil<>() {};
+		assertTrue(superType.equals(expected.getType()));
+	}
+
+	@Test
+	public void wildcardTypeTest() {
+		Type typeWithWildcard = new Nil<List<? extends NThing>>() {}.getType();
+		Type t1 = ((ParameterizedType) typeWithWildcard)
+			.getActualTypeArguments()[0];
+		Type t2 = new Nil<XThing>() {}.getType();
+		Type superType = Types.greatestCommonSuperType(new Type[] { t1, t2 },
+			false);
+		Nil<Base> expected = new Nil<>() {};
 		assertTrue(superType.equals(expected.getType()));
 	}
 }

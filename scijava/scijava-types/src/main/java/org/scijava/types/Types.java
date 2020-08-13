@@ -759,13 +759,23 @@ public final class Types {
 	 */
 	public static Type greatestCommonSuperType(final Type[] types, final boolean wildcardSingleIface) {
 
-		if (types.length == 0)
-			return null;
+		// return answer quick if the answer is trivial
+		if (types.length == 0) return null;
+		if (types.length == 1) return types[0];
+
 		// make sure that all types are supported
 		// TODO: are there any other types that aren't fully supported?
-		for (Type t : types) {
-			if (t instanceof TypeVariable<?>)
-				throw new UnsupportedOperationException("Unsupported type: " + t);
+		for (int i = 0; i < types.length; i++) {
+			if (types[i] instanceof TypeVariable<?>) {
+				TypeVariable<?> typeVar = (TypeVariable<?>) types[i];
+				types[i] = greatestCommonSuperType(typeVar.getBounds(), false);
+			}
+			// wildcards themselves are not supported, however we know that the
+			// greatest superType of any wildcard is its upper bound
+			if (types[i] instanceof WildcardType) {
+				WildcardType wildcard = (WildcardType) types[i];
+				types[i] = greatestCommonSuperType(wildcard.getUpperBounds(), false);
+			}
 		}
 
 		// We can effectively find the greatest common super type by assuming that
@@ -883,6 +893,11 @@ public final class Types {
 		if (sharedInterfaces.size() == 1 && !wildcardSingleIface) {
 			return sharedInterfaces.get(0);
 		} else if (sharedInterfaces.size() > 0) {
+			// TODO: such a wildcard is technically illegal as a result of current
+			// Java language specifications. See
+			// https://stackoverflow.com/questions/6643241/why-cant-you-have-multiple-interfaces-in-a-bounded-wildcard-generic
+			// Consider a wildcard extending a typeVar that extends multiple
+			// interfaces?
 			return wildcard(sharedInterfaces.toArray(new Type[] {}), new Type[] {});
 		}
 		return Object.class;
