@@ -580,10 +580,26 @@ public final class MatchingUtils {
 			// resolved to a Double and NOT a Long.
 			ParameterizedType paramInferFrom = (ParameterizedType) Types
 				.getExactSuperType(inferFrom, Types.raw(type));
-			if (paramInferFrom == null) throw new TypeInferenceException();
-
-			inferTypeVariables(type.getActualTypeArguments(), paramInferFrom
-				.getActualTypeArguments(), typeMappings, false);
+			if (paramInferFrom == null) {
+				// this means that inferFrom is NOT a superType of type. There is,
+				// however, one more thing that we can try. It is possible for inferFrom
+				// to be a subType of type (this can often happen when
+				// checkGenericAssignability is working with Functions). In this case,
+				// it is possible that inferFrom has information about the typeVariables
+				// of type.
+				ParameterizedType superTypeOfType = (ParameterizedType) Types
+					.getExactSuperType(type, Types.raw(inferFrom));
+				if (superTypeOfType == null) throw new TypeInferenceException(
+					inferFrom + " cannot be implicitly cast to " + type +
+						", thus it is impossible to infer type variables for " + inferFrom);
+				inferTypeVariables(superTypeOfType.getActualTypeArguments(),
+					((ParameterizedType) inferFrom).getActualTypeArguments(),
+					typeMappings, false);
+			}
+			else {
+				inferTypeVariables(type.getActualTypeArguments(), paramInferFrom
+					.getActualTypeArguments(), typeMappings, false);
+			}
 		}
 		else {
 			if (inferFrom instanceof WildcardType) {
