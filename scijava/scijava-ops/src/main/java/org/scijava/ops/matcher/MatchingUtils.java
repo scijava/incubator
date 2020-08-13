@@ -353,27 +353,32 @@ public final class MatchingUtils {
 		
 		TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
 
-		Type[] mappedSrcTypes = null;
 		try {
 			// Try to infer type variables contained in the type arguments of
 			// sry
 			inferTypeVariables(srcTypes, destTypes, typeMappings);
-			// Map the vars to the inferred types
-			mappedSrcTypes = mapVarToTypes(srcTypes, typeVarAssigns);
 		} catch (TypeInferenceException e) {
 			// types can't be inferred
+			// TODO: Consider the situations in which it is okay that the type
+			// variables cannot be inferred. For example, if we have a
+			// Function<Comparable<T>, Comparable<T>> and we ask for a
+			// Function<Double, Object>, it is okay that we cannot infer the T of
+			// Comparable<T> from Object since a Comparable<T> is an Object for any T.
+			// It would be nice if we could just return false any time we catch a
+			// TypeInferenceException, but until we sort this out, we cannot do so.
 			return safeAssignability && isSafeAssignable(destTypes, typeVarAssigns, src, dest);
 		}
 
-		// Build a new parameterized type from inferred types and check
-		// assignability
+		// Map TypeVariables in src to Types
 		Class<?> matchingRawType = Types.raw(dest);
+		Type[] mappedSrcTypes = mapVarToTypes(srcTypes, typeVarAssigns);
 		Type inferredSrcType = Types.parameterize(matchingRawType, mappedSrcTypes);
-		if (!Types.isAssignable(inferredSrcType, dest, typeVarAssigns)) {
-			if (!safeAssignability || !isSafeAssignable(destTypes, typeVarAssigns, src, dest))
-				return false;
-		}
-		return true;
+
+		// Check assignability
+		if (Types.isAssignable(inferredSrcType, dest, typeVarAssigns)) return true;
+
+		return safeAssignability && isSafeAssignable(destTypes, typeVarAssigns, src,
+			dest);
 	}
 
 	/**
