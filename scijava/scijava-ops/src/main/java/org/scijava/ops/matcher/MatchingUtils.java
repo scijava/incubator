@@ -602,23 +602,28 @@ public final class MatchingUtils {
 	}
 	
 	private static void inferTypeVariables(WildcardType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
-		Type[] upperBounds = type.getUpperBounds();
-		for (Type upperBound : upperBounds) {
-			// TODO: consider the various typings of inferFrom (i.e. what if inferFrom
-			// is a parameterizedType? TypeVar? Wildcard?
-			if (upperBound instanceof TypeVariable<?>) {
-				TypeVariable<?> typeVar = (TypeVariable<?>) upperBound;
-				resolveTypeInMap(typeVar, inferFrom, typeMappings, true);
-			}
-			else if (upperBound instanceof ParameterizedType) {
-				ParameterizedType parameterizedUpperBound = (ParameterizedType) upperBound;
-				if (inferFrom instanceof WildcardType) {
-					inferFrom = getInferrableBound((WildcardType) inferFrom);
-				}
-				inferTypeVariables(parameterizedUpperBound, inferFrom, typeMappings, true);
-			}
-			else continue;
+		Type inferrableBound = getInferrableBound(type);
+		if (inferFrom instanceof WildcardType) {
+			// NB if both type and inferFrom are Wildcards, it doesn't really matter
+			// (for the purpose of Type inference) whether those Wildcards have a
+			// defined upper or lower bound. It is only important that we compare
+			// those defined bounds, even if one is an upper bound and the other is a
+			// lower bound. If the Wildcards are not assignable (which is (always?)
+			// the case when one bound is an upper bound and the other is a lower
+			// bound), it is still possible to infer the type variables; despite doing
+			// so, checkGenericAssignability will return false.
+			inferFrom = getInferrableBound((WildcardType) inferFrom);
 		}
+		if (inferrableBound instanceof TypeVariable<?>) {
+			resolveTypeInMap((TypeVariable<?>) inferrableBound, inferFrom, typeMappings, true);
+		}
+		else if (inferrableBound instanceof ParameterizedType) {
+			ParameterizedType parameterizedUpperBound =
+				(ParameterizedType) inferrableBound;
+			inferTypeVariables(parameterizedUpperBound, inferFrom, typeMappings,
+				true);
+		}
+		// TODO: consider checking inferrableBounds instanceof Class
 	}
 	
 	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType,

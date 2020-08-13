@@ -7,7 +7,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,6 +141,50 @@ public class InferTypeVariablesTest {
 		WildcardType mappedWildcard = (WildcardType) mappedType;
 		expected.put(typeVarT, new MatchingUtils.WildcardTypeMapping(typeVarT,
 			mappedWildcard, true));
+
+		assertEquals(expected, typeAssigns);
+	}
+
+	@Test
+	public <T extends Number> void testInferWildcardAndClass()
+		throws TypeInferenceException
+	{
+		final Nil<List<? super T>> listT = new Nil<>() {};
+		final Nil<T> t = new Nil<>() {};
+		final Nil<List<? super Number>> listWildcard = new Nil<>() {};
+
+		Type[] types = new Type[] { listT.getType(), t.getType() };
+		Type[] inferFroms = new Type[] { listWildcard.getType(), Double.class };
+
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns =
+			new HashMap<>();
+		MatchingUtils.inferTypeVariables(types, inferFroms, typeAssigns);
+
+		// We expect T=Number
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected =
+			new HashMap<>();
+		TypeVariable<?> typeVarT = (TypeVariable<?>) t.getType();
+		expected.put(typeVarT, new TypeMapping(typeVarT, Number.class, true));
+
+		assertEquals(expected, typeAssigns);
+	}
+
+	@Test
+	public <T extends Number> void testInferSuperWildcard()
+		throws TypeInferenceException
+	{
+		final Nil<List<? super T>> listT = new Nil<>() {};
+		final Nil<List<? super Number>> listWildcard = new Nil<>() {};
+
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> typeAssigns =
+			new HashMap<>();
+		MatchingUtils.inferTypeVariables(listT.getType(), listWildcard.getType(), typeAssigns);
+
+		// We expect T=Number
+		final Map<TypeVariable<?>, MatchingUtils.TypeMapping> expected =
+			new HashMap<>();
+		TypeVariable<?> typeVarT = (TypeVariable<?>) new Nil<T>() {}.getType();
+		expected.put(typeVarT, new TypeMapping(typeVarT, Number.class, true));
 
 		assertEquals(expected, typeAssigns);
 	}

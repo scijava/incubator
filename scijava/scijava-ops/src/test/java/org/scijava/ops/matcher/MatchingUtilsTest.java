@@ -41,6 +41,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
@@ -497,6 +498,18 @@ public class MatchingUtilsTest {
 		// List<? extends Double[]> list = new Foo<>() {...};
 		// assertAll must return true
 		assertAll(Foo.class, true, upperType, lowerType);
+	}
+
+	@Test
+	public <T extends Number> void testSuperWildcardToSuperWildcard() {
+		final Nil<List<? super T>> listT = new Nil<>() {};
+		final Nil<List<? super Number>> listWildcard = new Nil<>() {};
+
+		// unfortunately we cannot use assertAll since it is impossible to create a
+		// Class implementing List<? super T>
+		boolean success = MatchingUtils.checkGenericAssignability(listT.getType(),
+			(ParameterizedType) listWildcard.getType(), false);
+		Assert.assertTrue(success);
 	}
 
 	@Test(expected = NullPointerException.class)
