@@ -855,6 +855,9 @@ public final class MatchingUtils {
 				mappedType = otherType;
 				return;
 			}
+			if (otherType instanceof Any) {
+				return;
+			}
 			if (malleable) {
 				// TODO: consider the correct value of that boolean
 				Type superType = Types.greatestCommonSuperType(new Type[] { otherType,
