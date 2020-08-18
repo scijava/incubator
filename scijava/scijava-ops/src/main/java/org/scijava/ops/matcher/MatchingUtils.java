@@ -424,7 +424,7 @@ public final class MatchingUtils {
 	/**
 	 * Exception indicating that type vars could not be inferred.
 	 */
-	static class TypeInferenceException extends Exception {
+	static class TypeInferenceException extends RuntimeException {
 		/**
 		 *
 		 */
@@ -466,14 +466,13 @@ public final class MatchingUtils {
 	 *          within {@code types}
 	 * @param typeMappings - the mapping of {@link TypeVariable}s to
 	 *          {@link Type}s
-	 * @throws TypeInferenceException
 	 */
-	static void inferTypeVariables(Type[] types, Type[] inferFroms, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+	static void inferTypeVariables(Type[] types, Type[] inferFroms, Map<TypeVariable<?>, TypeMapping> typeMappings) {
 		inferTypeVariables(types, inferFroms, typeMappings, true);
 	}
 	
 	private static void inferTypeVariables(Type[] types, Type[] inferFroms,
-		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) throws TypeInferenceException
+		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) 
 	{
 		// Ensure that the user has not passed a null map
 		if (typeMappings == null) throw new IllegalArgumentException(
@@ -502,14 +501,13 @@ public final class MatchingUtils {
 	 * @param type
 	 * @param inferFrom
 	 * @param typeMappings
-	 * @throws TypeInferenceException
 	 */
-	static void inferTypeVariables(Type type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+	static void inferTypeVariables(Type type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) {
 		inferTypeVariables(type, inferFrom, typeMappings, true);
 	}
 
 	private static void inferTypeVariables(Type type, Type inferFrom,
-		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) throws TypeInferenceException
+		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) 
 	{
 		if (type instanceof TypeVariable) {
 			inferTypeVariables((TypeVariable<?>) type, inferFrom, typeMappings, malleable);
@@ -529,7 +527,7 @@ public final class MatchingUtils {
 
 	}
 
-	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) throws TypeInferenceException {
+	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) {
 		TypeMapping typeData = typeMappings.get(type);
 		// If current is not null then we have already encountered that
 		// variable. If so, we require them to be exactly the same, and throw a
@@ -573,7 +571,7 @@ public final class MatchingUtils {
 		}
 	}
 
-	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+	private static void inferTypeVariables(ParameterizedType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) {
 		// Recursively follow parameterized types
 		if (inferFrom instanceof ParameterizedType) {
 			// Finding the supertype here is really important. Suppose that we are
@@ -619,7 +617,7 @@ public final class MatchingUtils {
 		}
 	}
 	
-	private static void inferTypeVariables(WildcardType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+	private static void inferTypeVariables(WildcardType type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) {
 		Type inferrableBound = getInferrableBound(type);
 		if (inferFrom instanceof WildcardType) {
 			// NB if both type and inferFrom are Wildcards, it doesn't really matter
@@ -646,7 +644,6 @@ public final class MatchingUtils {
 	
 	private static void resolveTypeInMap(TypeVariable<?> typeVar, Type newType,
 		Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleability)
-		throws TypeInferenceException
 	{
 		if (typeMappings.containsKey(typeVar)) {
 			typeMappings.get(typeVar).refine(newType, malleability);
@@ -658,7 +655,7 @@ public final class MatchingUtils {
 	}
 	
 	private static TypeMapping suitableTypeMapping(TypeVariable<?> typeVar,
-		Type newType, boolean malleability) throws TypeInferenceException
+		Type newType, boolean malleability) 
 	{
 		if (newType instanceof WildcardType) {
 			return new WildcardTypeMapping(typeVar, (WildcardType) newType,
@@ -667,7 +664,7 @@ public final class MatchingUtils {
 		return new TypeMapping(typeVar, newType, malleability);
 	}
 
-	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) throws TypeInferenceException {
+	private static void inferTypeVariables(Class<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) {
 		if( inferFrom instanceof TypeVariable<?>){
 			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
 			// If current type var is absent put it to the map. Otherwise,
@@ -689,7 +686,6 @@ public final class MatchingUtils {
 
 	private static void inferTypeVariables(GenericArrayType type, Type inferFrom,
 		Map<TypeVariable<?>, TypeMapping> typeMappings)
-		throws TypeInferenceException
 	{
 		if (inferFrom instanceof Class<?> && ((Class<?>) inferFrom).isArray()) {
 			Type componentType = type.getGenericComponentType();
@@ -863,10 +859,8 @@ public final class MatchingUtils {
 		 * @param otherType - the type that will be refined into {@link #mappedType}
 		 * @param newTypeMalleability - the malleability of {@code otherType},
 		 *          determined by the context from which {@code otherType} came.
-		 * @throws TypeInferenceException
 		 */
 		public void refine(Type otherType, boolean newTypeMalleability)
-			throws TypeInferenceException
 		{
 			malleable &= newTypeMalleability;
 			if (mappedType instanceof Any) {
@@ -976,11 +970,9 @@ public final class MatchingUtils {
 		 * @param otherType - the type that will be refined into {@link #mappedType}
 		 * @param newTypeMalleability - the malleability of {@code otherType},
 		 *          determined by the context from which {@code otherType} came.
-		 * @throws TypeInferenceException
 		 */
 		@Override
 		public void refine(Type otherType, boolean newTypeMalleability)
-			throws TypeInferenceException
 		{
 			if (otherType instanceof WildcardType) {
 				refineWildcard((WildcardType) otherType, newTypeMalleability);
@@ -997,7 +989,7 @@ public final class MatchingUtils {
 		}
 
 		private void refineWildcard(WildcardType otherType,
-			boolean newTypeMalleability) throws TypeInferenceException
+			boolean newTypeMalleability) 
 		{
 			if (otherType.getLowerBounds().length == 1) {
 				lowerBoundList.add(otherType.getLowerBounds()[0]);
