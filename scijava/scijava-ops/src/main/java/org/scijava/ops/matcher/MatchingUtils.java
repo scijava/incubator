@@ -927,33 +927,13 @@ public final class MatchingUtils {
 		private List<Type> lowerBoundList;
 
 		public WildcardTypeMapping(TypeVariable<?> typeVar, WildcardType mappedType,
-			boolean malleable) throws TypeInferenceException
+			boolean malleable) 
 		{
-			super(typeVar, mappedType, malleable);
-			Type[] upperBounds = mappedType.getUpperBounds();
-			if (upperBounds.length == 0) {
-				this.mappedType = Object.class;
-			}
-			else if (upperBounds.length == 1) {
-				this.mappedType = upperBounds[0];
-			}
-			else {
-				throw new TypeInferenceException(mappedType + //
-					" is an impossible WildcardType. " + //
-					"The Java language specification currently prevents multiple upper bounds " + //
-					Arrays.toString(upperBounds)); //
-			}
-
-			Type[] lowerBounds = mappedType.getLowerBounds();
+			super(typeVar, getUpperBound(mappedType), malleable);
 			lowerBoundList = new ArrayList<>();
-			if (lowerBounds.length == 1) {
-				lowerBoundList.add(lowerBounds[0]);
-			}
-			else if (lowerBounds.length > 1){
-				throw new TypeInferenceException(mappedType + //
-					" is an impossible WildcardType. " + //
-					"The Java language specification currently prevents multiple lower bounds " + //
-					Arrays.toString(lowerBounds)); //
+			Type mappedTypeLowerBound = getLowerBound(mappedType);
+			if (mappedTypeLowerBound != null) {
+				lowerBoundList.add(mappedTypeLowerBound);
 			}
 		}	
 		
@@ -989,22 +969,62 @@ public final class MatchingUtils {
 		}
 
 		private void refineWildcard(WildcardType otherType,
-			boolean newTypeMalleability) 
+			boolean newTypeMalleability)
 		{
-			if (otherType.getLowerBounds().length == 1) {
-				lowerBoundList.add(otherType.getLowerBounds()[0]);
+			Type otherLowerBound = getLowerBound(otherType);
+			if (otherLowerBound != null) {
+				lowerBoundList.add(otherLowerBound);
 			}
-			// Just as we did with the initial wildcard, set otherType to the upper
-			// bound of otherType (or to Object if there is no upper bound)
-			else if (otherType.getLowerBounds().length > 1) {
-				throw new TypeInferenceException(otherType + //
+			Type otherUpperBound = getUpperBound(otherType);
+			super.refine(otherUpperBound, newTypeMalleability);
+		}
+
+		/**
+		 * Current Java Language Specifications allow only one upper bound on any
+		 * {@link WildcardType}. This method returns that singular bound, or
+		 * {@code null} if this {@code WildcardType} has no upper bound.
+		 *
+		 * @param newType - the {@link WildcardType} for which we will find the
+		 *          upper bound
+		 * @return the upper bound of {@code newType}
+		 */
+		private static Type getUpperBound(WildcardType newType) {
+			Type[] upperBounds = newType.getUpperBounds();
+			if (upperBounds.length == 0) {
+				return Object.class;
+			}
+			else if (upperBounds.length == 1) {
+				return upperBounds[0];
+			}
+			else {
+				throw new TypeInferenceException(newType + //
 					" is an impossible WildcardType. " + //
-					"The Java language specification currently prevents multiple lower bounds " + //
-					Arrays.toString(otherType.getLowerBounds())); //
+					"The Java language specification currently prevents multiple upper bounds " + //
+					Arrays.toString(upperBounds)); //
 			}
-			Type upperBound = otherType.getUpperBounds().length == 0 ? Object.class
-				: otherType.getUpperBounds()[0];
-			super.refine(upperBound, newTypeMalleability);
+		}
+
+		/**
+		 * Current Java Language Specifications allow only one lower bound on any
+		 * {@link WildcardType}. This method returns that singular bound, or
+		 * {@code null} if this {@code WildcardType} has no lower bound.
+		 *
+		 * @param newType - the {@link WildcardType} for which we will find the
+		 *          lower bound
+		 * @return the lower bound of {@code newType}
+		 */
+		private static Type getLowerBound(WildcardType newType) {
+			Type[] lowerBounds = newType.getLowerBounds();
+			if (lowerBounds.length == 0) {
+				return null;
+			}
+			else if (lowerBounds.length == 1) {
+				return lowerBounds[0];
+			}
+			throw new TypeInferenceException(newType + //
+				" is an impossible WildcardType. " + //
+				"The Java language specification currently prevents multiple lower bounds " + //
+				Arrays.toString(lowerBounds)); //
 		}
 	}
 	
