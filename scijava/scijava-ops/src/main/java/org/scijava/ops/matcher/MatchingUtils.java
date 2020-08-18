@@ -1048,7 +1048,7 @@ public final class MatchingUtils {
 		@Override
 		public Type put(TypeVariable<?> typeVar, Type type) {
 			final TypeMapping previousMapping = //
-				map.put(typeVar, new TypeMapping(typeVar, type, isMalleable(typeVar)));
+				map.put(typeVar, suitableTypeMapping(typeVar, type, isMalleable(typeVar)));
 			return previousMapping == null ? null : previousMapping.getType();
 		}
 
