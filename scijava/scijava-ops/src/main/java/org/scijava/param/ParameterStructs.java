@@ -22,6 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.scijava.ops.FieldOpDependencyMember;
+import org.scijava.ops.MethodParameterOpDependencyMember;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
@@ -87,6 +88,13 @@ public final class ParameterStructs {
 		final List<Member<?>> items = parse(opInfo, newType);
 		return () -> items;
 	}
+	
+	public static Struct structOf(final Class<?> c, final Method m)
+			throws ValidityException
+		{
+			final List<Member<?>> items = parse(c, m);
+			return () -> items;
+		}
 
 	/**
 	 * Parses the specified functional class for @{@link Parameter} annotations. This consists of the following steps:
@@ -177,6 +185,30 @@ public final class ParameterStructs {
 
 		return items;
 	}
+
+	public static List<Member<?>> parse(final Class<?> c, final Method method)
+			throws ValidityException
+		{
+			if (c == null || method == null) return null;
+
+			method.setAccessible(true);
+
+			final ArrayList<Member<?>> items = new ArrayList<>();
+			final ArrayList<ValidityProblem> problems = new ArrayList<>();
+			final Set<String> names = new HashSet<>();
+			final Type methodReturnType = Types.methodReturnType(method, c);
+
+			// Parse method level @Parameter annotations.
+			parseFunctionalParameters(items, names, problems, method, methodReturnType, true);
+
+			// Parse method level @OpDependency annotations.
+			parseMethodOpDependencies(items, problems, c, method);
+
+			// Fail if there were any problems.
+			if (!problems.isEmpty()) throw new ValidityException(problems);
+
+			return items;
+		}
 	
 	/**
 	 * Returns a list of {@link FunctionalMethodType}s describing the input and output
@@ -410,6 +442,32 @@ public final class ParameterStructs {
 			items.add(item);
 		}
 	}
+
+	private static void parseMethodOpDependencies(final List<Member<?>> items,
+		final List<ValidityProblem> problems, final Class<?> enclosingclass,
+		final Method annotatedMethod)
+	{
+		final OpDependency[] dependencies = annotatedMethod.getAnnotationsByType(
+			OpDependency.class);
+		final java.lang.reflect.Parameter[] methodParams = annotatedMethod
+			.getParameters();
+		if (dependencies.length != methodParams.length) {
+			problems.add(new ValidityProblem(
+				"The number of annotated Op dependencies does not correspond to the number of parameters of Op method: " +
+					annotatedMethod));
+			return;
+		}
+		final Type[] methodParamTypes = Types.methodParamTypes(annotatedMethod,
+			enclosingclass);
+		for (int i = 0; i < dependencies.length; i++) {
+			final OpDependency dependency = dependencies[i];
+			final java.lang.reflect.Parameter methodParam = methodParams[i];
+			final Type methodParamType = methodParamTypes[i];
+			final Member<?> item = new MethodParameterOpDependencyMember<>(
+				methodParam, methodParamType, dependency);
+			items.add(item);
+		}
+	}	
 
 	private static boolean isImmutable(final Class<?> type) {
 		// NB: All eight primitive types, as well as the boxed primitive
