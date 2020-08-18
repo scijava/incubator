@@ -485,6 +485,12 @@ public final class MatchingUtils {
 		for (int i = 0; i < types.length; i++) {
 			inferTypeVariables(types[i], inferFroms[i], typeMappings, malleable);
 		}
+		// Check if the inferred types satisfy their bounds
+		// TODO: can we do this in an efficient manner?
+		TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
+		if (!Types.typesSatisfyVariables(typeVarAssigns)) {
+			throw new TypeInferenceException();
+		}
 	}
 	
 	/**
@@ -512,10 +518,7 @@ public final class MatchingUtils {
 			inferTypeVariables((ParameterizedType) type, inferFrom, typeMappings);
 		}
 		else if (type instanceof WildcardType) {
-			// TODO Do we need to specifically handle Wildcards? Or are they
-			// sufficiently handled by Types.satisfies below?
 			inferTypeVariables((WildcardType) type, inferFrom, typeMappings);
-
 		}
 		else if (type instanceof GenericArrayType) {
 			inferTypeVariables((GenericArrayType) type, inferFrom, typeMappings);
@@ -524,12 +527,6 @@ public final class MatchingUtils {
 			inferTypeVariables((Class<?>) type, inferFrom, typeMappings);
 		}
 
-		// Check if the inferred types satisfy their bounds
-		// TODO: can we do this in an efficient manner?
-		TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
-		if (!Types.typesSatisfyVariables(typeVarAssigns)) {
-			throw new TypeInferenceException();
-		}
 	}
 
 	private static void inferTypeVariables(TypeVariable<?> type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings, boolean malleable) throws TypeInferenceException {
