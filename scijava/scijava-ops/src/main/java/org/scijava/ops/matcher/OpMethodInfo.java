@@ -55,6 +55,7 @@ import org.scijava.struct.StructInstance;
 public class OpMethodInfo implements OpInfo {
 
 	private final Method method;
+//	private final Type opType;
 	private Struct struct;
 	private final ValidityException validityException;
 	private Object instance;
@@ -66,12 +67,13 @@ public class OpMethodInfo implements OpInfo {
 			problems.add(new ValidityProblem("Method to parse: " + method +
 				" must be public."));
 		}
-		if (Modifier.isStatic(method.getModifiers())) {
-			// TODO: We can't properly infer the generic types of static methods at
-			// the moment. This might be a Java limitation.
-			problems.add(new ValidityProblem("Method to parse: " + method +
-				" must not be static."));
-		}
+		// TODO: This might no longer be a concern.
+//		if (Modifier.isStatic(method.getModifiers())) {
+//			// TODO: We can't properly infer the generic types of static methods at
+//			// the moment. This might be a Java limitation.
+//			problems.add(new ValidityProblem("Method to parse: " + method +
+//				" must not be static."));
+//		}
 		this.method = method;
 		try {
 			struct = ParameterStructs.structOf(method.getDeclaringClass(), method);

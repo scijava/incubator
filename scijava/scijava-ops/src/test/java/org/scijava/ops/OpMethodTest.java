@@ -72,28 +72,23 @@ public class OpMethodTest extends AbstractTestEnvironment {
 		assertEquals(Integer.parseInt(numericString1) * Integer.parseInt(numericString2), (int) multipliedNumericStrings);
 	}
 
-	@OpMethod(names = "test.parseInteger")
+	@OpMethod(names = "test.parseInteger", type = Function.class)
 	// Refers to the input parameter of the function that's returned by this
 	// factory method.
 	@Parameter(key = "numericString")
 	// Refers to the output parameter of the function.
 	@Parameter(key = "parsedInteger", itemIO = ItemIO.OUTPUT)
-	public Function<String, Integer> createParseIntegerOp() {
-		return Integer::parseInt;
+	public Integer createParseIntegerOp(String in) {
+		return Integer.parseInt(in);
 	}
 
-	@OpMethod(names = "test.multiplyNumericStrings")
+	@OpMethod(names = "test.multiplyNumericStrings", type = BiFunction.class)
 	@Parameter(key = "numericString1")
 	@Parameter(key = "numericString2")
 	@Parameter(key = "multipliedNumericStrings", itemIO = ItemIO.OUTPUT)
-	// Refers to the first parameter of this factory method ("parseIntegerOp").
-	// Will be automatically provided by the matching system. Can be used by the
-	// returned lambda/Op as if it was an @OpDependency-annotated field in a
-	// regular Op class.
-	@OpDependency(name = "test.parseInteger")
-	public BiFunction<String, String, Integer> createMultiplyNumericStringsOp(
-		final Function<String, Integer> parseIntegerOp)
+	public static Integer createMultiplyNumericStringsOp( final String in1, final String in2, 
+		@OpDependency (name = "test.parseInteger") Function<String, Integer> parseIntegerOp)
 	{
-		return (i1, i2) -> parseIntegerOp.apply(i1) * parseIntegerOp.apply(i2);
+		return parseIntegerOp.apply(in1) * parseIntegerOp.apply(in2);
 	}
 }

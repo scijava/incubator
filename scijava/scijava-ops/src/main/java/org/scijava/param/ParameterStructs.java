@@ -1,14 +1,18 @@
 
 package org.scijava.param;
 
+import com.google.common.collect.Streams;
+
 import io.leangen.geantyref.AnnotationFormatException;
 import io.leangen.geantyref.TypeFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +30,8 @@ import org.scijava.ops.MethodParameterOpDependencyMember;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpMethod;
+import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.util.AnnotationUtils;
 import org.scijava.struct.ItemIO;
 import org.scijava.struct.Member;
@@ -197,9 +203,20 @@ public final class ParameterStructs {
 			final ArrayList<ValidityProblem> problems = new ArrayList<>();
 			final Set<String> names = new HashSet<>();
 			final Type methodReturnType = Types.methodReturnType(method, c);
+			final java.lang.reflect.Parameter[] methodParameters = method.getParameters();
+			final Type[] methodParamTypes = Types.methodParamTypes(method, c);
+			final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+			final OpMethod methodAnnotation = method.getAnnotation(OpMethod.class);
+//			final Type[] opInputs = getOpInputs(methodParamTypes, paramAnnotations);
+			
+			// Determine functional type
+			// TODO: catch IllegalArgumentException and add 
+			final Type functionalType = getOpMethodType(methodAnnotation.type(), method, problems);
+			
+			final java.lang.reflect.Parameter[] opParams = getOpParams(methodParameters);
 
 			// Parse method level @Parameter annotations.
-			parseFunctionalParameters(items, names, problems, method, methodReturnType, true);
+			parseFunctionalParameters(items, names, problems, method, functionalType, true);
 
 			// Parse method level @OpDependency annotations.
 			parseMethodOpDependencies(items, problems, c, method);
@@ -210,6 +227,78 @@ public final class ParameterStructs {
 			return items;
 		}
 	
+	private static java.lang.reflect.Parameter[] getOpDependencies(
+		java.lang.reflect.Parameter[] methodParams)
+	{
+		return Arrays //
+			.stream(methodParams) //
+			.filter(param -> param.getAnnotation(OpDependency.class) != null) //
+			.toArray(java.lang.reflect.Parameter[]::new);
+	}
+	
+	private static java.lang.reflect.Parameter[] getOpParams(
+		java.lang.reflect.Parameter[] methodParams)
+	{
+		return Arrays //
+			.stream(methodParams) //
+			.filter(param -> param.getAnnotation(OpDependency.class) == null) //
+			.toArray(java.lang.reflect.Parameter[]::new);
+
+	}
+
+	private static Type[] getOpParamTypes(
+		java.lang.reflect.Parameter[] methodParams)
+	{
+		return Arrays //
+			.stream(methodParams) //
+			.filter(param -> param.getAnnotation(OpDependency.class) == null) //
+			.map(param -> param.getParameterizedType())
+			.toArray(Type[]::new);
+
+	}
+
+	private static Type getOpMethodType(Class<?> opClass, Method opMethod, List<ValidityProblem> problems)
+	{
+		// since type is a functional interface, it has (exactly) one abstract
+		// declared method (the method that our OpMethod is emulating).
+		Method abstractMethod = singularAbstractMethod(opClass);
+		Type[] typeMethodParams = abstractMethod.getGenericParameterTypes();
+		java.lang.reflect.Parameter[] opMethodParams = getOpParams(opMethod.getParameters());
+
+		if (typeMethodParams.length != opMethodParams.length) {
+			problems.add(new ValidityProblem("Number of parameters in OpMethod" +
+				opMethod +
+				" does not match the required number of parameters for functional method of FunctionalInterface " +
+				opClass));
+			return Types.parameterizeRaw(opClass);
+		}
+		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
+		
+		// map params of OpMethod to type variables of abstract method of functional
+		// interface (along with return type if applicable)
+		// TODO: not sure how this handles when there are type variables.
+		MatchingUtils.inferTypeVariables(typeMethodParams, getOpParamTypes(opMethodParams), typeVarAssigns);
+		if (abstractMethod.getReturnType() != void.class) {
+			MatchingUtils.inferTypeVariables(new Type[] {abstractMethod.getGenericReturnType()}, new Type[] {opMethod.getGenericReturnType()}, typeVarAssigns);
+		}
+		
+		// parameterize opClass 
+		return Types.parameterize(opClass, typeVarAssigns);
+	}
+
+	private static Method singularAbstractMethod(Class<?> functionalInterface) {
+		Method[] typeMethods = Arrays.stream(functionalInterface
+			.getDeclaredMethods()).filter(method -> Modifier.isAbstract(method
+				.getModifiers())).toArray(Method[]::new);
+		if (typeMethods.length != 1) {
+			throw new IllegalArgumentException(functionalInterface +
+				" should be a FunctionalInterface, however it has " +
+				typeMethods.length + " abstract declared methods");
+		}
+
+		return typeMethods[0];
+	}
+
 	/**
 	 * Returns a list of {@link FunctionalMethodType}s describing the input and output
 	 * types of the functional method of the specified functional type. In doing so,
@@ -447,24 +536,15 @@ public final class ParameterStructs {
 		final List<ValidityProblem> problems, final Class<?> enclosingclass,
 		final Method annotatedMethod)
 	{
-		final OpDependency[] dependencies = annotatedMethod.getAnnotationsByType(
-			OpDependency.class);
 		final java.lang.reflect.Parameter[] methodParams = annotatedMethod
 			.getParameters();
-		if (dependencies.length != methodParams.length) {
-			problems.add(new ValidityProblem(
-				"The number of annotated Op dependencies does not correspond to the number of parameters of Op method: " +
-					annotatedMethod));
-			return;
-		}
-		final Type[] methodParamTypes = Types.methodParamTypes(annotatedMethod,
-			enclosingclass);
-		for (int i = 0; i < dependencies.length; i++) {
-			final OpDependency dependency = dependencies[i];
-			final java.lang.reflect.Parameter methodParam = methodParams[i];
-			final Type methodParamType = methodParamTypes[i];
+		final java.lang.reflect.Parameter[] opDependencyParams = getOpDependencies(methodParams);
+
+		for (java.lang.reflect.Parameter param : opDependencyParams) {
+			final OpDependency dependency = param.getAnnotation(OpDependency.class);
+			final Type methodParamType = param.getParameterizedType();
 			final Member<?> item = new MethodParameterOpDependencyMember<>(
-				methodParam, methodParamType, dependency);
+				param, methodParamType, dependency);
 			items.add(item);
 		}
 	}	

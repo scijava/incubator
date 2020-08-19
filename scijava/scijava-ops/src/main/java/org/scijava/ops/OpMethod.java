@@ -46,6 +46,8 @@ public @interface OpMethod {
 
 	String names();
 
+	Class<?> type();
+
 	double priority() default Priority.NORMAL;
 
 }
