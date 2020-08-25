@@ -30,6 +30,9 @@
 
 package org.scijava.ops.matcher;
 
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,16 +41,20 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.StreamSupport;
 
 import org.scijava.Priority;
+import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.util.Adapt;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
+import org.scijava.types.Types;
 
 /**
  * @author Marcel Wiedenmann
@@ -55,7 +62,7 @@ import org.scijava.struct.StructInstance;
 public class OpMethodInfo implements OpInfo {
 
 	private final Method method;
-//	private final Type opType;
+	private Type opType;
 	private Struct struct;
 	private final ValidityException validityException;
 	private Object instance;
@@ -77,6 +84,14 @@ public class OpMethodInfo implements OpInfo {
 		this.method = method;
 		try {
 			struct = ParameterStructs.structOf(method.getDeclaringClass(), method);
+			final OpMethod methodAnnotation = method.getAnnotation(OpMethod.class);
+			try {
+				opType = ParameterStructs.getOpMethodType(methodAnnotation.type(),
+					method);
+			}
+			catch (IllegalArgumentException e) {
+				opType = Types.parameterizeRaw(methodAnnotation.type());
+			}
 			instance = method.getDeclaringClass().getDeclaredConstructor()
 				.newInstance();
 		}
@@ -97,7 +112,7 @@ public class OpMethodInfo implements OpInfo {
 
 	@Override
 	public Type opType() {
-		return method.getGenericReturnType();
+		return opType;
 	}
 
 	@Override
@@ -125,11 +140,40 @@ public class OpMethodInfo implements OpInfo {
 	{
 		try {
 			method.setAccessible(true);
-			return struct.createInstance(method.invoke(instance, dependencies
-				.toArray()));
+			MethodHandles.Lookup lookup = MethodHandles.lookup();
+			MethodHandle handle = lookup.unreflect(method);
+			// bind dependencies
+			int index = 0;
+			// TODO: we could make this easier if we assume that dependencies are always in a line.
+			for (int i = 0; i < struct.members().size(); i++) {
+				if (!(struct.members().get(i) instanceof OpDependencyMember))
+					continue;
+				handle = MethodHandles.insertArguments(handle, i, dependencies.get(index++));
+			}
+			
+			Object op = Adapt.Methods.lambdaize(Types.raw(opType), handle);
+			
+			
+		final List<OpDependencyMember<?>> dependencyMembers = dependencies();
+		for (int i = 0; i < dependencyMembers.size(); i++) {
+			final OpDependencyMember<?> dependencyMember = dependencyMembers.get(i);
+			try {
+				dependencyMember.createInstance(op).set(dependencies.get(i));
+			}
+			catch (final Exception ex) {
+				// TODO: Improve error message. Used to include exact OpRef of Op
+				// dependency.
+				throw new IllegalStateException(
+					"Exception trying to inject Op dependency field.\n" +
+						"\tOp dependency field to resolve: " + dependencyMember.getKey() +
+						"\n" + "\tFound Op to inject: " + dependencies.get(i).getClass()
+							.getName() + //
+						"\n" + "\tField signature: " + dependencyMember.getType(), ex);
+			}
 		}
-		catch (final IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException ex)
+		return struct().createInstance(op);
+		}
+		catch (final Throwable ex)
 		{
 			throw new IllegalStateException("Failed to invoke Op method: " + method +
 				". Provided Op dependencies were: " + Objects.toString(dependencies),

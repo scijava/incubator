@@ -210,8 +210,15 @@ public final class ParameterStructs {
 //			final Type[] opInputs = getOpInputs(methodParamTypes, paramAnnotations);
 			
 			// Determine functional type
-			// TODO: catch IllegalArgumentException and add 
-			final Type functionalType = getOpMethodType(methodAnnotation.type(), method, problems);
+			Type functionalType;
+			try {
+				functionalType = getOpMethodType(methodAnnotation.type(),
+					method);
+			}
+			catch (IllegalArgumentException e) {
+				problems.add(new ValidityProblem(e.getMessage()));
+				functionalType = Types.parameterizeRaw(methodAnnotation.type());
+			}
 			
 			final java.lang.reflect.Parameter[] opParams = getOpParams(methodParameters);
 
@@ -257,7 +264,7 @@ public final class ParameterStructs {
 
 	}
 
-	private static Type getOpMethodType(Class<?> opClass, Method opMethod, List<ValidityProblem> problems)
+	public static Type getOpMethodType(Class<?> opClass, Method opMethod)
 	{
 		// since type is a functional interface, it has (exactly) one abstract
 		// declared method (the method that our OpMethod is emulating).
@@ -266,11 +273,10 @@ public final class ParameterStructs {
 		java.lang.reflect.Parameter[] opMethodParams = getOpParams(opMethod.getParameters());
 
 		if (typeMethodParams.length != opMethodParams.length) {
-			problems.add(new ValidityProblem("Number of parameters in OpMethod" +
+			throw new IllegalArgumentException("Number of parameters in OpMethod" +
 				opMethod +
 				" does not match the required number of parameters for functional method of FunctionalInterface " +
-				opClass));
-			return Types.parameterizeRaw(opClass);
+				opClass);
 		}
 		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 		
@@ -286,7 +292,7 @@ public final class ParameterStructs {
 		return Types.parameterize(opClass, typeVarAssigns);
 	}
 
-	private static Method singularAbstractMethod(Class<?> functionalInterface) {
+	public static Method singularAbstractMethod(Class<?> functionalInterface) {
 		Method[] typeMethods = Arrays.stream(functionalInterface
 			.getDeclaredMethods()).filter(method -> Modifier.isAbstract(method
 				.getModifiers())).toArray(Method[]::new);
