@@ -39,8 +39,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.scijava.Priority;
@@ -48,13 +51,24 @@ import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.Sandbox;
 import org.scijava.ops.util.Adapt;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
+import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 import org.scijava.types.Types;
+
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.CtNewConstructor;
+import javassist.CtNewMethod;
+import javassist.NotFoundException;
 
 /**
  * @author Marcel Wiedenmann
@@ -129,51 +143,157 @@ public class OpMethodInfo implements OpInfo {
 	public StructInstance<?> createOpInstance(
 		final List<? extends Object> dependencies)
 	{
-		try {
-			method.setAccessible(true);
-			MethodHandles.Lookup lookup = MethodHandles.lookup();
-			MethodHandle handle = lookup.unreflect(method);
-			// bind dependencies
-			int dIndex = 0;
-			int argIndex = -1;
-			// TODO: we could make this easier if we assume that dependencies are always in a line.
-			for (int i = 0; i < struct.members().size(); i++) {
-				
-				boolean dep = struct.members().get(i) instanceof OpDependencyMember;
-				if (struct.members().get(i).isInput() || dep) argIndex++;
-				if (!dep) continue;
-				handle = MethodHandles.insertArguments(handle, argIndex--, dependencies
-					.get(dIndex++));
-			}
-			
-			Object op = Adapt.Methods.lambdaize(Types.raw(opType), handle);
-			
-			
-		final List<OpDependencyMember<?>> dependencyMembers = dependencies();
-		for (int i = 0; i < dependencyMembers.size(); i++) {
-			final OpDependencyMember<?> dependencyMember = dependencyMembers.get(i);
+
+		// Case 1: no dependencies - lambdaMetaFactory is fastest
+		if (OpUtils.dependencies(struct()).size() == 0) {
 			try {
-				dependencyMember.createInstance(op).set(dependencies.get(i));
+				method.setAccessible(true);
+				MethodHandles.Lookup lookup = MethodHandles.lookup();
+				MethodHandle handle = lookup.unreflect(method);
+				Object op = Adapt.Methods.lambdaize(Types.raw(opType), handle);
+				return struct().createInstance(op);
 			}
-			catch (final Exception ex) {
-				// TODO: Improve error message. Used to include exact OpRef of Op
-				// dependency.
-				throw new IllegalStateException(
-					"Exception trying to inject Op dependency field.\n" +
-						"\tOp dependency field to resolve: " + dependencyMember.getKey() +
-						"\n" + "\tFound Op to inject: " + dependencies.get(i).getClass()
-							.getName() + //
-						"\n" + "\tField signature: " + dependencyMember.getType(), ex);
+			catch (Throwable exc) {
+				throw new IllegalStateException("Failed to invoke Op method: " + method,
+					exc);
 			}
 		}
-		return struct().createInstance(op);
+
+		// Case 2: dependenies - Javassist is best
+		try {
+			return struct().createInstance(javassistOp(method, dependencies));
 		}
-		catch (final Throwable ex)
-		{
+		catch (Throwable ex) {
 			throw new IllegalStateException("Failed to invoke Op method: " + method +
 				". Provided Op dependencies were: " + Objects.toString(dependencies),
 				ex);
 		}
+		
+//		try {
+//			method.setAccessible(true);
+//			MethodHandles.Lookup lookup = MethodHandles.lookup();
+//			MethodHandle handle = lookup.unreflect(method);
+//			// bind dependencies
+//			int dIndex = 0;
+//			int argIndex = -1;
+//			// TODO: we could make this easier if we assume that dependencies are always in a line.
+//			for (int i = 0; i < struct.members().size(); i++) {
+//				
+//				boolean dep = struct.members().get(i) instanceof OpDependencyMember;
+//				if (struct.members().get(i).isInput() || dep) argIndex++;
+//				if (!dep) continue;
+//				handle = MethodHandles.insertArguments(handle, argIndex--, dependencies
+//					.get(dIndex++));
+//			}
+//			
+//			Object op = Adapt.Methods.lambdaize(Types.raw(opType), handle);
+//			
+//			
+//		final List<OpDependencyMember<?>> dependencyMembers = dependencies();
+//		for (int i = 0; i < dependencyMembers.size(); i++) {
+//			final OpDependencyMember<?> dependencyMember = dependencyMembers.get(i);
+//			try {
+//				dependencyMember.createInstance(op).set(dependencies.get(i));
+//			}
+//			catch (final Exception ex) {
+//				// TODO: Improve error message. Used to include exact OpRef of Op
+//				// dependency.
+//				throw new IllegalStateException(
+//					"Exception trying to inject Op dependency field.\n" +
+//						"\tOp dependency field to resolve: " + dependencyMember.getKey() +
+//						"\n" + "\tFound Op to inject: " + dependencies.get(i).getClass()
+//							.getName() + //
+//						"\n" + "\tField signature: " + dependencyMember.getType(), ex);
+//			}
+//		}
+//		return struct().createInstance(op);
+//		}
+//		catch (final Throwable ex)
+//		{
+//			throw new IllegalStateException("Failed to invoke Op method: " + method +
+//				". Provided Op dependencies were: " + Objects.toString(dependencies),
+//				ex);
+//		}
+	}
+	
+	private Object javassistOp(Method m, List<? extends Object> dependencies) throws Throwable {
+    ClassPool pool = ClassPool.getDefault();
+    
+    // Make the class -- TODO: change when this is moved.
+    String packageName = OpMethodInfo.class.getPackageName();
+    List<String> nameElements = new ArrayList<>();
+    nameElements.add(m.getDeclaringClass().getSimpleName());
+    nameElements.add(m.getName());
+    for(Class<?> c : m.getParameterTypes())
+    	nameElements.add(c.getSimpleName());
+    nameElements.add(m.getReturnType().getSimpleName());
+    String className = packageName + "." + String.join("_", nameElements);
+    CtClass cc = pool.makeClass(className);
+    
+    // Add implemented interface
+		CtClass jasOpType = pool.get(Types.raw(opType).getName());
+    cc.addInterface(jasOpType);
+    
+    // Add the OpDependency field
+    List<OpDependencyMember<?>> depMembers = OpUtils.dependencies(struct());
+    for(int i = 0; i < dependencies.size(); i++) {
+    	Class<?> depClass = depMembers.get(i).getRawType();
+			CtClass fType = pool.get(depClass.getName());
+			CtField f = new CtField(fType, "dep" + i, cc);
+			f.setModifiers(Modifier.PRIVATE + Modifier.FINAL);
+			cc.addField(f);
+    }
+    
+    // Add constructor
+    StringBuilder sb = new StringBuilder();
+    sb.append("public " + cc.getSimpleName() + "(");
+    for (int i = 0; i < dependencies.size(); i++) {
+    	Class<?> depClass = depMembers.get(i).getRawType();
+    	sb.append(depClass.getName() + " dep" + i);
+    	if(i < dependencies.size() - 1) sb.append(",");
+    }
+    sb.append(") {");
+    for (int i = 0; i < dependencies.size(); i++) {
+    	sb.append("this.dep" + i + " = dep" + i + ";");
+    }
+    sb.append("}");
+    CtConstructor constructor = CtNewConstructor.make(sb.toString(), cc);
+    cc.addConstructor(constructor);
+    
+    // add functional interface method
+    sb.setLength(0);
+    boolean isVoid = m.getReturnType() == void.class;
+    String methodName = ParameterStructs.singularAbstractMethod(Types.raw(opType)).getName();
+//    sb.append("public Object apply(Object in1, Object in2, Object in3) { return " + m.getDeclaringClass().getName() + "." + m.getName() + "((String) in1, (String) in2, (String) in3, dep1);}");
+		sb.append("public " + (isVoid ? "void" : "Object") + " " + methodName + "(");
+		int applyInputs = OpUtils.inputs(struct()).size();
+		for(int i = 0; i < applyInputs; i++) {
+    	sb.append(" Object in" + i);
+    	if(i < applyInputs - 1) sb.append(",");
+		}
+		sb.append(") { return " + m.getDeclaringClass().getName() + "." + m.getName() + "(");
+		int numInputs = 0;
+		int numDependencies = 0;
+		List<Member<?>> members = struct().members().stream().filter(member -> !(!member.isInput() && member.isOutput())).collect(Collectors.toList());
+		for(int i = 0; i < members.size(); i++) {
+			Member<?> member = members.get(i);
+			String castClassName = Types.raw(member.getType()).getName();
+			sb.append("(" + castClassName + ") ");
+			if (member instanceof OpDependencyMember)
+				sb.append("dep" + numDependencies++);
+			else
+				sb.append("in" + numInputs++);
+			if (numDependencies + numInputs < members.size())
+				sb.append(", ");
+		}
+		sb.append("); }");
+    CtMethod functionalMethod = CtNewMethod.make(sb.toString(), cc);
+    cc.addMethod(functionalMethod);
+    
+    Class<?>[] depClasses = depMembers.stream().map(dep -> dep.getRawType()).toArray(Class[]::new);
+    Class<?> c = cc.toClass(MethodHandles.lookup());
+    Object o = c.getDeclaredConstructor(depClasses).newInstance(dependencies.toArray());
+    return o;
 	}
 
 	@Override
