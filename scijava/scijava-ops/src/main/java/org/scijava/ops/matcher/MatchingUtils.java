@@ -506,6 +506,22 @@ public final class MatchingUtils {
 	 * @param inferFrom
 	 * @param typeMappings
 	 */
+	static void inferTypeVariablesWithTypeMappings(Type type[], Type[] inferFrom,
+		Map<TypeVariable<?>, TypeMapping> typeMappings)
+	{
+		inferTypeVariables(type, inferFrom, typeMappings, true);
+	}
+	
+	/**
+	 * Tries to infer type vars contained in types from corresponding types from
+	 * inferFrom, putting them into the specified map. <b>When a
+	 * {@link TypeInferenceException} is thrown, the caller should assume that
+	 * some of the mappings within {@code typeMappings} are incorrect.</b>
+	 *
+	 * @param type
+	 * @param inferFrom
+	 * @param typeMappings
+	 */
 	static void inferTypeVariables(Type type, Type inferFrom, Map<TypeVariable<?>, TypeMapping> typeMappings) {
 		inferTypeVariables(type, inferFrom, typeMappings, true);
 	}

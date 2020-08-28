@@ -78,7 +78,7 @@ public class OpMethodTest extends AbstractTestEnvironment {
 	@Parameter(key = "numericString")
 	// Refers to the output parameter of the function.
 	@Parameter(key = "parsedInteger", itemIO = ItemIO.OUTPUT)
-	public Integer createParseIntegerOp(String in) {
+	public static Integer createParseIntegerOp(String in) {
 		return Integer.parseInt(in);
 	}
 

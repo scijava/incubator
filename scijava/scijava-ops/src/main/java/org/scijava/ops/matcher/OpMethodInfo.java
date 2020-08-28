@@ -65,7 +65,6 @@ public class OpMethodInfo implements OpInfo {
 	private Type opType;
 	private Struct struct;
 	private final ValidityException validityException;
-	private Object instance;
 
 	public OpMethodInfo(final Method method) {
 		final List<ValidityProblem> problems = new ArrayList<>();
@@ -74,13 +73,13 @@ public class OpMethodInfo implements OpInfo {
 			problems.add(new ValidityProblem("Method to parse: " + method +
 				" must be public."));
 		}
-		// TODO: This might no longer be a concern.
-//		if (Modifier.isStatic(method.getModifiers())) {
-//			// TODO: We can't properly infer the generic types of static methods at
-//			// the moment. This might be a Java limitation.
-//			problems.add(new ValidityProblem("Method to parse: " + method +
-//				" must not be static."));
-//		}
+		if (!Modifier.isStatic(method.getModifiers())) {
+			// TODO: Should throw and error if the method is not static.
+			// TODO: We can't properly infer the generic types of static methods at
+			// the moment. This might be a Java limitation.
+			problems.add(new ValidityProblem("Method to parse: " + method +
+				" must be static."));
+		}
 		this.method = method;
 		try {
 			struct = ParameterStructs.structOf(method.getDeclaringClass(), method);
@@ -92,17 +91,9 @@ public class OpMethodInfo implements OpInfo {
 			catch (IllegalArgumentException e) {
 				opType = Types.parameterizeRaw(methodAnnotation.type());
 			}
-			instance = method.getDeclaringClass().getDeclaredConstructor()
-				.newInstance();
 		}
 		catch (final ValidityException e) {
 			problems.addAll(e.problems());
-		}
-		catch (NoSuchMethodException | InstantiationException
-				| IllegalAccessException | InvocationTargetException e)
-		{
-			problems.add(new ValidityProblem("Could not instantiate method's class.",
-				e));
 		}
 		validityException = problems.isEmpty() ? null : new ValidityException(
 			problems);
@@ -143,12 +134,16 @@ public class OpMethodInfo implements OpInfo {
 			MethodHandles.Lookup lookup = MethodHandles.lookup();
 			MethodHandle handle = lookup.unreflect(method);
 			// bind dependencies
-			int index = 0;
+			int dIndex = 0;
+			int argIndex = -1;
 			// TODO: we could make this easier if we assume that dependencies are always in a line.
 			for (int i = 0; i < struct.members().size(); i++) {
-				if (!(struct.members().get(i) instanceof OpDependencyMember))
-					continue;
-				handle = MethodHandles.insertArguments(handle, i, dependencies.get(index++));
+				
+				boolean dep = struct.members().get(i) instanceof OpDependencyMember;
+				if (struct.members().get(i).isInput() || dep) argIndex++;
+				if (!dep) continue;
+				handle = MethodHandles.insertArguments(handle, argIndex--, dependencies
+					.get(dIndex++));
 			}
 			
 			Object op = Adapt.Methods.lambdaize(Types.raw(opType), handle);
