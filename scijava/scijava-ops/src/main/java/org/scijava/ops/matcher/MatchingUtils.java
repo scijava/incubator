@@ -354,7 +354,7 @@ public final class MatchingUtils {
 			// Try to infer type variables contained in the type arguments of
 			// sry
 			inferTypeVariables(srcTypes, destTypes, typeVarAssigns);
-		} catch (TypeInferenceException e) {
+		} catch (IllegalArgumentException e) {
 			// types can't be inferred
 			// TODO: Consider the situations in which it is okay that the type
 			// variables cannot be inferred. For example, if we have a
