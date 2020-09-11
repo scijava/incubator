@@ -36,11 +36,15 @@ import java.util.function.Function;
 
 import org.junit.Test;
 import org.scijava.ops.core.OpCollection;
+import org.scijava.ops.function.Producer;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;
 
 /**
+ * Tests the construction of {@link OpMethod}s.
+ * 
+ * @author Gabriel Selzer
  * @author Marcel Wiedenmann
  */
 @Plugin(type = OpCollection.class)
@@ -90,5 +94,13 @@ public class OpMethodTest extends AbstractTestEnvironment {
 		@OpDependency (name = "test.parseInteger") Function<String, Integer> parseIntegerOp)
 	{
 		return parseIntegerOp.apply(in1) * parseIntegerOp.apply(in2);
+	}
+	
+	@Test
+	public void testOpMethodProducer() {
+		final Producer<Integer> op = ops.op("test.multiplyNumericStrings").input()
+			.outType(Integer.class).producer();
+		final Integer expected = Integer.valueOf(1);
+		assertEquals(expected, op.create());
 	}
 }
