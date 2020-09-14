@@ -56,31 +56,21 @@ public class OpMethodTestOps {
 	@OpMethod(names = "test.multiplyNumericStrings", type = ${functionArity.call($arity)}.class)
 	public static Integer multiplyNumericStringsFunction$arity($stringInputs.call($arity))
 	{
-		Integer out = Integer.valueOf(1);
-		
-#foreach($a in [1..$arity])
-		out *= Integer.parseInt(in${a});
-#end
-
-		return out;
+		return multiplyNumericStringsFunction${arity}($applyArgs.call($arity), parseInt);
 	}
 #end
 
 	// -- Computers -- //
 	
 	@OpMethod(names = "test.doubleList", type = Computers.Arity0.class)
-	public static void doublesToListArity1(List<Double> output) {
+	public static void doublesToList0(List<Double> output) {
 		output.clear();
 	}
 #foreach($arity in [1..$maxArity])
 
 	@OpMethod(names = "test.doubleList", type = ${computerArity.call($arity)}.class)
 	public static void doublesToList$arity($stringInputs.call($arity)#if($arity > 0),#{else}#end List<Double> output) {
-		output.clear();
-		
-#foreach($a in [1..$arity])
-		output.add(Double.parseDouble(in$a));
-#end
+		doublesToListWithOp${arity}($applyArgs.call($arity), output, appendDouble);
 	}
 #end
 
@@ -91,11 +81,70 @@ public class OpMethodTestOps {
 
 	@OpMethod(names = "test.addDoubles$inplaceSuffix.call($arity, $a)", type = ${inplaceType.call($arity, $a)}.class)
 	public static void addDoubles$inplaceSuffix.call($arity, $a)($doubleInputs.call($arity, $a)) {
-		for (int i = 0; i < io.length; i++) {
-#foreach($input in $inputOnlyInplaceArgs.call($arity, $a))
-			io[i] += ${input}[i];
+		dependentAddDoubles$inplaceSuffix.call($arity, $a)($inplaceArgsString.call($arity, $a), addArrays);
+	}
 #end
-		}
+#end
+
+	// -- Helper Op -- //
+
+	@OpField(names = "test.parseInt")
+	public static final Function<String, Integer> parseInt = in -> Integer
+		.parseInt(in);
+
+	@OpField(names = "test.appendDouble")
+	public static final Inplaces.Arity2_1<List<Double>, String> appendDouble = (
+		list, element) -> list.add(Double.parseDouble(element));
+
+	@OpField(names = "test.addArrays")
+	public static final Inplaces.Arity2_1<double[], double[]> addArrays = (io,
+		in2) -> {
+		for (int i = 0; i < io.length; i++)
+			io[i] += in2[i];
+	};
+
+	// -- Dependent Functions -- //
+#foreach($arity in [1..$maxArity])
+
+	@OpMethod(names = "test.dependentMultiplyStrings", type = ${functionArity.call($arity)}.class)
+	public static Integer multiplyNumericStringsFunction$arity($stringInputs.call($arity),
+		@OpDependency(name = "test.parseInt") Function<String, Integer> op)
+	{
+		Integer out = Integer.valueOf(1);
+
+#foreach($a in $opArgs.call($arity))
+		out *= op.apply(${a});
+#end
+
+		return out;
+	}
+#end
+
+	// -- Dependent Computers -- //
+#foreach($arity in [1..$maxArity])
+
+	@OpMethod(names = "test.dependentDoubleList", type = ${computerArity.call($arity)}.class)
+	public static void doublesToListWithOp${arity}($stringInputs.call($arity),
+		List<Double> output,
+		@OpDependency(name = "test.appendDouble") Inplaces.Arity2_1<List<Double>, String> op)
+	{
+		output.clear();
+#foreach($a in $opArgs.call($arity))
+		op.mutate(output, $a);
+#end
+	}
+#end
+
+	// -- Dependent Inplaces -- //
+
+#foreach($arity in [1..$maxArity])
+#foreach($a in [1..$arity])
+
+	@OpMethod(names = "test.dependentAddDoubles$inplaceSuffix.call($arity, $a)", type = ${inplaceType.call($arity, $a)}.class)
+	public static void dependentAddDoubles$inplaceSuffix.call($arity, $a)($doubleInputs.call($arity, $a), @OpDependency(name = "test.addArrays") Inplaces.Arity2_1<double[], double[]> op) {
+#foreach($input in $inputOnlyInplaceArgs.call($arity, $a))
+			op.mutate(io, $input);
+#end
 	}
 #end
 #end

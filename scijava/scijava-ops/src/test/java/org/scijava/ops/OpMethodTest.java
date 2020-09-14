@@ -1502,4 +1502,1370 @@ public class OpMethodTest extends AbstractTestEnvironment {
 		ops.op("test.addDoubles16_16").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, in, io).mutate16();
 		assertTrue(outputExpected(io, 16));
 	}
+
+	// -- Dependent Functions -- //
+
+	@Test
+	public void testDependentMethodFunction1() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 1), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction2() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 2), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction3() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 3), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction4() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 4), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction5() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 5), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction6() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 6), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction7() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 7), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction8() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 8), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction9() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 9), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction10() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 10), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction11() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 11), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction12() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 12), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction13() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 13), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction14() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 14), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction15() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 15), out, 0);
+	}
+
+	@Test
+	public void testDependentMethodFunction16() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, 16), out, 0);
+	}
+
+	// -- Dependent Computers -- //
+
+	@Test
+	public void testDependentMethodComputer1() {
+		String in = "1";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in)
+			.output(out).compute();
+		assertEquals(expected(1, 1), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer2() {
+		String in = "2";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in)
+			.output(out).compute();
+		assertEquals(expected(2, 2), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer3() {
+		String in = "3";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in)
+			.output(out).compute();
+		assertEquals(expected(3, 3), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer4() {
+		String in = "4";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(4, 4), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer5() {
+		String in = "5";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(5, 5), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer6() {
+		String in = "6";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(6, 6), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer7() {
+		String in = "7";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(7, 7), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer8() {
+		String in = "8";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(8, 8), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer9() {
+		String in = "9";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(9, 9), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer10() {
+		String in = "10";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(10, 10), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer11() {
+		String in = "11";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(11, 11), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer12() {
+		String in = "12";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(12, 12), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer13() {
+		String in = "13";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(13, 13), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer14() {
+		String in = "14";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(14, 14), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer15() {
+		String in = "15";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(15, 15), out);
+	}
+
+	@Test
+	public void testDependentMethodComputer16() {
+		String in = "16";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, in, in)
+			.output(out).compute();
+		assertEquals(expected(16, 16), out);
+	}
+
+	// -- Dependent Inplaces -- //
+
+	@Test
+	public void testDependentMethodInplace1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles1").input(io).mutate();
+		assertTrue(outputExpected(io, 1));
+	}
+
+	@Test
+	public void testDependentMethodInplace2_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles2_1").input(io, in).mutate1();
+		assertTrue(outputExpected(io, 2));
+	}
+
+	@Test
+	public void testDependentMethodInplace2_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles2_2").input(in, io).mutate2();
+		assertTrue(outputExpected(io, 2));
+	}
+
+	@Test
+	public void testDependentMethodInplace3_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles3_1").input(io, in, in).mutate1();
+		assertTrue(outputExpected(io, 3));
+	}
+
+	@Test
+	public void testDependentMethodInplace3_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles3_2").input(in, io, in).mutate2();
+		assertTrue(outputExpected(io, 3));
+	}
+
+	@Test
+	public void testDependentMethodInplace3_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles3_3").input(in, in, io).mutate3();
+		assertTrue(outputExpected(io, 3));
+	}
+
+	@Test
+	public void testDependentMethodInplace4_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles4_1").input(io, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 4));
+	}
+
+	@Test
+	public void testDependentMethodInplace4_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles4_2").input(in, io, in, in).mutate2();
+		assertTrue(outputExpected(io, 4));
+	}
+
+	@Test
+	public void testDependentMethodInplace4_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles4_3").input(in, in, io, in).mutate3();
+		assertTrue(outputExpected(io, 4));
+	}
+
+	@Test
+	public void testDependentMethodInplace4_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles4_4").input(in, in, in, io).mutate4();
+		assertTrue(outputExpected(io, 4));
+	}
+
+	@Test
+	public void testDependentMethodInplace5_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles5_1").input(io, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 5));
+	}
+
+	@Test
+	public void testDependentMethodInplace5_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles5_2").input(in, io, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 5));
+	}
+
+	@Test
+	public void testDependentMethodInplace5_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles5_3").input(in, in, io, in, in).mutate3();
+		assertTrue(outputExpected(io, 5));
+	}
+
+	@Test
+	public void testDependentMethodInplace5_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles5_4").input(in, in, in, io, in).mutate4();
+		assertTrue(outputExpected(io, 5));
+	}
+
+	@Test
+	public void testDependentMethodInplace5_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles5_5").input(in, in, in, in, io).mutate5();
+		assertTrue(outputExpected(io, 5));
+	}
+
+	@Test
+	public void testDependentMethodInplace6_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles6_1").input(io, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 6));
+	}
+
+	@Test
+	public void testDependentMethodInplace6_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles6_2").input(in, io, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 6));
+	}
+
+	@Test
+	public void testDependentMethodInplace6_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles6_3").input(in, in, io, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 6));
+	}
+
+	@Test
+	public void testDependentMethodInplace6_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles6_4").input(in, in, in, io, in, in).mutate4();
+		assertTrue(outputExpected(io, 6));
+	}
+
+	@Test
+	public void testDependentMethodInplace6_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles6_5").input(in, in, in, in, io, in).mutate5();
+		assertTrue(outputExpected(io, 6));
+	}
+
+	@Test
+	public void testDependentMethodInplace6_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles6_6").input(in, in, in, in, in, io).mutate6();
+		assertTrue(outputExpected(io, 6));
+	}
+
+	@Test
+	public void testDependentMethodInplace7_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles7_1").input(io, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 7));
+	}
+
+	@Test
+	public void testDependentMethodInplace7_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles7_2").input(in, io, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 7));
+	}
+
+	@Test
+	public void testDependentMethodInplace7_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles7_3").input(in, in, io, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 7));
+	}
+
+	@Test
+	public void testDependentMethodInplace7_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles7_4").input(in, in, in, io, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 7));
+	}
+
+	@Test
+	public void testDependentMethodInplace7_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles7_5").input(in, in, in, in, io, in, in).mutate5();
+		assertTrue(outputExpected(io, 7));
+	}
+
+	@Test
+	public void testDependentMethodInplace7_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles7_6").input(in, in, in, in, in, io, in).mutate6();
+		assertTrue(outputExpected(io, 7));
+	}
+
+	@Test
+	public void testDependentMethodInplace7_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles7_7").input(in, in, in, in, in, in, io).mutate7();
+		assertTrue(outputExpected(io, 7));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_1").input(io, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_2").input(in, io, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_3").input(in, in, io, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_4").input(in, in, in, io, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_5").input(in, in, in, in, io, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_6").input(in, in, in, in, in, io, in, in).mutate6();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_7").input(in, in, in, in, in, in, io, in).mutate7();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace8_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles8_8").input(in, in, in, in, in, in, in, io).mutate8();
+		assertTrue(outputExpected(io, 8));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_1").input(io, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_2").input(in, io, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_3").input(in, in, io, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_4").input(in, in, in, io, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_5").input(in, in, in, in, io, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_6").input(in, in, in, in, in, io, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_7").input(in, in, in, in, in, in, io, in, in).mutate7();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_8").input(in, in, in, in, in, in, in, io, in).mutate8();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace9_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles9_9").input(in, in, in, in, in, in, in, in, io).mutate9();
+		assertTrue(outputExpected(io, 9));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_1").input(io, in, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_2").input(in, io, in, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_3").input(in, in, io, in, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_4").input(in, in, in, io, in, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_5").input(in, in, in, in, io, in, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_6").input(in, in, in, in, in, io, in, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_7").input(in, in, in, in, in, in, io, in, in, in).mutate7();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_8").input(in, in, in, in, in, in, in, io, in, in).mutate8();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_9").input(in, in, in, in, in, in, in, in, io, in).mutate9();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace10_10() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles10_10").input(in, in, in, in, in, in, in, in, in, io).mutate10();
+		assertTrue(outputExpected(io, 10));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_1").input(io, in, in, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_2").input(in, io, in, in, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_3").input(in, in, io, in, in, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_4").input(in, in, in, io, in, in, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_5").input(in, in, in, in, io, in, in, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_6").input(in, in, in, in, in, io, in, in, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_7").input(in, in, in, in, in, in, io, in, in, in, in).mutate7();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_8").input(in, in, in, in, in, in, in, io, in, in, in).mutate8();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_9").input(in, in, in, in, in, in, in, in, io, in, in).mutate9();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_10() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_10").input(in, in, in, in, in, in, in, in, in, io, in).mutate10();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace11_11() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles11_11").input(in, in, in, in, in, in, in, in, in, in, io).mutate11();
+		assertTrue(outputExpected(io, 11));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_1").input(io, in, in, in, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_2").input(in, io, in, in, in, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_3").input(in, in, io, in, in, in, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_4").input(in, in, in, io, in, in, in, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_5").input(in, in, in, in, io, in, in, in, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_6").input(in, in, in, in, in, io, in, in, in, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_7").input(in, in, in, in, in, in, io, in, in, in, in, in).mutate7();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_8").input(in, in, in, in, in, in, in, io, in, in, in, in).mutate8();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_9").input(in, in, in, in, in, in, in, in, io, in, in, in).mutate9();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_10() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_10").input(in, in, in, in, in, in, in, in, in, io, in, in).mutate10();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_11() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_11").input(in, in, in, in, in, in, in, in, in, in, io, in).mutate11();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace12_12() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles12_12").input(in, in, in, in, in, in, in, in, in, in, in, io).mutate12();
+		assertTrue(outputExpected(io, 12));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_1").input(io, in, in, in, in, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_2").input(in, io, in, in, in, in, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_3").input(in, in, io, in, in, in, in, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_4").input(in, in, in, io, in, in, in, in, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_5").input(in, in, in, in, io, in, in, in, in, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_6").input(in, in, in, in, in, io, in, in, in, in, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_7").input(in, in, in, in, in, in, io, in, in, in, in, in, in).mutate7();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_8").input(in, in, in, in, in, in, in, io, in, in, in, in, in).mutate8();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_9").input(in, in, in, in, in, in, in, in, io, in, in, in, in).mutate9();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_10() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_10").input(in, in, in, in, in, in, in, in, in, io, in, in, in).mutate10();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_11() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_11").input(in, in, in, in, in, in, in, in, in, in, io, in, in).mutate11();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_12() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_12").input(in, in, in, in, in, in, in, in, in, in, in, io, in).mutate12();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace13_13() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles13_13").input(in, in, in, in, in, in, in, in, in, in, in, in, io).mutate13();
+		assertTrue(outputExpected(io, 13));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_1").input(io, in, in, in, in, in, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_2").input(in, io, in, in, in, in, in, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_3").input(in, in, io, in, in, in, in, in, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_4").input(in, in, in, io, in, in, in, in, in, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_5").input(in, in, in, in, io, in, in, in, in, in, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_6").input(in, in, in, in, in, io, in, in, in, in, in, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_7").input(in, in, in, in, in, in, io, in, in, in, in, in, in, in).mutate7();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_8").input(in, in, in, in, in, in, in, io, in, in, in, in, in, in).mutate8();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_9").input(in, in, in, in, in, in, in, in, io, in, in, in, in, in).mutate9();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_10() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_10").input(in, in, in, in, in, in, in, in, in, io, in, in, in, in).mutate10();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_11() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_11").input(in, in, in, in, in, in, in, in, in, in, io, in, in, in).mutate11();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_12() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_12").input(in, in, in, in, in, in, in, in, in, in, in, io, in, in).mutate12();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_13() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_13").input(in, in, in, in, in, in, in, in, in, in, in, in, io, in).mutate13();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace14_14() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles14_14").input(in, in, in, in, in, in, in, in, in, in, in, in, in, io).mutate14();
+		assertTrue(outputExpected(io, 14));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_1").input(io, in, in, in, in, in, in, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_2").input(in, io, in, in, in, in, in, in, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_3").input(in, in, io, in, in, in, in, in, in, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_4").input(in, in, in, io, in, in, in, in, in, in, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_5").input(in, in, in, in, io, in, in, in, in, in, in, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_6").input(in, in, in, in, in, io, in, in, in, in, in, in, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_7").input(in, in, in, in, in, in, io, in, in, in, in, in, in, in, in).mutate7();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_8").input(in, in, in, in, in, in, in, io, in, in, in, in, in, in, in).mutate8();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_9").input(in, in, in, in, in, in, in, in, io, in, in, in, in, in, in).mutate9();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_10() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_10").input(in, in, in, in, in, in, in, in, in, io, in, in, in, in, in).mutate10();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_11() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_11").input(in, in, in, in, in, in, in, in, in, in, io, in, in, in, in).mutate11();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_12() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_12").input(in, in, in, in, in, in, in, in, in, in, in, io, in, in, in).mutate12();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_13() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_13").input(in, in, in, in, in, in, in, in, in, in, in, in, io, in, in).mutate13();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_14() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_14").input(in, in, in, in, in, in, in, in, in, in, in, in, in, io, in).mutate14();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace15_15() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles15_15").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, io).mutate15();
+		assertTrue(outputExpected(io, 15));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_1() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_1").input(io, in, in, in, in, in, in, in, in, in, in, in, in, in, in, in).mutate1();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_2() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_2").input(in, io, in, in, in, in, in, in, in, in, in, in, in, in, in, in).mutate2();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_3() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_3").input(in, in, io, in, in, in, in, in, in, in, in, in, in, in, in, in).mutate3();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_4() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_4").input(in, in, in, io, in, in, in, in, in, in, in, in, in, in, in, in).mutate4();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_5() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_5").input(in, in, in, in, io, in, in, in, in, in, in, in, in, in, in, in).mutate5();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_6() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_6").input(in, in, in, in, in, io, in, in, in, in, in, in, in, in, in, in).mutate6();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_7() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_7").input(in, in, in, in, in, in, io, in, in, in, in, in, in, in, in, in).mutate7();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_8() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_8").input(in, in, in, in, in, in, in, io, in, in, in, in, in, in, in, in).mutate8();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_9() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_9").input(in, in, in, in, in, in, in, in, io, in, in, in, in, in, in, in).mutate9();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_10() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_10").input(in, in, in, in, in, in, in, in, in, io, in, in, in, in, in, in).mutate10();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_11() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_11").input(in, in, in, in, in, in, in, in, in, in, io, in, in, in, in, in).mutate11();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_12() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_12").input(in, in, in, in, in, in, in, in, in, in, in, io, in, in, in, in).mutate12();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_13() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_13").input(in, in, in, in, in, in, in, in, in, in, in, in, io, in, in, in).mutate13();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_14() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_14").input(in, in, in, in, in, in, in, in, in, in, in, in, in, io, in, in).mutate14();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_15() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_15").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, io, in).mutate15();
+		assertTrue(outputExpected(io, 16));
+	}
+
+	@Test
+	public void testDependentMethodInplace16_16() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles16_16").input(in, in, in, in, in, in, in, in, in, in, in, in, in, in, in, io).mutate16();
+		assertTrue(outputExpected(io, 16));
+	}
 }

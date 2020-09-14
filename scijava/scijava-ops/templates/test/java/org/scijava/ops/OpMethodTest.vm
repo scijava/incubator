@@ -166,4 +166,43 @@ public class OpMethodTest extends AbstractTestEnvironment {
 	}
 #end
 #end
+
+	// -- Dependent Functions -- //
+#foreach($arity in [1..$maxArity])
+
+	@Test
+	public void testDependentMethodFunction$arity() {
+		final String in = "2";
+		final Integer out = ops.op("test.dependentMultiplyStrings").input($computerInputs.call($arity))
+			.outType(Integer.class).apply();
+		assertEquals(Math.pow(2, $arity), out, 0);
+	}
+#end
+
+	// -- Dependent Computers -- //
+#foreach($arity in [1..$maxArity])
+
+	@Test
+	public void testDependentMethodComputer$arity() {
+		String in = "$arity";
+		List<Double> out = new ArrayList<>();
+		ops.op("test.dependentDoubleList").input($computerInputs.call($arity))
+			.output(out).compute();
+		assertEquals(expected($arity, $arity), out);
+	}
+#end
+
+	// -- Dependent Inplaces -- //
+#foreach($arity in [1..$maxArity])
+#foreach($a in [1..$arity])
+
+	@Test
+	public void testDependentMethodInplace${inplaceSuffix.call($arity, $a)}() {
+		final double[] io = { 1., 2., 3. };
+		final double[] in = { 1., 2., 3. };
+		ops.op("test.dependentAddDoubles${inplaceSuffix.call($arity, $a)}").input($inplaceArgs.call($arity, $a)).mutate#if($arity == 1)#{else}$a#end();
+		assertTrue(outputExpected(io, $arity));
+	}
+#end
+#end
 }

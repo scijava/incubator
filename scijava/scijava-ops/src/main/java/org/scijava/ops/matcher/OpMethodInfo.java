@@ -224,8 +224,18 @@ public class OpMethodInfo implements OpInfo {
     List<String> nameElements = new ArrayList<>();
     nameElements.add(m.getDeclaringClass().getSimpleName());
     nameElements.add(m.getName());
-    for(Class<?> c : m.getParameterTypes())
-    	nameElements.add(c.getSimpleName());
+    for(Class<?> c : m.getParameterTypes()) {
+			// TODO: if c is an array, simpleName will include brackets (which is
+			// illegal in a class name). To differentiate Object[] from Object, we map
+			// Object[] to ObjectArr. This is not truly extensible, since someone
+			// could create an ObjectArr class which might conflict, so it would be
+			// best to find a better solution.
+    	String simpleName = c.getSimpleName();
+    	if (c.isArray()) {
+    		simpleName = c.getComponentType() + "Arr";
+    	}
+    	nameElements.add(simpleName);
+    }
     nameElements.add(m.getReturnType().getSimpleName());
     String className = packageName + "." + String.join("_", nameElements);
     CtClass cc = pool.makeClass(className);
@@ -278,6 +288,8 @@ public class OpMethodInfo implements OpInfo {
 		for(int i = 0; i < members.size(); i++) {
 			Member<?> member = members.get(i);
 			String castClassName = Types.raw(member.getType()).getName();
+			if (Types.raw(member.getType()).isArray())
+				castClassName = Types.raw(member.getType()).getSimpleName();
 			sb.append("(" + castClassName + ") ");
 			if (member instanceof OpDependencyMember)
 				sb.append("dep" + numDependencies++);

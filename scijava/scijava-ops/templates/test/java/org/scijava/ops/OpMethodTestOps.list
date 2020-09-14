@@ -10,9 +10,16 @@ argsList = ```
 
 [OpMethodTestOps.java]
 
+opArgs = ```
+{ arity ->
+  names = genericsNamesList(arity)
+  names[0..names.size() - 2]
+}
+```
 stringInputs = ```
 { arity ->
-  String.join(", ", (1..arity).stream().map{a -> 'String in' + a}.collect())
+  names = genericsNamesList(arity)
+  String.join(", ", names[0..names.size() - 2].stream().map{a -> 'String ' + a}.collect())
 }
 ```
 addDoublesOutput = ```
@@ -39,5 +46,10 @@ inputOnlyInplaceArgs=```
 doubleInputs=```
 { arity, io ->
   String.join(', ', inplaceArgs(arity, io).stream().map{a -> 'double[] ' + a}.collect())
+}
+```
+inplaceArgsString =```
+{ arity, io ->
+  String.join(', ', inplaceArgs(arity, io))
 }
 ```
