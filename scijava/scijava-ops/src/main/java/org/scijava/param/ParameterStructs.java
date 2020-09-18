@@ -1,8 +1,6 @@
 
 package org.scijava.param;
 
-import com.google.common.collect.Streams;
-
 import io.leangen.geantyref.AnnotationFormatException;
 import io.leangen.geantyref.TypeFactory;
 
@@ -37,8 +35,8 @@ import org.scijava.struct.ItemIO;
 import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
-import org.scijava.util.ClassUtils;
 import org.scijava.types.Types;
+import org.scijava.util.ClassUtils;
 
 /**
  * Utility functions for working with {@link org.scijava.param} classes.
@@ -202,12 +200,7 @@ public final class ParameterStructs {
 			final ArrayList<Member<?>> items = new ArrayList<>();
 			final ArrayList<ValidityProblem> problems = new ArrayList<>();
 			final Set<String> names = new HashSet<>();
-			final Type methodReturnType = Types.methodReturnType(method, c);
-			final java.lang.reflect.Parameter[] methodParameters = method.getParameters();
-			final Type[] methodParamTypes = Types.methodParamTypes(method, c);
-			final Annotation[][] paramAnnotations = method.getParameterAnnotations();
 			final OpMethod methodAnnotation = method.getAnnotation(OpMethod.class);
-//			final Type[] opInputs = getOpInputs(methodParamTypes, paramAnnotations);
 			
 			// Determine functional type
 			Type functionalType;
@@ -220,8 +213,6 @@ public final class ParameterStructs {
 				functionalType = Types.parameterizeRaw(methodAnnotation.type());
 			}
 			
-			final java.lang.reflect.Parameter[] opParams = getOpParams(methodParameters);
-
 			// Parse method level @Parameter annotations.
 			parseFunctionalParameters(items, names, problems, method, functionalType, true);
 

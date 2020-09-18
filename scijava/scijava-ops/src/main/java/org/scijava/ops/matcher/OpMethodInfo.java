@@ -35,6 +35,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -290,14 +291,14 @@ public class OpMethodInfo implements OpInfo {
 		List<Member<?>> members = struct().members().stream() //
 			.filter(member -> !(!member.isInput() && member.isOutput())) //
 			.collect(Collectors.toList());
-		for (int i = 0; i < members.size(); i++) {
-			Member<?> member = members.get(i);
-			String castClassName = Types.raw(member.getType()).getName();
-			if (Types.raw(member.getType()).isArray()) castClassName = Types.raw(
-				member.getType()).getSimpleName();
+		Parameter[] mParams = m.getParameters();
+		for (int i = 0; i < mParams.length; i++) {
+			Class<?> paramRawType = Types.raw(mParams[i].getParameterizedType());
+			String castClassName = paramRawType.getName();
+			if (paramRawType.isArray()) castClassName = paramRawType.getSimpleName();
 			sb.append("(" + castClassName + ") ");
-			if (member instanceof OpDependencyMember) sb.append("dep" +
-				numDependencies++);
+			if (mParams[i].getAnnotation(OpDependency.class) != null) sb.append(
+				"dep" + numDependencies++);
 			else sb.append("in" + numInputs++);
 			if (numDependencies + numInputs < members.size()) sb.append(", ");
 		}
