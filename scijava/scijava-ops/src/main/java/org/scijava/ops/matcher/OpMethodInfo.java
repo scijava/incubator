@@ -30,28 +30,23 @@
 
 package org.scijava.ops.matcher;
 
-import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.scijava.Priority;
+import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.Sandbox;
 import org.scijava.ops.util.Adapt;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
@@ -61,6 +56,7 @@ import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 import org.scijava.types.Types;
 
+import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -148,8 +144,7 @@ public class OpMethodInfo implements OpInfo {
 		if (OpUtils.dependencies(struct()).size() == 0) {
 			try {
 				method.setAccessible(true);
-				MethodHandles.Lookup lookup = MethodHandles.lookup();
-				MethodHandle handle = lookup.unreflect(method);
+				MethodHandle handle = MethodHandles.lookup().unreflect(method);
 				Object op = Adapt.Methods.lambdaize(Types.raw(opType), handle);
 				return struct().createInstance(op);
 			}
@@ -169,143 +164,155 @@ public class OpMethodInfo implements OpInfo {
 				ex);
 		}
 		
-//		try {
-//			method.setAccessible(true);
-//			MethodHandles.Lookup lookup = MethodHandles.lookup();
-//			MethodHandle handle = lookup.unreflect(method);
-//			// bind dependencies
-//			int dIndex = 0;
-//			int argIndex = -1;
-//			// TODO: we could make this easier if we assume that dependencies are always in a line.
-//			for (int i = 0; i < struct.members().size(); i++) {
-//				
-//				boolean dep = struct.members().get(i) instanceof OpDependencyMember;
-//				if (struct.members().get(i).isInput() || dep) argIndex++;
-//				if (!dep) continue;
-//				handle = MethodHandles.insertArguments(handle, argIndex--, dependencies
-//					.get(dIndex++));
-//			}
-//			
-//			Object op = Adapt.Methods.lambdaize(Types.raw(opType), handle);
-//			
-//			
-//		final List<OpDependencyMember<?>> dependencyMembers = dependencies();
-//		for (int i = 0; i < dependencyMembers.size(); i++) {
-//			final OpDependencyMember<?> dependencyMember = dependencyMembers.get(i);
-//			try {
-//				dependencyMember.createInstance(op).set(dependencies.get(i));
-//			}
-//			catch (final Exception ex) {
-//				// TODO: Improve error message. Used to include exact OpRef of Op
-//				// dependency.
-//				throw new IllegalStateException(
-//					"Exception trying to inject Op dependency field.\n" +
-//						"\tOp dependency field to resolve: " + dependencyMember.getKey() +
-//						"\n" + "\tFound Op to inject: " + dependencies.get(i).getClass()
-//							.getName() + //
-//						"\n" + "\tField signature: " + dependencyMember.getType(), ex);
-//			}
-//		}
-//		return struct().createInstance(op);
-//		}
-//		catch (final Throwable ex)
-//		{
-//			throw new IllegalStateException("Failed to invoke Op method: " + method +
-//				". Provided Op dependencies were: " + Objects.toString(dependencies),
-//				ex);
-//		}
 	}
 	
-	private Object javassistOp(Method m, List<? extends Object> dependencies) throws Throwable {
-    ClassPool pool = ClassPool.getDefault();
-    
-    // Make the class -- TODO: change when this is moved.
-    String packageName = OpMethodInfo.class.getPackageName();
+	/**
+	 * Creates a class that knows how to create a partial application of an Op,
+	 * and returns that partial application. Specifically, the class knows how to
+	 * fix all of the {@link OpDependency}s of an Op, returning an Op taking only
+	 * the primary parameters
+	 * 
+	 * @param m - the {@link OpMethod}
+	 * @param dependencies - the {@OpDependency}s associated with {@code m}
+	 * @return a partial application of {@code m} with all {@link OpDependency}s
+	 *         injected.
+	 * @throws Throwable
+	 */
+	private Object javassistOp(Method m, List<? extends Object> dependencies)
+		throws Throwable
+	{
+		ClassPool pool = ClassPool.getDefault();
+
+		// Create wrapper class
+		String className = formClassName(m);
+		CtClass cc = pool.makeClass(className);
+
+		// Add implemented interface
+		CtClass jasOpType = pool.get(Types.raw(opType).getName());
+		cc.addInterface(jasOpType);
+
+		// Add OpDependency fields
+		List<OpDependencyMember<?>> depMembers = OpUtils.dependencies(struct());
+		for (int i = 0; i < depMembers.size(); i++) {
+			CtField f = createDependencyField(pool, cc, depMembers.get(i), i);
+			cc.addField(f);
+		}
+
+		// Add constructor
+		CtConstructor constructor = CtNewConstructor.make(createConstructor(
+			depMembers, cc), cc);
+		cc.addConstructor(constructor);
+
+		// add functional interface method
+		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(m), cc);
+		cc.addMethod(functionalMethod);
+
+		// Return Op instance
+		Class<?>[] depClasses = depMembers.stream().map(dep -> dep.getRawType())
+			.toArray(Class[]::new);
+		Class<?> c = cc.toClass(MethodHandles.lookup());
+		return c.getDeclaredConstructor(depClasses).newInstance(dependencies
+			.toArray());
+	}
+
+	private String formClassName(Method m) {
+		// package name
+		String packageName = this.getClass().getPackageName();
+
+		// class name -> OwnerName_MethodName_Params_ReturnType
     List<String> nameElements = new ArrayList<>();
     nameElements.add(m.getDeclaringClass().getSimpleName());
     nameElements.add(m.getName());
     for(Class<?> c : m.getParameterTypes()) {
-			// TODO: if c is an array, simpleName will include brackets (which is
-			// illegal in a class name). To differentiate Object[] from Object, we map
-			// Object[] to ObjectArr. This is not truly extensible, since someone
-			// could create an ObjectArr class which might conflict, so it would be
-			// best to find a better solution.
-    	String simpleName = c.getSimpleName();
-    	if (c.isArray()) {
-    		simpleName = c.getComponentType() + "Arr";
-    	}
-    	nameElements.add(simpleName);
+			nameElements.add(getParameterName(c));
     }
     nameElements.add(m.getReturnType().getSimpleName());
     String className = packageName + "." + String.join("_", nameElements);
-    CtClass cc = pool.makeClass(className);
-    
-    // Add implemented interface
-		CtClass jasOpType = pool.get(Types.raw(opType).getName());
-    cc.addInterface(jasOpType);
-    
-    // Add the OpDependency field
-    List<OpDependencyMember<?>> depMembers = OpUtils.dependencies(struct());
-    for(int i = 0; i < dependencies.size(); i++) {
-    	Class<?> depClass = depMembers.get(i).getRawType();
-			CtClass fType = pool.get(depClass.getName());
-			CtField f = new CtField(fType, "dep" + i, cc);
-			f.setModifiers(Modifier.PRIVATE + Modifier.FINAL);
-			cc.addField(f);
-    }
-    
-    // Add constructor
-    StringBuilder sb = new StringBuilder();
-    sb.append("public " + cc.getSimpleName() + "(");
-    for (int i = 0; i < dependencies.size(); i++) {
-    	Class<?> depClass = depMembers.get(i).getRawType();
-    	sb.append(depClass.getName() + " dep" + i);
-    	if(i < dependencies.size() - 1) sb.append(",");
-    }
-    sb.append(") {");
-    for (int i = 0; i < dependencies.size(); i++) {
-    	sb.append("this.dep" + i + " = dep" + i + ";");
-    }
-    sb.append("}");
-    CtConstructor constructor = CtNewConstructor.make(sb.toString(), cc);
-    cc.addConstructor(constructor);
-    
-    // add functional interface method
-    sb.setLength(0);
-    boolean isVoid = m.getReturnType() == void.class;
-    String methodName = ParameterStructs.singularAbstractMethod(Types.raw(opType)).getName();
-//    sb.append("public Object apply(Object in1, Object in2, Object in3) { return " + m.getDeclaringClass().getName() + "." + m.getName() + "((String) in1, (String) in2, (String) in3, dep1);}");
-		sb.append("public " + (isVoid ? "void" : "Object") + " " + methodName + "(");
-		int applyInputs = OpUtils.inputs(struct()).size();
-		for(int i = 0; i < applyInputs; i++) {
-    	sb.append(" Object in" + i);
-    	if(i < applyInputs - 1) sb.append(",");
+		return className;
+	}
+
+	private CtField createDependencyField(ClassPool pool, CtClass cc,
+		OpDependencyMember<?> dependency, int i) throws NotFoundException,
+		CannotCompileException
+	{
+		Class<?> depClass = dependency.getRawType();
+		CtClass fType = pool.get(depClass.getName());
+		CtField f = new CtField(fType, "dep" + i, cc);
+		f.setModifiers(Modifier.PRIVATE + Modifier.FINAL);
+		return f;
+	}
+
+	private String createConstructor(List<OpDependencyMember<?>> depMembers,
+		CtClass cc)
+	{
+		StringBuilder sb = new StringBuilder();
+		// constructor signature
+		sb.append("public " + cc.getSimpleName() + "(");
+		for (int i = 0; i < depMembers.size(); i++) {
+			Class<?> depClass = depMembers.get(i).getRawType();
+			sb.append(depClass.getName() + " dep" + i);
+			if (i < depMembers.size() - 1) sb.append(",");
 		}
-		sb.append(") { return " + m.getDeclaringClass().getName() + "." + m.getName() + "(");
+		sb.append(") {");
+
+		// assign dependencies to field
+		for (int i = 0; i < depMembers.size(); i++) {
+			sb.append("this.dep" + i + " = dep" + i + ";");
+		}
+		sb.append("}");
+		return sb.toString();
+	}
+
+	private String createFunctionalMethod(Method m) {
+		StringBuilder sb = new StringBuilder();
+
+		// determine the name of the functional method
+		String methodName = ParameterStructs.singularAbstractMethod(Types.raw(
+			opType)).getName();
+
+		// method modifiers
+		boolean isVoid = m.getReturnType() == void.class;
+		sb.append("public " + (isVoid ? "void" : "Object") + " " + methodName +
+			"(");
+
+		// method inputs
+		int applyInputs = OpUtils.inputs(struct()).size();
+		for (int i = 0; i < applyInputs; i++) {
+			sb.append(" Object in" + i);
+			if (i < applyInputs - 1) sb.append(",");
+		}
+
+		// method body
+		sb.append(") { return " + m.getDeclaringClass().getName() + "." + m
+			.getName() + "(");
 		int numInputs = 0;
 		int numDependencies = 0;
-		List<Member<?>> members = struct().members().stream().filter(member -> !(!member.isInput() && member.isOutput())).collect(Collectors.toList());
-		for(int i = 0; i < members.size(); i++) {
+		List<Member<?>> members = struct().members().stream() //
+			.filter(member -> !(!member.isInput() && member.isOutput())) //
+			.collect(Collectors.toList());
+		for (int i = 0; i < members.size(); i++) {
 			Member<?> member = members.get(i);
 			String castClassName = Types.raw(member.getType()).getName();
-			if (Types.raw(member.getType()).isArray())
-				castClassName = Types.raw(member.getType()).getSimpleName();
+			if (Types.raw(member.getType()).isArray()) castClassName = Types.raw(
+				member.getType()).getSimpleName();
 			sb.append("(" + castClassName + ") ");
-			if (member instanceof OpDependencyMember)
-				sb.append("dep" + numDependencies++);
-			else
-				sb.append("in" + numInputs++);
-			if (numDependencies + numInputs < members.size())
-				sb.append(", ");
+			if (member instanceof OpDependencyMember) sb.append("dep" +
+				numDependencies++);
+			else sb.append("in" + numInputs++);
+			if (numDependencies + numInputs < members.size()) sb.append(", ");
 		}
 		sb.append("); }");
-    CtMethod functionalMethod = CtNewMethod.make(sb.toString(), cc);
-    cc.addMethod(functionalMethod);
-    
-    Class<?>[] depClasses = depMembers.stream().map(dep -> dep.getRawType()).toArray(Class[]::new);
-    Class<?> c = cc.toClass(MethodHandles.lookup());
-    Object o = c.getDeclaredConstructor(depClasses).newInstance(dependencies.toArray());
-    return o;
+		return sb.toString();
+	}
+
+	private String getParameterName(Class<?> c) {
+		if (!c.isArray()) return c.getSimpleName();
+		// TODO: if c is an array, simpleName will include brackets (which is
+		// illegal in a class name). To differentiate Object[] from Object, we map
+		// Object[] to ObjectArr. This is not truly extensible, since someone
+		// could create an ObjectArr class which might conflict, so it would be
+		// best to find a better solution.
+		return  c.getComponentType() + "Arr";
 	}
 
 	@Override
