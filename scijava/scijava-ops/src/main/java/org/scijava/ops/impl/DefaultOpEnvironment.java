@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -186,7 +187,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			final Nil<?> outType) throws OpMatchingException {
 		final OpRef ref = OpRef.fromTypes(opName, toTypes(specialType), outType != null ? outType.getType() : null,
 				toTypes(inTypes));
-		return (T) findOpInstance(opName, ref, true);
+		return (T) findOpInstance(ref, true);
 	}
 
 	private Type[] toTypes(Nil<?>... nils) {
@@ -200,13 +201,12 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * that the {@code OpRef} can provide that T (since the OpRef could require
 	 * that the Op returned is of multiple types).
 	 * 
-	 * @param opName
 	 * @param ref
 	 * @param adaptable
 	 * @return an Op satisfying the request described by {@code ref}.
 	 * @throws OpMatchingException
 	 */
-	private Object findOpInstance(final String opName, final OpRef ref,
+	private Object findOpInstance(final OpRef ref,
 		boolean adaptable) throws OpMatchingException
 	{
 		// see if the ref has been matched already
@@ -251,6 +251,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				return adaptOp(ref);
 			}
 			catch (OpMatchingException e2) {
+				try {
+					//TODO: fix
+					return simplifyOp(ref).get(0);
+				}
+				catch (OpMatchingException e3) {
+					// TODO: do something
+				}
 				// no adapted match
 				OpMatchingException adaptedMatchException = new OpMatchingException(
 					"No Op available for request: " + ref, e2);
@@ -258,6 +265,200 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				throw adaptedMatchException;
 			}
 		}
+	}
+
+	private List<OpCandidate> simplifyOp(OpRef ref) throws OpMatchingException {
+		
+		List<OpCandidate> candidates = new ArrayList<>();
+
+		// simplify all inputs and outputs
+		List<Type> typeList = Arrays.asList(ref.getArgs());
+		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(typeList);
+		
+		// make new OpRef based on simplified inputs
+		for (List<Simplifier<?, ?>> simplification: simplifications) {
+			
+			Class<?> opClass = Types.raw(ref.getTypes()[0]);
+			// TODO: ensure that the given type parameters are within the bounds of
+			// the op type's type parameters.
+			// For all built-in op types (e.g. Function, Computer), the type
+			// parameters are unbounded. But, for extensibility, we should check.
+			List<Type> newArgsList = simplification.stream().map(s -> s.simpleType()).collect(Collectors.toList());
+			// TODO: not correct whenever there is a return type
+			Type newType = retype(ref.getTypes()[0], newArgsList);
+			//HACK: we assume that the output is a pure output and does not belong within the args
+			OpRef simplifiedRef = new OpRef(ref.getName(), new Type[] { newType }, ref
+				.getOutType(), newArgsList.toArray(Type[]::new));
+			try{
+				// TODO: consider adaptability
+				candidates.add(findOpCandidate(simplifiedRef, true));
+			}
+			catch (OpMatchingException e) {
+				continue;
+			}
+		}
+		
+		// find new Op 
+		
+		return candidates;
+	}
+	
+	/**
+	 * FIXME: We assume that the last type parameter is a pure output and all
+	 * other parameters are pure inputs
+	 * 
+	 * @param oldType
+	 * @param newArgList
+	 * @return - a new type
+	 */
+	private Type retype(Type oldType, List<Type> newArgList) {
+			Class<?> opClass = Types.raw(oldType);
+			if (!(oldType instanceof ParameterizedType))
+				throw new IllegalStateException("We hadn't thought about this yet.");
+			ParameterizedType pType = (ParameterizedType) oldType;
+			Type[] typeArgs = pType.getActualTypeArguments();
+			Type returnType = typeArgs[typeArgs.length - 1];
+
+			List<Type> newTypeParams = new ArrayList<>(newArgList);
+			newTypeParams.add(returnType);
+			return Types.parameterize(opClass, newTypeParams.toArray(Type[]::new));
+	}
+	
+	/**
+	 * An object that can convert between a general and precise type.
+	 * @author G
+	 *
+	 * @param <G> - the general type
+	 * @param <P> - the precise type
+	 */
+	public interface Simplifier<G, P> {
+
+		public G simplify(P p);
+		
+		public P focus(G g);
+		
+		default Type simpleType() {
+			return Types.param(getClass(), Simplifier.class, 0);
+		}
+		
+		default Type focusedType() {
+			return Types.param(getClass(), Simplifier.class, 1);
+		}
+		
+	}
+	
+	class Identity<T> implements Simplifier<T, T> {
+		private Type type;
+		
+		public Identity(Type type) {
+			this.type = type;
+		}
+		
+		@Override
+		public T simplify(T p) {
+			return p;
+		}
+
+		@Override
+		public T focus(T g) {
+			return g;
+		}
+
+		@Override
+		public Type simpleType() {
+			return type;
+		}
+		
+		@Override
+		public Type focusedType() {
+			return type;
+		}
+		
+		
+		@Override
+		public String toString() {
+			return "Identity: " + type;
+		}
+	}
+
+	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t){
+		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
+	}
+	
+	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t, int i, List<Simplifier<?, ?>> simplifiers){
+		if (i >= t.size()) return Collections.singletonList(simplifiers);
+		List<List<Simplifier<?, ?>>> result = new ArrayList<>();
+		Type original = t.get(i);
+		List<Simplifier<?, ?>> simplifiedArgs = simplify(original);
+		for (Simplifier<?, ?> simplified : simplifiedArgs) {
+			List<Simplifier<?, ?>> copy = new ArrayList<>(simplifiers);
+			copy.add(i, simplified);
+			result.addAll(simplifyArgs(t, i + 1, copy));
+		}
+		return result;
+	}
+	
+	private List<Simplifier<?, ?>> simplify(Type t) {
+		if (t == Integer.class) {
+			return Collections.singletonList(new Simplifier<Number, Integer> () {
+
+				@Override
+				public Number simplify(Integer p) {
+					return p;
+				}
+
+				@Override
+				public Integer focus(Number g) {
+					return g.intValue();
+				}
+				
+				@Override
+				public String toString() {
+					return "Integer Simplifier";
+				}
+			});
+		}
+		
+		if (t == Double.class) {
+			return Collections.singletonList(new Simplifier<Number, Double> () {
+
+				@Override
+				public Number simplify(Double p) {
+					return p;
+				}
+
+				@Override
+				public Double focus(Number g) {
+					return g.doubleValue();
+				}
+				
+				@Override
+				public String toString() {
+					return "Double Simplifier";
+				}
+			});
+		}
+		
+		if (t == Long.class) {
+			return Collections.singletonList(new Simplifier<Number, Long> () {
+
+				@Override
+				public Number simplify(Long p) {
+					return p;
+				}
+
+				@Override
+				public Long focus(Number g) {
+					return g.longValue();
+				}
+				
+				@Override
+				public String toString() {
+					return "Long Simplifier";
+				}
+			});
+		}
+		return Collections.singletonList(new Identity<>(t));
 	}
 
 	/**
@@ -351,7 +552,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		for (final OpDependencyMember<?> dependency : dependencies) {
 			final OpRef dependencyRef = inferOpRef(dependency, typeVarAssigns);
 			try {
-				resolvedDependencies.add(findOpInstance(dependencyRef.getName(), dependencyRef, dependency.isAdaptable()));
+				resolvedDependencies.add(findOpInstance(dependencyRef, dependency.isAdaptable()));
 			} catch (final Exception e) {
 				throw new OpMatchingException("Could not find Op that matches requested Op dependency:" + "\nOp class: "
 						+ info.implementationName() + //
