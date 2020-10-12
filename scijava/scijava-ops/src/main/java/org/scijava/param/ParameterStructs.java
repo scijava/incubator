@@ -30,6 +30,7 @@ import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.matcher.MatchingUtils;
+import org.scijava.ops.simplify.Simplifier;
 import org.scijava.ops.util.AnnotationUtils;
 import org.scijava.struct.ItemIO;
 import org.scijava.struct.Member;
@@ -296,6 +297,24 @@ public final class ParameterStructs {
 		return typeMethods[0];
 	}
 
+	//TODO: Javadoc
+	public static List<Member<?>> parse(final OpInfo opInfo, final List<Simplifier<?, ?>> suppliers) throws ValidityException {
+		final ArrayList<Member<?>> items = new ArrayList<>();
+		final ArrayList<ValidityProblem> problems = new ArrayList<>();
+		final Set<String> names = new HashSet<>();
+
+		Struct srcStruct = opInfo.struct();
+		srcStruct.members().stream().map()
+		parseFunctionalParameters(items, names, problems, opInfo.getAnnotationBearer(), newType, true);
+
+		// Fail if there were any problems.
+		if (!problems.isEmpty()) {
+			throw new ValidityException(problems);
+		}
+
+		return items;
+	}
+	
 	/**
 	 * Returns a list of {@link FunctionalMethodType}s describing the input and output
 	 * types of the functional method of the specified functional type. In doing so,

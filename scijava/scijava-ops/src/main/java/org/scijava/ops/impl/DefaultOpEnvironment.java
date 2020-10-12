@@ -73,6 +73,9 @@ import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
 import org.scijava.ops.matcher.OpRef;
+import org.scijava.ops.matcher.SimplifiedOpInfo;
+import org.scijava.ops.simplify.Identity;
+import org.scijava.ops.simplify.Simplifier;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
 import org.scijava.param.ParameterStructs;
@@ -253,6 +256,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			catch (OpMatchingException e2) {
 				try {
 					//TODO: fix
+					discoverSimplifications(ref.getName());
 					return simplifyOp(ref).get(0);
 				}
 				catch (OpMatchingException e3) {
@@ -264,6 +268,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				adaptedMatchException.addSuppressed(e1);
 				throw adaptedMatchException;
 			}
+		}
+	}
+
+	private void discoverSimplifications(String name) {
+		Set<OpInfo> infos = opsOfName(name);
+		for(OpInfo info : infos) {
+			Type opType = info.opType();
 		}
 	}
 
@@ -324,63 +335,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			return Types.parameterize(opClass, newTypeParams.toArray(Type[]::new));
 	}
 	
-	/**
-	 * An object that can convert between a general and precise type.
-	 * @author G
-	 *
-	 * @param <G> - the general type
-	 * @param <P> - the precise type
-	 */
-	public interface Simplifier<G, P> {
-
-		public G simplify(P p);
-		
-		public P focus(G g);
-		
-		default Type simpleType() {
-			return Types.param(getClass(), Simplifier.class, 0);
-		}
-		
-		default Type focusedType() {
-			return Types.param(getClass(), Simplifier.class, 1);
-		}
-		
-	}
-	
-	class Identity<T> implements Simplifier<T, T> {
-		private Type type;
-		
-		public Identity(Type type) {
-			this.type = type;
-		}
-		
-		@Override
-		public T simplify(T p) {
-			return p;
-		}
-
-		@Override
-		public T focus(T g) {
-			return g;
-		}
-
-		@Override
-		public Type simpleType() {
-			return type;
-		}
-		
-		@Override
-		public Type focusedType() {
-			return type;
-		}
-		
-		
-		@Override
-		public String toString() {
-			return "Identity: " + type;
-		}
-	}
-
 	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t){
 		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
 	}
@@ -725,6 +679,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				final Class<?> opClass = pluginInfo.loadClass();
 				OpInfo opInfo = new OpClassInfo(opClass);
 				addToOpIndex(opInfo, pluginInfo.getName());
+				simplifyInfo(opInfo, pluginInfo.getName());
 			} catch (InstantiableException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
@@ -742,6 +697,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					}
 					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field);
 					addToOpIndex(opInfo, field.getAnnotation(OpField.class).names());
+					simplifyInfo(opInfo, field.getAnnotation(OpField.class).names());
 				}
 				final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
 				for (final Method method: methods) {
@@ -752,6 +708,29 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
 		}
+	}
+	
+	// Add Op simplifications
+	//TODO: we currently only assume that all inputs are pure inputs and all outputs are pure outputs. This logic will have to be improved.
+	// TODO: think of a better name
+	private void simplifyInfo(OpInfo info, String names) {
+		Type opType = info.opType();
+		if (!(opType instanceof ParameterizedType)) return;
+		ParameterizedType pType = (ParameterizedType) opType;
+		List<Type> args = new ArrayList<>(Arrays.asList(pType.getActualTypeArguments()));
+		args.remove(args.size() - 1);
+		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(args);
+		for(List<Simplifier<?, ?>> simplification: simplifications) {
+			try {
+				SimplifiedOpInfo simplifiedInfo = new SimplifiedOpInfo(info,
+					simplification);
+				// only add the simplification if it changes the signature.
+				if (!simplifiedInfo.isIdentical())
+					addToOpIndex(simplifiedInfo, names);
+			} catch(UnsupportedOperationException e) {
+				// TODO: do something
+			}
+		}	
 	}
 
 	private void addToOpIndex(final OpInfo opInfo, final String opNames) {
