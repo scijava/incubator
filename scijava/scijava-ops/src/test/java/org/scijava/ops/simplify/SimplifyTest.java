@@ -24,4 +24,13 @@ public class SimplifyTest extends AbstractTestEnvironment {
 		assertEquals(4.0, result, 0);
 	}
 
+	@Test
+	public void testSimplifySome() {
+		Integer number = 2;
+		Double exponent = 2.;
+		Double result = ops.op("math.pow").input(number, exponent).outType(
+			Double.class).apply();
+		assertEquals(4.0, result, 0);
+	}
+
 }

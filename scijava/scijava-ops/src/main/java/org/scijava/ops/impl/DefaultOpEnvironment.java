@@ -256,7 +256,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			catch (OpMatchingException e2) {
 				try {
 					//TODO: fix
-					discoverSimplifications(ref.getName());
 					return simplifyOp(ref).get(0);
 				}
 				catch (OpMatchingException e3) {
@@ -271,13 +270,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 
-	private void discoverSimplifications(String name) {
-		Set<OpInfo> infos = opsOfName(name);
-		for(OpInfo info : infos) {
-			Type opType = info.opType();
-		}
-	}
-
 	private List<OpCandidate> simplifyOp(OpRef ref) throws OpMatchingException {
 		
 		List<OpCandidate> candidates = new ArrayList<>();
@@ -289,6 +281,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		// make new OpRef based on simplified inputs
 		for (List<Simplifier<?, ?>> simplification: simplifications) {
 			
+			// avoid recursion by throwing out the identity simplification.
+			// TODO there is probably a better place for this.
+			if(isIdentity(simplification)) continue;
+
 			Class<?> opClass = Types.raw(ref.getTypes()[0]);
 			// TODO: ensure that the given type parameters are within the bounds of
 			// the op type's type parameters.
@@ -310,10 +306,17 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 		
 		// find new Op 
-		
+		// TODO: fix
+		if (candidates.size() != 1) throw new OpMatchingException("Mutliple viable simplifications for ref.");
 		return candidates;
 	}
 	
+	private boolean isIdentity(List<Simplifier<?, ?>> simplification) {
+		return simplification
+				.parallelStream()
+				.allMatch(simplifier -> simplifier instanceof Identity);
+	}
+
 	/**
 	 * FIXME: We assume that the last type parameter is a pure output and all
 	 * other parameters are pure inputs
