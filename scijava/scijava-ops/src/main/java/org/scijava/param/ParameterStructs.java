@@ -298,16 +298,25 @@ public final class ParameterStructs {
 	}
 
 	//TODO: Javadoc
+	// TODO: We currently assume that simplifiers only exist for pure inputs
 	public static List<Member<?>> parse(final OpInfo opInfo, final List<Simplifier<?, ?>> suppliers) throws ValidityException {
 		final ArrayList<Member<?>> items = new ArrayList<>();
 		final ArrayList<ValidityProblem> problems = new ArrayList<>();
-		final Set<String> names = new HashSet<>();
 
 		Struct srcStruct = opInfo.struct();
-		srcStruct.members().stream().map()
-		parseFunctionalParameters(items, names, problems, opInfo.getAnnotationBearer(), newType, true);
+		for (int i = 0; i < srcStruct.members().size(); i++) {
+			Member<?> member = srcStruct.members().get(i);
+			// FIXME: We currently assume that only pure inputs have simplifiers.
+			if (!member.isInput() || member.isOutput()) {
+				items.add(member);
+				continue;
+			}
+			Type newType = suppliers.get(i).simpleType();
+			items.add(new ConvertedParameterMember<>(member, newType));
+		}
 
 		// Fail if there were any problems.
+		// TODO: can we delete this?
 		if (!problems.isEmpty()) {
 			throw new ValidityException(problems);
 		}

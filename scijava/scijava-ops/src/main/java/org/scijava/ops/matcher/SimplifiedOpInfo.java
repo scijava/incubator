@@ -67,7 +67,7 @@ public class SimplifiedOpInfo implements OpInfo {
 
 	@Override
 	public Struct struct() {
-		return null;
+		return struct;
 	}
 
 	@Override
