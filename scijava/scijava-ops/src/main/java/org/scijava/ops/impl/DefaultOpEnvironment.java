@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,6 +129,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * is retrieved by providing the {@link Class} that it is able to wrap.
 	 */
 	private Map<Class<?>, OpWrapper<?>> wrappers;
+	
+	/**
+	 * Data structure storing all known {@link Simplifier}s. A set of suitable
+	 * {@code Simplifier}s can be retrieved by providing the raw
+	 * {@code focusedType} of the {@code Simplifier}
+	 */
+	private Map<Class<?>, List<Simplifier<?, ?>>> simplifiers;
 
 	public DefaultOpEnvironment(final Context context) {
 		context.inject(this);
@@ -340,7 +348,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		if (i >= t.size()) return Collections.singletonList(simplifiers);
 		List<List<Simplifier<?, ?>>> result = new ArrayList<>();
 		Type original = t.get(i);
-		List<Simplifier<?, ?>> simplifiedArgs = simplify(original);
+		List<Simplifier<?, ?>> simplifiedArgs = getSimplifiers(original);
 		for (Simplifier<?, ?> simplified : simplifiedArgs) {
 			List<Simplifier<?, ?>> copy = new ArrayList<>(simplifiers);
 			copy.add(i, simplified);
@@ -349,66 +357,19 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return result;
 	}
 	
-	private List<Simplifier<?, ?>> simplify(Type t) {
-		if (t == Integer.class) {
-			return Collections.singletonList(new Simplifier<Number, Integer> () {
-
-				@Override
-				public Number simplify(Integer p) {
-					return p;
-				}
-
-				@Override
-				public Integer focus(Number g) {
-					return g.intValue();
-				}
-				
-				@Override
-				public String toString() {
-					return "Integer Simplifier";
-				}
-			});
-		}
-		
-		if (t == Double.class) {
-			return Collections.singletonList(new Simplifier<Number, Double> () {
-
-				@Override
-				public Number simplify(Double p) {
-					return p;
-				}
-
-				@Override
-				public Double focus(Number g) {
-					return g.doubleValue();
-				}
-				
-				@Override
-				public String toString() {
-					return "Double Simplifier";
-				}
-			});
-		}
-		
-		if (t == Long.class) {
-			return Collections.singletonList(new Simplifier<Number, Long> () {
-
-				@Override
-				public Number simplify(Long p) {
-					return p;
-				}
-
-				@Override
-				public Long focus(Number g) {
-					return g.longValue();
-				}
-				
-				@Override
-				public String toString() {
-					return "Long Simplifier";
-				}
-			});
-		}
+	/**
+	 * Obtains all {@link Simplifier}s known to the environment that can operate
+	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
+	 * {@code t}, an {@link Identity} simplifier will be provided.
+	 * 
+	 * @param t - the {@link Type} we are interested in simplifying.
+	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
+	 */
+	private List<Simplifier<?, ?>> getSimplifiers(Type t) {
+		if (simplifiers == null) initSimplifiers();
+		List<Simplifier<?, ?>> set = simplifiers.get(Types.raw(t));
+		// TODO: if t is generic, we might need to do further work
+		if (set != null) return set;
 		return Collections.singletonList(new Identity<>(t));
 	}
 
@@ -704,6 +665,18 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			} catch (InstantiableException | InstantiationException | IllegalAccessException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
+		}
+	}
+	
+	// TODO: should this be synchronized?
+	private void initSimplifiers() {
+		simplifiers = new HashMap<>();
+		for (Simplifier<?, ?> s : pluginService.createInstancesOfType(Simplifier.class)) {
+			Class<?> focused = Types.raw(s.focusedType());
+			if(!simplifiers.containsKey(focused)) {
+				simplifiers.put(focused, new ArrayList<>());
+			}
+				simplifiers.get(focused).add(s);
 		}
 	}
 	
