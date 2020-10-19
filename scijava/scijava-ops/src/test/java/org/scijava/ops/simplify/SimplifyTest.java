@@ -2,10 +2,13 @@ package org.scijava.ops.simplify;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.function.BiFunction;
+
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
-import org.scijava.util.Types;
-import java.lang.reflect.Type;
+import org.scijava.ops.OpField;
+import org.scijava.ops.core.OpCollection;
+import org.scijava.plugin.Plugin;
 
 /**
  * Basic simplify test
@@ -13,13 +16,17 @@ import java.lang.reflect.Type;
  * @author Gabriel Selzer
  * @author Curtis Rueden
  */
+@Plugin(type = OpCollection.class)
 public class SimplifyTest extends AbstractTestEnvironment {
+	
+	@OpField(names = "test.math.powDouble", params = "base, exponent, result")
+	public final BiFunction<Double, Double, Double> powOp = (b, e) -> Math.pow(b, e);
 
 	@Test
 	public void testSimplify() {
 		Integer number = 2;
 		Integer exponent = 2;
-		Double result = ops.op("math.pow").input(number, exponent).outType(
+		Double result = ops.op("test.math.powDouble").input(number, exponent).outType(
 			Double.class).apply();
 		assertEquals(4.0, result, 0);
 	}
@@ -28,7 +35,7 @@ public class SimplifyTest extends AbstractTestEnvironment {
 	public void testSimplifySome() {
 		Integer number = 2;
 		Double exponent = 2.;
-		Double result = ops.op("math.pow").input(number, exponent).outType(
+		Double result = ops.op("test.math.powDouble").input(number, exponent).outType(
 			Double.class).apply();
 		assertEquals(4.0, result, 0);
 	}
