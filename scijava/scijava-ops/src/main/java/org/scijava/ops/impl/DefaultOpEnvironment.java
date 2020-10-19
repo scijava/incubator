@@ -256,7 +256,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			catch (OpMatchingException e2) {
 				try {
 					//TODO: fix
-					return simplifyOp(ref).get(0);
+					List<OpRef> simplifiedRefs = getRefSimplifications(ref);
+					return matcher.findMatch(this, simplifiedRefs).singleMatch();
 				}
 				catch (OpMatchingException e3) {
 					// TODO: do something
@@ -270,45 +271,38 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 
-	private List<OpCandidate> simplifyOp(OpRef ref) throws OpMatchingException {
-		
-		List<OpCandidate> candidates = new ArrayList<>();
+	private List<OpRef> getRefSimplifications(OpRef ref)
+		throws OpMatchingException
+	{
 
 		// simplify all inputs and outputs
 		List<Type> typeList = Arrays.asList(ref.getArgs());
 		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(typeList);
-		
-		// make new OpRef based on simplified inputs
-		for (List<Simplifier<?, ?>> simplification: simplifications) {
-			
-			// avoid recursion by throwing out the identity simplification.
-			// TODO there is probably a better place for this.
-			if(isIdentity(simplification)) continue;
 
-			Class<?> opClass = Types.raw(ref.getTypes()[0]);
+		// build a list of new OpRefs based on simplified inputs
+		List<OpRef> simplifiedRefs = new ArrayList<>();
+		for (List<Simplifier<?, ?>> simplification : simplifications) {
+
+			// avoid recursion by ignoring the identity simplification.
+			if (isIdentity(simplification)) continue;
+
 			// TODO: ensure that the given type parameters are within the bounds of
 			// the op type's type parameters.
 			// For all built-in op types (e.g. Function, Computer), the type
 			// parameters are unbounded. But, for extensibility, we should check.
-			List<Type> newArgsList = simplification.stream().map(s -> s.simpleType()).collect(Collectors.toList());
+			List<Type> newArgsList = simplification.stream().map(s -> s.simpleType())
+				.collect(Collectors.toList());
 			// TODO: not correct whenever there is a return type
 			Type newType = retype(ref.getTypes()[0], newArgsList);
-			//HACK: we assume that the output is a pure output and does not belong within the args
+			// HACK: we assume that the output is a pure output and does not belong
+			// within the args
 			OpRef simplifiedRef = new OpRef(ref.getName(), new Type[] { newType }, ref
 				.getOutType(), newArgsList.toArray(Type[]::new));
-			try{
-				// TODO: consider adaptability
-				candidates.add(findOpCandidate(simplifiedRef, true));
-			}
-			catch (OpMatchingException e) {
-				continue;
-			}
+			simplifiedRefs.add(simplifiedRef);
 		}
-		
-		// find new Op 
-		// TODO: fix
-		if (candidates.size() != 1) throw new OpMatchingException("Mutliple viable simplifications for ref.");
-		return candidates;
+		if (simplifiedRefs.size() == 0) throw new OpMatchingException(
+			"No simplifications exist for ref: \n" + ref);
+		return simplifiedRefs;
 	}
 	
 	private boolean isIdentity(List<Simplifier<?, ?>> simplification) {
