@@ -196,7 +196,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	@SuppressWarnings("unchecked")
 	private <T> T findOpInstance(final String opName, final Nil<T> specialType, final Nil<?>[] inTypes,
 			final Nil<?> outType) throws OpMatchingException {
-		final OpRef ref = OpRef.fromTypes(opName, toTypes(specialType), outType != null ? outType.getType() : null,
+		final OpRef ref = OpRef.fromTypes(opName, specialType.getType(), outType != null ? outType.getType() : null,
 				toTypes(inTypes));
 		return (T) findOpInstance(ref, true);
 	}
@@ -300,11 +300,12 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			// parameters are unbounded. But, for extensibility, we should check.
 			List<Type> newArgsList = simplification.stream().map(s -> s.simpleType())
 				.collect(Collectors.toList());
+
 			// TODO: not correct whenever there is a return type
-			Type newType = retype(ref.getTypes()[0], newArgsList);
+			Type newType = retype(ref.getType(), newArgsList);
 			// HACK: we assume that the output is a pure output and does not belong
 			// within the args
-			OpRef simplifiedRef = new OpRef(ref.getName(), new Type[] { newType }, ref
+			OpRef simplifiedRef = new OpRef(ref.getName(), newType, ref
 				.getOutType(), newArgsList.toArray(Type[]::new));
 			simplifiedRefs.add(simplifiedRef);
 		}
@@ -544,18 +545,17 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	private boolean adaptOpOutputSatisfiesRefTypes(Type adaptTo, Map<TypeVariable<?>, Type> map, OpRef ref) {
-		for (Type opType : ref.getTypes()) {
-			// TODO: clean this logic
-			if (opType instanceof ParameterizedType) {
-				if (!MatchingUtils.checkGenericAssignability(adaptTo,
-					(ParameterizedType) opType, map, true))
-				{
-					return false;
-				}
-			}
-			else if (!Types.isAssignable(opType, adaptTo, map)) {
+		Type opType = ref.getType();
+		// TODO: clean this logic -- can this just be ref.typesMatch() ?
+		if (opType instanceof ParameterizedType) {
+			if (!MatchingUtils.checkGenericAssignability(adaptTo,
+				(ParameterizedType) opType, map, true))
+			{
 				return false;
 			}
+		}
+		else if (!Types.isAssignable(opType, adaptTo, map)) {
+			return false;
 		}
 		return true;
 	}
@@ -625,7 +625,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			error += ". This is not supported.";
 			throw new OpMatchingException(error);
 		}
-		return new OpRef(name, new Type[] { type }, mappedOutputs[0], mappedInputs);
+		return new OpRef(name, type, mappedOutputs[0], mappedInputs);
 	}
 
 	private void initOpDirectory() {
@@ -680,7 +680,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 	
-	// Add Op simplifications
 	//TODO: we currently only assume that all inputs are pure inputs and all outputs are pure outputs. This logic will have to be improved.
 	// TODO: think of a better name
 	private void simplifyInfo(OpInfo info, String names) {

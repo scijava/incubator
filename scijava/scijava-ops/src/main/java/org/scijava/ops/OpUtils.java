@@ -426,11 +426,10 @@ public final class OpUtils {
 	}
 
 	public static Class<?> findFirstImplementedFunctionalInterface(final OpRef opRef) {
-		for (final Type opType : opRef.getTypes()) {
-			final Class<?> functionalInterface = ParameterStructs.findFunctionalInterface(Types.raw(opType));
-			if (functionalInterface != null) {
-				return functionalInterface;
-			}
+		final Class<?> functionalInterface = ParameterStructs
+			.findFunctionalInterface(Types.raw(opRef.getType()));
+		if (functionalInterface != null) {
+			return functionalInterface;
 		}
 		return null;
 	}
