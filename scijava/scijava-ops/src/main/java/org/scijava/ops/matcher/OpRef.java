@@ -37,6 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.scijava.log.Logger;
+import org.scijava.ops.OpEnvironment;
+import org.scijava.ops.OpInfo;
 import org.scijava.ops.core.Op;
 import org.scijava.types.Types;
 
@@ -216,5 +219,12 @@ public class OpRef {
 		if (sb.length() > 0)
 			sb.append("/");
 		sb.append(s);
+	}
+
+	// TODO: consider the fact that Logger is not (directly) exported.
+	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpInfo info,
+		Map<TypeVariable<?>, Type> typeVarAssigns)
+	{
+		return new OpCandidate(env, log, this, info, typeVarAssigns);
 	}
 }

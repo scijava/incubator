@@ -99,6 +99,7 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 			for (final OpInfo info : env.infos(ref.getName())) {
 				Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 				if (ref.typesMatch(info.opType(), typeVarAssigns)) {
+					OpCandidate candidate = ref.createCandidate(env, log, info, typeVarAssigns);
 					candidates.add(new OpCandidate(env, log, ref, info, typeVarAssigns));
 				}
 			}

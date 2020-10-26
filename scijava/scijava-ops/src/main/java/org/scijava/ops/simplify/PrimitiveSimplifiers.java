@@ -28,6 +28,7 @@ public class PrimitiveSimplifiers {
 		public String toString() {
 			return "Byte Simplifier";
 		}
+
 	}
 
 	@Plugin(type = Simplifier.class)

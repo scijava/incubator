@@ -75,6 +75,7 @@ import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
 import org.scijava.ops.matcher.OpRef;
 import org.scijava.ops.matcher.SimplifiedOpInfo;
+import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.ops.simplify.Identity;
 import org.scijava.ops.simplify.Simplifier;
 import org.scijava.ops.util.OpWrapper;
@@ -285,6 +286,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 
 		// simplify all inputs and outputs
 		List<Type> typeList = Arrays.asList(ref.getArgs());
+		
+		// TODO: these will be needed to ensure that the simplified parameters
+		// satisfy the class' type variables.
+		Type[] simpleBounds = Types.raw(ref.getType()).getTypeParameters();
 		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(typeList);
 
 		// build a list of new OpRefs based on simplified inputs
@@ -305,8 +310,9 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			Type newType = retype(ref.getType(), newArgsList);
 			// HACK: we assume that the output is a pure output and does not belong
 			// within the args
-			OpRef simplifiedRef = new OpRef(ref.getName(), newType, ref
-				.getOutType(), newArgsList.toArray(Type[]::new));
+			// TODO: make new simplifiedOpRef
+			OpRef simplifiedRef = new SimplifiedOpRef(ref.getName(), newType, ref
+				.getOutType(), newArgsList.toArray(Type[]::new), simplification);
 			simplifiedRefs.add(simplifiedRef);
 		}
 		if (simplifiedRefs.size() == 0) throw new OpMatchingException(

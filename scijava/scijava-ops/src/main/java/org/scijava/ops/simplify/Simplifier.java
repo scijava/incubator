@@ -14,7 +14,7 @@ import org.scijava.types.Types;
  * @param <P> - the precise type
  */
 public interface Simplifier<G, P> extends SciJavaPlugin {
-
+	
 	public G simplify(P p);
 
 	public P focus(G g);
