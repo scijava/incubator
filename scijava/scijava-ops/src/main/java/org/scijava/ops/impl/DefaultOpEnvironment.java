@@ -686,26 +686,23 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 	
-	//TODO: we currently only assume that all inputs are pure inputs and all outputs are pure outputs. This logic will have to be improved.
+	// TODO: we currently only assume that all inputs are pure inputs and all
+	// outputs are pure outputs. This logic will have to be improved.
 	// TODO: think of a better name
 	private void simplifyInfo(OpInfo info, String names) {
 		Type opType = info.opType();
 		if (!(opType instanceof ParameterizedType)) return;
 		ParameterizedType pType = (ParameterizedType) opType;
-		List<Type> args = new ArrayList<>(Arrays.asList(pType.getActualTypeArguments()));
+		List<Type> args = new ArrayList<>(Arrays.asList(pType
+			.getActualTypeArguments()));
 		args.remove(args.size() - 1);
 		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(args);
-		for(List<Simplifier<?, ?>> simplification: simplifications) {
-			try {
-				SimplifiedOpInfo simplifiedInfo = new SimplifiedOpInfo(info,
-					simplification);
-				// only add the simplification if it changes the signature.
-				if (!simplifiedInfo.isIdentical())
-					addToOpIndex(simplifiedInfo, names);
-			} catch(UnsupportedOperationException e) {
-				// TODO: do something
-			}
-		}	
+		for (List<Simplifier<?, ?>> simplification : simplifications) {
+			SimplifiedOpInfo simplifiedInfo = new SimplifiedOpInfo(info,
+				simplification);
+			// only add the simplification if it changes the signature.
+			if (!simplifiedInfo.isIdentical()) addToOpIndex(simplifiedInfo, names);
+		}
 	}
 
 	private void addToOpIndex(final OpInfo opInfo, final String opNames) {
