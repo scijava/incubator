@@ -174,7 +174,7 @@ public final class OpUtils {
 	}
 
 	public static double getPriority(final OpCandidate candidate) {
-		return candidate.opInfo().priority();
+		return candidate.priority();
 	}
 
 	public static Type[] padTypes(final OpCandidate candidate, Type[] types) {

@@ -7,14 +7,18 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.scijava.log.Logger;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
+import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
@@ -134,6 +138,17 @@ public class SimplifiedOpInfo implements OpInfo {
 		return srcInfo.getAnnotationBearer();
 	}
 	
+	@Override
+	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpRef ref,
+		Map<TypeVariable<?>, Type> typeVarAssigns)
+	{
+		if (ref instanceof SimplifiedOpRef) {
+			SimplifiedOpRef simpleRef = (SimplifiedOpRef) ref;
+			return new SimplifiedOpCandidate(env, log, simpleRef, this, typeVarAssigns);
+		}
+		return new SimplifiedOpCandidate(env, log, ref, this, typeVarAssigns);
+	}
+
 	/**
 	 * Creates a Class given an Op and a set of {@link Simplifier}s. This class:
 	 * <ul>

@@ -220,11 +220,4 @@ public class OpRef {
 			sb.append("/");
 		sb.append(s);
 	}
-
-	// TODO: consider the fact that Logger is not (directly) exported.
-	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpInfo info,
-		Map<TypeVariable<?>, Type> typeVarAssigns)
-	{
-		return new OpCandidate(env, log, this, info, typeVarAssigns);
-	}
 }

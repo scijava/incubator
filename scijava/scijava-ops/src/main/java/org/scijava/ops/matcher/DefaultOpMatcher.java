@@ -99,8 +99,8 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 			for (final OpInfo info : env.infos(ref.getName())) {
 				Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 				if (ref.typesMatch(info.opType(), typeVarAssigns)) {
-					OpCandidate candidate = ref.createCandidate(env, log, info, typeVarAssigns);
-					candidates.add(new OpCandidate(env, log, ref, info, typeVarAssigns));
+					OpCandidate candidate = info.createCandidate(env, log, ref, typeVarAssigns);
+					candidates.add(candidate);
 				}
 			}
 		}
@@ -114,7 +114,7 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 		// List of valid candidates needs to be sorted according to priority.
 		// This is used as an optimization in order to not look at ops with
 		// lower priority than the already found one.
-		validCandidates.sort((c1, c2) -> Double.compare(c2.opInfo().priority(), c1.opInfo().priority()));
+		validCandidates.sort((c1, c2) -> Double.compare(c2.priority(), c1.priority()));
 
 		List<OpCandidate> matches;
 		matches = filterMatches(validCandidates, (cand) -> typesPerfectMatch(cand));

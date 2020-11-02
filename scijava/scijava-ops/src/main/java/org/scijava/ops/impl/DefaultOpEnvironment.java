@@ -289,7 +289,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		
 		// TODO: these will be needed to ensure that the simplified parameters
 		// satisfy the class' type variables.
-		Type[] simpleBounds = Types.raw(ref.getType()).getTypeParameters();
 		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(typeList);
 
 		// build a list of new OpRefs based on simplified inputs

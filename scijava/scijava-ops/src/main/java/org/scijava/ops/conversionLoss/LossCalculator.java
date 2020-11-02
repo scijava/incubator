@@ -2,6 +2,7 @@
 package org.scijava.ops.conversionLoss;
 
 import org.scijava.plugin.SciJavaPlugin;
+import org.scijava.types.Nil;
 
 /**
  * Calculates the conversion loss going from:
@@ -12,14 +13,24 @@ import org.scijava.plugin.SciJavaPlugin;
  */
 public abstract class LossCalculator<T, R> implements SciJavaPlugin {
 
-	public LossCalculation<T, R> calculateLoss(T t, R r) {
-		double fLoss = calculateForward(t);
-		double rLoss = calculateReverse(r);
-		return new LossCalculation<>(t, r, fLoss, rLoss);
+	// TODO: can we delete this?
+//	public LossCalculation<T, R> calculateLoss(Nil<? extends T> t, Nil<? extends R> r) {
+//		double fLoss = calculateForward(t);
+//		double rLoss = calculateReverse(r);
+//		return new LossCalculation<>(t, r, fLoss, rLoss);
+//	}
+
+	public abstract double calculateForward();
+
+	public abstract double calculateReverse();
+	
+	public abstract Nil<T> fromType();
+	
+	public abstract Nil<R> toType();
+	
+	@Override
+	public String toString() {
+		return fromType().getType() + " -> " + toType().getType() + " LossCalculator";
 	}
-
-	abstract double calculateForward(T t);
-
-	abstract double calculateReverse(R r);
 
 }

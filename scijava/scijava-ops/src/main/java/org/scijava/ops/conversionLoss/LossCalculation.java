@@ -1,6 +1,8 @@
 
 package org.scijava.ops.conversionLoss;
 
+import org.scijava.types.Nil;
+
 /**
  * Container storing the result of converion loss between types {@code T} and
  * {@code R}. Conversion loss is stored for <b>both directions of
@@ -13,12 +15,12 @@ package org.scijava.ops.conversionLoss;
 public class LossCalculation<T, R> {
 
 	// TODO: maybe these should be Nils?
-	final T fromType;
-	final R toType;
+	final Nil<? extends T> fromType;
+	final Nil<? extends R> toType;
 	final double fLoss;
 	final double rLoss;
 
-	public LossCalculation(T from, R to, double fLoss, double rLoss) {
+	public LossCalculation(Nil<? extends T> from, Nil<? extends R> to, double fLoss, double rLoss) {
 		this.fromType = from;
 		this.toType = to;
 		this.fLoss = fLoss;

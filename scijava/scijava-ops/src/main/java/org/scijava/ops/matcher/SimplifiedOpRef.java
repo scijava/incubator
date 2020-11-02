@@ -2,12 +2,15 @@ package org.scijava.ops.matcher;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.scijava.log.Logger;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.simplify.Identity;
 import org.scijava.ops.simplify.Simplifier;
 
 /**
@@ -30,14 +33,12 @@ public class SimplifiedOpRef extends OpRef {
 		this.simplifiers = simplifiers;
 	}
 	
-	@Override
-	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpInfo info,
-		Map<TypeVariable<?>, Type> typeVarAssigns)
-	{
-		if (info instanceof SimplifiedOpInfo) {
-			SimplifiedOpInfo simpleInfo = (SimplifiedOpInfo) info;
-			return new SimplifiedOpCandidate(env, log, this, simpleInfo, typeVarAssigns);
-		}
-		return super.createCandidate(env, log, info, typeVarAssigns);
+	public static SimplifiedOpRef identitySimplification(OpRef ref) {
+		List<Simplifier<?, ?>> identityList = Arrays.stream(ref.getArgs()).map(
+			type -> new Identity<>(type)).collect(Collectors.toList());
+		// TODO: can we make a constructor that takes an original OpRef and a list
+		// of Simplifiers?
+		return new SimplifiedOpRef(ref.getName(), ref.getType(), ref.getOutType(),
+			ref.getArgs(), identityList);
 	}
 }
