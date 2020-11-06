@@ -77,6 +77,7 @@ import org.scijava.ops.matcher.OpRef;
 import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.ops.simplify.Identity;
+import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.simplify.Simplifier;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
@@ -642,7 +643,9 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				final Class<?> opClass = pluginInfo.loadClass();
 				OpInfo opInfo = new OpClassInfo(opClass);
 				addToOpIndex(opInfo, pluginInfo.getName());
-				simplifyInfo(opInfo, pluginInfo.getName());
+				if(opClass.getAnnotation(Unsimplifiable.class) == null) {
+					simplifyInfo(opInfo, pluginInfo.getName());
+				}
 			} catch (InstantiableException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
@@ -660,12 +663,17 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					}
 					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field);
 					addToOpIndex(opInfo, field.getAnnotation(OpField.class).names());
-					simplifyInfo(opInfo, field.getAnnotation(OpField.class).names());
+					if(field.getAnnotation(Unsimplifiable.class) == null) {
+						simplifyInfo(opInfo, field.getAnnotation(OpField.class).names());
+					}
 				}
 				final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
 				for (final Method method: methods) {
 					OpInfo opInfo = new OpMethodInfo(method);
 					addToOpIndex(opInfo, method.getAnnotation(OpMethod.class).names());
+					if(method.getAnnotation(Unsimplifiable.class) == null) {
+						simplifyInfo(opInfo, method.getAnnotation(OpMethod.class).names());
+					}
 				}
 			} catch (InstantiableException | InstantiationException | IllegalAccessException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
