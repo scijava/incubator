@@ -40,14 +40,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.scijava.AbstractContextual;
 import org.scijava.Context;
@@ -77,8 +76,8 @@ import org.scijava.ops.matcher.OpRef;
 import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.ops.simplify.Identity;
-import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.simplify.Simplifier;
+import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
 import org.scijava.param.ParameterStructs;
@@ -367,17 +366,18 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	/**
 	 * Obtains all {@link Simplifier}s known to the environment that can operate
 	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
-	 * {@code t}, an {@link Identity} simplifier will be provided.
+	 * {@code t}, an {@link Identity} simplifier will be created.
 	 * 
 	 * @param t - the {@link Type} we are interested in simplifying.
 	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
 	 */
 	private List<Simplifier<?, ?>> getSimplifiers(Type t) {
+//		System.out.println("Simplifier request made");
 		if (simplifiers == null) initSimplifiers();
-		List<Simplifier<?, ?>> set = simplifiers.get(Types.raw(t));
+		List<Simplifier<?, ?>> list = simplifiers.get(Types.raw(t));
 		// TODO: if t is generic, we might need to do further work
-		if (set != null) return set;
-		return Collections.singletonList(new Identity<>(t));
+		if (list != null) return list;
+		return Collections.singletonList(new Identity<>(t)); 
 	}
 
 	/**
@@ -681,16 +681,23 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 	
-	// TODO: should this be synchronized?
-	private void initSimplifiers() {
-		simplifiers = new HashMap<>();
+	private synchronized void initSimplifiers() {
+		if(simplifiers != null) return;
+		Map<Class<?>, List<Simplifier<?, ?>>> temp = new HashMap<>();
 		for (Simplifier<?, ?> s : pluginService.createInstancesOfType(Simplifier.class)) {
 			Class<?> focused = Types.raw(s.focusedType());
-			if(!simplifiers.containsKey(focused)) {
-				simplifiers.put(focused, new ArrayList<>());
+			if(!temp.containsKey(focused)) {
+				temp.put(focused, new ArrayList<>());
 			}
-				simplifiers.get(focused).add(s);
+				temp.get(focused).add(s);
 		}
+		
+		for (Class<?> c : temp.keySet()) {
+			Type t = temp.get(c).get(0).focusedType();
+			temp.get(c).add(new Identity<>(t));
+		}
+		
+		simplifiers = temp;
 	}
 	
 	// TODO: we currently only assume that all inputs are pure inputs and all
@@ -700,15 +707,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		Type opType = info.opType();
 		if (!(opType instanceof ParameterizedType)) return;
 		ParameterizedType pType = (ParameterizedType) opType;
-		List<Type> args = new ArrayList<>(Arrays.asList(pType
-			.getActualTypeArguments()));
-		args.remove(args.size() - 1);
-		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(args);
+		Type[] args = OpUtils.inputTypes(info.struct()); 
+//		args.remove(args.size() - 1);
+		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(Arrays.asList(args));
 		for (List<Simplifier<?, ?>> simplification : simplifications) {
-			SimplifiedOpInfo simplifiedInfo = new SimplifiedOpInfo(info,
-				simplification);
 			// only add the simplification if it changes the signature.
-			if (!simplifiedInfo.isIdentical()) addToOpIndex(simplifiedInfo, names);
+			if (simplification.stream().allMatch(s -> s instanceof Identity)) continue;
+			addToOpIndex(new SimplifiedOpInfo(info, simplification), names);
 		}
 	}
 

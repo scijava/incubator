@@ -3,6 +3,7 @@ package org.scijava.ops.matcher;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.List;
 import java.util.Map;
 
 import org.scijava.Priority;
@@ -11,7 +12,9 @@ import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.conversionLoss.LossReporter;
 import org.scijava.ops.core.Op;
+import org.scijava.ops.matcher.OpCandidate.StatusCode;
 import org.scijava.struct.ItemIO;
+import org.scijava.struct.StructInstance;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
 
@@ -31,7 +34,7 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		this.info = info;
 		this.ref = ref;
 
-		originalRefTypes = ref.simplifiers.stream().map(s -> s.focusedType())
+		originalRefTypes = ref.getSimplifiers().stream().map(s -> s.focusedType())
 			.toArray(Type[]::new);
 		originalInfoTypes = info.simplifiers.stream().map(s -> s.focusedType())
 			.toArray(Type[]::new);
@@ -47,6 +50,23 @@ public class SimplifiedOpCandidate extends OpCandidate {
 	{
 		this(env, log, SimplifiedOpRef.identitySimplification(ref), info,
 			typeVarAssigns);
+	}
+
+	@Override
+	public StructInstance<?> createOpInstance(List<?> dependencies) throws OpMatchingException
+	{
+		if (!getStatusCode().equals(StatusCode.MATCH)) {
+			throw new OpMatchingException(
+					"Status of candidate to create op from indicates a problem: " + getStatus());
+		}
+
+		StructInstance<?> inst = opInfo().createOpInstance(dependencies, ref.getSimplifiers());
+		return inst;
+	}
+
+	@Override
+	public SimplifiedOpInfo opInfo() {
+		return info;
 	}
 
 	/**
@@ -82,7 +102,7 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		double penalty = 0;
 
 		// TODO: will these ever be incorrectly ordered?
-		Nil<?>[] refInTypes = ref.simplifiers.stream().map(s -> Nil.of(s
+		Nil<?>[] refInTypes = ref.getSimplifiers().stream().map(s -> Nil.of(s
 			.focusedType())).toArray(Nil[]::new);
 		Nil<?>[] infoInTypes = info.simplifiers.stream().map(s -> Nil.of(s
 			.focusedType())).toArray(Nil[]::new);

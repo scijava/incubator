@@ -75,4 +75,7 @@ public class PrimitiveLossReporters {
 		return maxValue - converted;
 	};
 
+//	@Unsimplifiable
+//	@Plugin(type = Op.class)
+//	static class DoubleIntegerReporter extends LosslessReporter<Double, Integer> {}
 }

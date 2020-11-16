@@ -31,6 +31,9 @@ public class SimplifyTest extends AbstractTestEnvironment {
 	public final BiFunction<Long, Long, Double> powOpL = (b, e) -> Math.pow(b, e);
 
 	@OpField(names = "test.math.powDouble", params = "base, exponent, result")
+	public final BiFunction<Integer[], Double, Double> powOpArray = (b, e) -> Math.pow(b[0], e);
+
+	@OpField(names = "test.math.powDouble", params = "base, exponent, result")
 	public final Computers.Arity2<Long, Long, List<Long>> powOpLArray = (b, e, list) -> {
 		list.clear();
 		list.add((long) Math.pow(b, e));
@@ -53,15 +56,24 @@ public class SimplifyTest extends AbstractTestEnvironment {
 			.outType(Double.class).apply();
 		assertEquals(4.0, result, 0);
 	}
-
+	
 	@Test
-	public void testSimplifyComputer() {
-		Integer number = 2;
-		Integer exponent = 4;
-		List<Long> list = new ArrayList<>();
-		list.add(5l);
-		ops.op("test.math.powDouble").input(number, exponent)
-			.output(list).compute();
-		assertEquals(16l, list.get(0), 0);
+	public void testSimplifyArray() {
+		Byte[] number = {2};
+		Double exponent = 3.;
+		Double result = ops.op("test.math.powDouble").input(number, exponent)
+			.outType(Double.class).apply();
+		assertEquals(8.0, result, 0);
 	}
+
+//	@Test
+//	public void testSimplifyComputer() {
+//		Integer number = 2;
+//		Integer exponent = 4;
+//		List<Long> list = new ArrayList<>();
+//		list.add(5l);
+//		ops.op("test.math.powDouble").input(number, exponent)
+//			.output(list).compute();
+//		assertEquals(16l, list.get(0), 0);
+//	}
 }

@@ -132,6 +132,10 @@ public final class OpUtils {
 		return getTypes(inputs(candidate.struct()));
 	}
 
+	public static Type[] inputTypes(Struct struct) {
+		return getTypes(inputs(struct));
+	}
+
 	public static Member<?> output(OpCandidate candidate) {
 		return candidate.opInfo().output();
 	}
