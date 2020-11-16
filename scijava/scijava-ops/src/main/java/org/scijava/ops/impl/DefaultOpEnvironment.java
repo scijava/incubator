@@ -90,6 +90,8 @@ import org.scijava.types.TypeService;
 import org.scijava.types.Types;
 import org.scijava.util.ClassUtils;
 
+import com.google.common.collect.Lists;
+
 /**
  * Default implementation of {@link OpEnvironment}, whose ops and related state
  * are discovered from a SciJava application context.
@@ -347,7 +349,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 	
 	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t){
-		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
+		return simplifyArgsFast(t);
+//		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
 	}
 	
 	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t, int i, List<Simplifier<?, ?>> simplifiers){
@@ -361,6 +364,18 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			result.addAll(simplifyArgs(t, i + 1, copy));
 		}
 		return result;
+	}
+
+	/**
+	 * Uses Google Guava to generate a list of permutations of each available
+	 * simplification possibility
+	 */
+	private List<List<Simplifier<?, ?>>> simplifyArgsFast(List<Type> t){
+		// TODO: can we use parallelStream?
+		List<List<Simplifier<?, ? >>> typeSimplifiers = t.stream() //
+				.map(type -> getSimplifiers(type)) //
+				.collect(Collectors.toList());
+		return Lists.cartesianProduct(typeSimplifiers);
 	}
 	
 	/**

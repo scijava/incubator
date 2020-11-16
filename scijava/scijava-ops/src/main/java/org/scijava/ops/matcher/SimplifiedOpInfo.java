@@ -52,22 +52,90 @@ public class SimplifiedOpInfo implements OpInfo {
 
 	final OpInfo srcInfo;
 	final List<Simplifier<?, ?>> simplifiers;
-	final ParameterizedType simplifiedType;
 
 	private Struct struct;
+	private ParameterizedType simplifiedType;
 	private ValidityException validityException;
 
 	public SimplifiedOpInfo(OpInfo info, List<Simplifier<?, ?>> simplification) {
 		this.srcInfo = info;
 		this.simplifiers = simplification;
-		this.simplifiedType = generateSimplifiedType(srcInfo);
 
-		// NOTE: since the source Op has already been shown to be valid, there is
-		// not much for us to do here.
-//		struct = info.struct();
-		try {
-			Iterator<Simplifier<?, ?>> itr = simplification.iterator();
-			final List<Member<?>> originalItems = info.struct().members();
+		// NOTE: we lazily initialize this struct since we already know that it is fundamentally valid
+//		try {
+//			Iterator<Simplifier<?, ?>> itr = simplification.iterator();
+//			final List<Member<?>> originalItems = info.struct().members();
+//			final List<Member<?>> newItems = new ArrayList<>();
+//			for (Member<?> m : originalItems) {
+//				if(m.isInput()) {
+//					try {
+//						SimplifiedMember<?> sm = new SimplifiedMember<>(m, itr.next().simpleType());
+//						newItems.add(sm);
+//					} catch(NoSuchElementException e) {
+//						throw e;
+//					}
+//				}
+//				else {
+//					newItems.add(m);
+//				}
+//			}
+//			struct = () -> newItems;
+//		}
+//		catch (ValidityException e) {
+//			validityException = e;
+//		}
+	}
+
+	// TODO: We assume that this is a Function of some type.
+	// We also assume that simplifiers exist for all inputs ONLY.
+	// FIXME: generalize
+	/**
+	 * Generates the type of the Op where all inputs have been simplified by the
+	 * use of {@link Simplifier}s. NB: This generation is done lazily to
+	 * compensate for the vast number of {@link SimplifiedOpInfo}s that are
+	 * generated as a part of the simplification process.
+	 * 
+	 * @param originalInfo - the original {@link OpInfo}
+	 */
+	private synchronized void generateSimplifiedType(OpInfo originalInfo) {
+		if(simplifiedType != null) return;
+
+		// generate simplified type
+		List<Type> simplifiedTypes = simplifiers.stream().map(s -> s.simpleType())
+			.collect(Collectors.toList());
+		if (!(originalInfo.opType() instanceof ParameterizedType))
+			throw new UnsupportedOperationException(
+				"I am not smart enough to handle this yet.");
+		simplifiedTypes.add(srcInfo.output().getType());
+		Class<?> rawType = Types.raw(originalInfo.opType());
+		simplifiedType = Types.parameterize(rawType, simplifiedTypes.toArray(Type[]::new));
+	}
+
+	@Override
+	public Type opType() {
+			if (simplifiedType == null)
+				generateSimplifiedType(srcInfo);
+			return simplifiedType;
+	}
+
+	@Override
+	public Struct struct() {
+		if (struct == null) generateStruct();
+		return struct;
+	}
+
+	/**
+	 * Generates the {@link Struct} of the Op where all inputs have been
+	 * simplified by the use of {@link Simplifier}s. NB: This generation is done
+	 * lazily to compensate for the vast number of {@link SimplifiedOpInfo}s that
+	 * are generated as a part of the simplification process.
+	 */
+	private synchronized void generateStruct() {
+		if (struct != null) return;
+
+		// generate the struct
+		Iterator<Simplifier<?, ?>> itr = simplifiers.iterator();
+			final List<Member<?>> originalItems = srcInfo.struct().members();
 			final List<Member<?>> newItems = new ArrayList<>();
 			for (Member<?> m : originalItems) {
 				if(m.isInput()) {
@@ -82,36 +150,7 @@ public class SimplifiedOpInfo implements OpInfo {
 					newItems.add(m);
 				}
 			}
-			struct = () -> newItems;
-			OpUtils.checkHasSingleOutput(struct);
-		}
-		catch (ValidityException e) {
-			validityException = e;
-		}
-	}
-
-	// TODO: We assume that this is a Function of some type.
-	// We also assume that simplifiers exist for all inputs ONLY.
-	// FIXME: generalize
-	private ParameterizedType generateSimplifiedType(OpInfo originalInfo) {
-		List<Type> simplifiedTypes = simplifiers.stream().map(s -> s.simpleType())
-			.collect(Collectors.toList());
-		if (!(originalInfo.opType() instanceof ParameterizedType))
-			throw new UnsupportedOperationException(
-				"I am not smart enough to handle this yet.");
-		simplifiedTypes.add(srcInfo.output().getType());
-		Class<?> rawType = Types.raw(originalInfo.opType());
-		return Types.parameterize(rawType, simplifiedTypes.toArray(Type[]::new));
-	}
-
-	@Override
-	public Type opType() {
-		return simplifiedType;
-	}
-
-	@Override
-	public Struct struct() {
-		return struct;
+		struct = () -> newItems;
 	}
 
 	@Override
