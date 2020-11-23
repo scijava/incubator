@@ -96,4 +96,14 @@ public class OpAdaptationInfo implements OpInfo {
 		return srcInfo.getAnnotationBearer();
 	}
 
+	/**
+	 * TODO: consider whether we could simplify {@link OpAdaptationInfo}s.
+	 * Currently, the system doesn't even store them outside of caching, so they
+	 * cannot be simplified. But maybe it would be useful.
+	 */
+	@Override
+	public boolean isSimplifiable() {
+		return false;
+	}
+
 }

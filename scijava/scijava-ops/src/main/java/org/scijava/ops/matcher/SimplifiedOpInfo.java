@@ -574,4 +574,9 @@ public class SimplifiedOpInfo implements OpInfo {
 		return sb.toString();
 	}
 
+	@Override
+	public boolean isSimplifiable() {
+		return false;
+	}
+
 }

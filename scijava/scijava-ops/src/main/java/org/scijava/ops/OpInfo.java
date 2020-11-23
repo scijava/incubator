@@ -29,6 +29,9 @@ public interface OpInfo extends Comparable<OpInfo> {
 
 	/** Gets the associated {@link Struct} metadata. */
 	Struct struct();
+	
+	/** Describes whether this Op can be simplified. */
+	boolean isSimplifiable();
 
 	/** Gets the op's input parameters. */
 	default List<Member<?>> inputs() {

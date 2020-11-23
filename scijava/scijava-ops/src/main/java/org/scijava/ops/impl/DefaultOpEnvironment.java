@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -132,6 +133,14 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * is retrieved by providing the {@link Class} that it is able to wrap.
 	 */
 	private Map<Class<?>, OpWrapper<?>> wrappers;
+
+	/**
+	 * Data structure storing the names of all Ops whose simplifications are
+	 * registered in {@code opDirectory}. As we only generate the
+	 * {@link SimplifiedOpInfo}s for the Ops who might be matched, we need to know
+	 * whether the Ops associated with that particular name. 
+	 */
+	private Set<String> simplifiedNames;
 	
 	/**
 	 * Data structure storing all known {@link Simplifier}s. A set of suitable
@@ -187,7 +196,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 
 	@Override
 	public OpInfo opify(final Class<?> opClass, final double priority) {
-		return new OpClassInfo(opClass, priority);
+		return new OpClassInfo(opClass, priority, opClass.getAnnotation(Unsimplifiable.class) == null);
 	}
 
 	@Override
@@ -266,9 +275,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			}
 			catch (OpMatchingException e2) {
 				try {
-					//TODO: fix
-					List<OpRef> simplifiedRefs = getRefSimplifications(ref);
-					return matcher.findMatch(this, simplifiedRefs).singleMatch();
+					return simplifiedOp(ref);
 				}
 				catch (OpMatchingException e3) {
 					// TODO: do something
@@ -280,6 +287,28 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				throw adaptedMatchException;
 			}
 		}
+	}
+
+	private OpCandidate simplifiedOp(OpRef ref) throws OpMatchingException {
+		// simplify all potential matches
+		String opName = ref.getName();
+		if(!simplifiedNames.contains(opName)) {
+			simplifyInfos(ref.getName());
+		}
+
+		// obtain simplifications for ref
+		List<OpRef> simplifiedRefs = getRefSimplifications(ref);
+
+		// find match based on simplifications
+		return matcher.findMatch(this, simplifiedRefs).singleMatch();
+	}
+
+	private synchronized void simplifyInfos(String name) {
+		if (simplifiedNames.contains(name)) return;
+		// NB: we make a copy of the set to prevent ConcurrentModificationExceptions
+		Set<OpInfo> infos = new HashSet<>(opsOfName(name));
+		infos.stream().forEach(info -> simplifyInfo(info, name));
+		simplifiedNames.add(name);
 	}
 
 	private List<OpRef> getRefSimplifications(OpRef ref)
@@ -658,9 +687,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				final Class<?> opClass = pluginInfo.loadClass();
 				OpInfo opInfo = new OpClassInfo(opClass);
 				addToOpIndex(opInfo, pluginInfo.getName());
-				if(opClass.getAnnotation(Unsimplifiable.class) == null) {
-					simplifyInfo(opInfo, pluginInfo.getName());
-				}
 			} catch (InstantiableException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
@@ -678,22 +704,20 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					}
 					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field);
 					addToOpIndex(opInfo, field.getAnnotation(OpField.class).names());
-					if(field.getAnnotation(Unsimplifiable.class) == null) {
-						simplifyInfo(opInfo, field.getAnnotation(OpField.class).names());
-					}
 				}
 				final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
 				for (final Method method: methods) {
 					OpInfo opInfo = new OpMethodInfo(method);
 					addToOpIndex(opInfo, method.getAnnotation(OpMethod.class).names());
-					if(method.getAnnotation(Unsimplifiable.class) == null) {
-						simplifyInfo(opInfo, method.getAnnotation(OpMethod.class).names());
-					}
 				}
 			} catch (InstantiableException | InstantiationException | IllegalAccessException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
 		}
+		
+		// Initialize simplifiedNames
+		// FIXME: is there a better place for this?
+		simplifiedNames = new HashSet<>();
 	}
 	
 	private synchronized void initSimplifiers() {
