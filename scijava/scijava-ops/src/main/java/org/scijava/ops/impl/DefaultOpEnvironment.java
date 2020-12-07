@@ -29,6 +29,8 @@
 
 package org.scijava.ops.impl;
 
+import com.google.common.collect.Lists;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -47,7 +49,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.scijava.AbstractContextual;
 import org.scijava.Context;
@@ -90,8 +92,6 @@ import org.scijava.types.Nil;
 import org.scijava.types.TypeService;
 import org.scijava.types.Types;
 import org.scijava.util.ClassUtils;
-
-import com.google.common.collect.Lists;
 
 /**
  * Default implementation of {@link OpEnvironment}, whose ops and related state
@@ -175,6 +175,18 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			throw new IllegalArgumentException(e);
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T op(final OpInfo info, final Nil<T> specialType, final Nil<?>[] inTypes, final Nil<?> outType) {
+		try {
+			Type[] types = Arrays.stream(inTypes).map(nil -> nil.getType()).toArray(Type[]::new);
+			OpRef ref = OpRef.fromTypes(specialType.getType(), outType.getType(), types);
+			return (T) findOpInstance(ref, info);
+		} catch (OpMatchingException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
 
 	@Override
 	public Type genericType(Object obj) {
@@ -215,6 +227,35 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 
 	private Type[] toTypes(Nil<?>... nils) {
 		return Arrays.stream(nils).filter(n -> n != null).map(n -> n.getType()).toArray(Type[]::new);
+	}
+	
+	/**
+	 * Creates an Op instance from an {@link OpInfo} with the provided {@link OpRef} as a template.
+	 * 
+	 * @param ref
+	 * @param info
+	 * @return an Op created from {@code info}
+	 * @throws OpMatchingException
+	 */
+	private Object findOpInstance(final OpRef ref, final OpInfo info) throws OpMatchingException {
+		// create new OpCandidate from ref and info
+		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
+		if (!ref.typesMatch(info.opType(), typeVarAssigns))
+			throw new OpMatchingException(
+				"The given OpRef and OpInfo are not compatible!");
+		OpCandidate candidate = new OpCandidate(this, this.log, ref, info,
+			typeVarAssigns);
+		// obtain Op instance (with dependencies)
+		Object op = instantiateOp(candidate);
+
+		// wrap Op
+		Object wrappedOp = wrapOp(op, candidate.opInfo(), candidate
+			.typeVarAssigns());
+
+		// cache instance
+		opCache.putIfAbsent(ref, wrappedOp);
+
+		return wrappedOp;
 	}
 	
 	/**
@@ -307,7 +348,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		if (simplifiedNames.contains(name)) return;
 		// NB: we make a copy of the set to prevent ConcurrentModificationExceptions
 		Set<OpInfo> infos = new HashSet<>(opsOfName(name));
-		infos.stream().forEach(info -> simplifyInfo(info, name));
+		infos.stream().filter(info -> info.isSimplifiable()) //
+			.forEach(info -> simplifyInfo(info, name));
 		simplifiedNames.add(name);
 	}
 
@@ -320,11 +362,11 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		
 		// TODO: these will be needed to ensure that the simplified parameters
 		// satisfy the class' type variables.
-		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(typeList);
+		List<List<OpInfo>> simplifications = simplifyArgs(typeList);
 
 		// build a list of new OpRefs based on simplified inputs
 		List<OpRef> simplifiedRefs = new ArrayList<>();
-		for (List<Simplifier<?, ?>> simplification : simplifications) {
+		for (List<OpInfo> simplification : simplifications) {
 
 			// avoid recursion by ignoring the identity simplification.
 			if (isIdentity(simplification)) continue;
@@ -333,16 +375,15 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			// the op type's type parameters.
 			// For all built-in op types (e.g. Function, Computer), the type
 			// parameters are unbounded. But, for extensibility, we should check.
-			List<Type> newArgsList = simplification.stream().map(s -> s.simpleType())
-				.collect(Collectors.toList());
+			Type[] newArgsList = simplification.stream().map(s -> s.output().getType())
+				.toArray(Type[]::new);
 
 			// TODO: not correct whenever there is a return type
 			Type newType = retype(ref.getType(), newArgsList);
 			// HACK: we assume that the output is a pure output and does not belong
 			// within the args
-			// TODO: make new simplifiedOpRef
-			OpRef simplifiedRef = new SimplifiedOpRef(ref.getName(), newType, ref
-				.getOutType(), newArgsList.toArray(Type[]::new), simplification);
+			OpRef simplifiedRef = new SimplifiedOpRef(ref, newType, ref.getOutType(),
+				newArgsList, simplification);
 			simplifiedRefs.add(simplifiedRef);
 		}
 		if (simplifiedRefs.size() == 0) throw new OpMatchingException(
@@ -350,7 +391,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return simplifiedRefs;
 	}
 	
-	private boolean isIdentity(List<Simplifier<?, ?>> simplification) {
+	private boolean isIdentity(List<OpInfo> simplification) {
 		return simplification
 				.parallelStream()
 				.allMatch(simplifier -> simplifier instanceof Identity);
@@ -360,49 +401,113 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * FIXME: We assume that the last type parameter is a pure output and all
 	 * other parameters are pure inputs
 	 * 
-	 * @param oldType
-	 * @param newArgList
+	 * Suppose oldType is BiFunction<Integer, Long, Double>
+	 * Suppose the simplifiers being used are Identity<T>, Identity<T>
+	 * So newArgList will be [T, T]
+	 * 
+	 * @param originalType
+	 * @param newInputTypes
 	 * @return - a new type
 	 */
-	private Type retype(Type oldType, List<Type> newArgList) {
-			Class<?> opClass = Types.raw(oldType);
-			if (!(oldType instanceof ParameterizedType))
+	private Type retype(Type originalType, Type[] newInputTypes) {
+			// only retype types that we know how to retype
+			if (!(originalType instanceof ParameterizedType))
 				throw new IllegalStateException("We hadn't thought about this yet.");
-			ParameterizedType pType = (ParameterizedType) oldType;
-			Type[] typeArgs = pType.getActualTypeArguments();
-			Type returnType = typeArgs[typeArgs.length - 1];
 
-			List<Type> newTypeParams = new ArrayList<>(newArgList);
-			newTypeParams.add(returnType);
-			return Types.parameterize(opClass, newTypeParams.toArray(Type[]::new));
+			// obtain list of original inputs
+			ParameterizedType pType = (ParameterizedType) originalType;
+			Type[] originalTypeArgs = pType.getActualTypeArguments();
+			Type[] originalInputTypes = new Type[newInputTypes.length];
+			System.arraycopy(originalTypeArgs, 0, originalInputTypes, 0, originalInputTypes.length);
+			
+			// Resolve type variables within newInputTypes
+			// We assume that any typeVariables within newInputTypes are due to
+			// identity simplifications, and that they should thus be mapped to the
+			// original input types
+			Map<TypeVariable<?>, Type> map = new HashMap<>();
+			Type[] originalTypeArg = new Type[1];
+			Type[] newTypeArg = new Type[1];
+			// TODO: do we need to call this on a per type basis if there are two identity
+			// simplifications for two different original types?
+			for(int i = 0; i < newInputTypes.length; i++) {
+				if (newInputTypes[i] instanceof TypeVariable<?>) {
+					map.clear();
+					originalTypeArg[0] = originalInputTypes[i];
+					newTypeArg[0] = newInputTypes[i];
+					// TODO: make less cryptic
+					MatchingUtils.inferTypeVariables(newTypeArg, originalTypeArg, map);
+					newInputTypes[i] = map.get(newInputTypes[i]);
+				}
+			}
+
+			// Obtain return type
+			// TODO: can we do some simplification here as well?
+			Type returnType = originalTypeArgs[originalTypeArgs.length - 1];
+
+			// Combine new inputs with return
+			Type[] newTypeArgs = new Type[originalTypeArgs.length];
+			System.arraycopy(newInputTypes, 0, newTypeArgs, 0, newInputTypes.length);
+//			List<Type> newTypeParams = new ArrayList<>(newArgList);
+			newTypeArgs[newTypeArgs.length - 1] = returnType;
+
+			// Make new (simplfied) Op type
+			Class<?> opClass = Types.raw(originalType);
+			return Types.parameterize(opClass, newTypeArgs);
 	}
 	
-	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t){
+	private List<List<OpInfo>> simplifyArgs(List<Type> t){
 		return simplifyArgsFast(t);
 //		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
 	}
-	
-	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t, int i, List<Simplifier<?, ?>> simplifiers){
-		if (i >= t.size()) return Collections.singletonList(simplifiers);
-		List<List<Simplifier<?, ?>>> result = new ArrayList<>();
-		Type original = t.get(i);
-		List<Simplifier<?, ?>> simplifiedArgs = getSimplifiers(original);
-		for (Simplifier<?, ?> simplified : simplifiedArgs) {
-			List<Simplifier<?, ?>> copy = new ArrayList<>(simplifiers);
-			copy.add(i, simplified);
-			result.addAll(simplifyArgs(t, i + 1, copy));
-		}
-		return result;
-	}
 
+	private List<List<OpInfo>> focusArgs(List<Type> t){
+		return focusArgsFast(t);
+//		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
+	}
+	
+//	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t, int i, List<Simplifier<?, ?>> simplifiers){
+//		if (i >= t.size()) return Collections.singletonList(simplifiers);
+//		List<List<Simplifier<?, ?>>> result = new ArrayList<>();
+//		Type original = t.get(i);
+//		List<Simplifier<?, ?>> simplifiedArgs = getSimplifiers(original);
+//		for (Simplifier<?, ?> simplified : simplifiedArgs) {
+//			List<Simplifier<?, ?>> copy = new ArrayList<>(simplifiers);
+//			copy.add(i, simplified);
+//			result.addAll(simplifyArgs(t, i + 1, copy));
+//		}
+//		return result;
+//	}
+//	
 	/**
 	 * Uses Google Guava to generate a list of permutations of each available
 	 * simplification possibility
 	 */
-	private List<List<Simplifier<?, ?>>> simplifyArgsFast(List<Type> t){
+	private List<List<OpInfo>> simplifyArgsFast(List<Type> t){
 		// TODO: can we use parallelStream?
-		List<List<Simplifier<?, ? >>> typeSimplifiers = t.stream() //
+//		List<List<Function<?, ? >>> typeSimplifiers = t.stream() //
+//				.map(type -> StreamSupport.stream(infos("simplify").spliterator().) //
+//				.collect(Collectors.toList());
+//		return Lists.cartesianProduct(typeSimplifiers);
+		// TODO: can we use parallelStream?
+		List<List<OpInfo>> typeSimplifiers = t.stream() //
 				.map(type -> getSimplifiers(type)) //
+				.collect(Collectors.toList());
+		return Lists.cartesianProduct(typeSimplifiers);
+	}
+	
+	/**
+	 * Uses Google Guava to generate a list of permutations of each available
+	 * simplification possibility
+	 */
+	private List<List<OpInfo>> focusArgsFast(List<Type> t){
+		// TODO: can we use parallelStream?
+//		List<List<Function<?, ? >>> typeSimplifiers = t.stream() //
+//				.map(type -> StreamSupport.stream(infos("simplify").spliterator().) //
+//				.collect(Collectors.toList());
+//		return Lists.cartesianProduct(typeSimplifiers);
+		// TODO: can we use parallelStream?
+		List<List<OpInfo>> typeSimplifiers = t.stream() //
+				.map(type -> getFocusers(type)) //
 				.collect(Collectors.toList());
 		return Lists.cartesianProduct(typeSimplifiers);
 	}
@@ -415,13 +520,44 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * @param t - the {@link Type} we are interested in simplifying.
 	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
 	 */
-	private List<Simplifier<?, ?>> getSimplifiers(Type t) {
+	private List<OpInfo> getSimplifiers(Type t) {
+		// TODO: optimize
+		Set<OpInfo> infos = opsOfName("simplify");
+		List<OpInfo> list = infos.parallelStream() //
+				.filter(info -> Function.class.isAssignableFrom(Types.raw(info.opType()))) //
+				.filter(info -> Types.isAssignable(t, info.inputs().get(0).getType())) //
+				.collect(Collectors.toList());
+		return list;
 //		System.out.println("Simplifier request made");
-		if (simplifiers == null) initSimplifiers();
-		List<Simplifier<?, ?>> list = simplifiers.get(Types.raw(t));
-		// TODO: if t is generic, we might need to do further work
-		if (list != null) return list;
-		return Collections.singletonList(new Identity<>(t)); 
+//		if (simplifiers == null) initSimplifiers();
+//		List<Simplifier<?, ?>> list = simplifiers.get(Types.raw(t));
+//		// TODO: if t is generic, we might need to do further work
+//		if (list != null) return list;
+//		return Collections.singletonList(new Identity<>(t)); 
+	}
+
+	/**
+	 * Obtains all {@link Simplifier}s known to the environment that can operate
+	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
+	 * {@code t}, an {@link Identity} simplifier will be created.
+	 * 
+	 * @param t - the {@link Type} we are interested in simplifying.
+	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
+	 */
+	private List<OpInfo> getFocusers(Type t) {
+		// TODO: optimize
+		Set<OpInfo> infos = opsOfName("focus");
+		List<OpInfo> list = infos.parallelStream() //
+				.filter(info -> Function.class.isAssignableFrom(Types.raw(info.opType()))) //
+				.filter(info -> Types.isAssignable(t, info.output().getType())) //
+				.collect(Collectors.toList());
+		return list;
+//		System.out.println("Simplifier request made");
+//		if (simplifiers == null) initSimplifiers();
+//		List<Simplifier<?, ?>> list = simplifiers.get(Types.raw(t));
+//		// TODO: if t is generic, we might need to do further work
+//		if (list != null) return list;
+//		return Collections.singletonList(new Identity<>(t)); 
 	}
 
 	/**
@@ -720,24 +856,24 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		simplifiedNames = new HashSet<>();
 	}
 	
-	private synchronized void initSimplifiers() {
-		if(simplifiers != null) return;
-		Map<Class<?>, List<Simplifier<?, ?>>> temp = new HashMap<>();
-		for (Simplifier<?, ?> s : pluginService.createInstancesOfType(Simplifier.class)) {
-			Class<?> focused = Types.raw(s.focusedType());
-			if(!temp.containsKey(focused)) {
-				temp.put(focused, new ArrayList<>());
-			}
-				temp.get(focused).add(s);
-		}
-		
-		for (Class<?> c : temp.keySet()) {
-			Type t = temp.get(c).get(0).focusedType();
-			temp.get(c).add(new Identity<>(t));
-		}
-		
-		simplifiers = temp;
-	}
+//	private synchronized void initSimplifiers() {
+//		if(simplifiers != null) return;
+//		Map<Class<?>, List<OpInfo>> temp = new HashMap<>();
+//		for (OpInfo s : infos("simplify")) {
+//			if(Types.raw(s.opType()) != Function.class) continue;
+//			Class<?> focused = Types.raw(s.inputs().get(0).getType());
+//			if(!temp.containsKey(focused)) {
+//				temp.put(focused, new ArrayList<>());
+//			}
+//				temp.get(focused).add(s);
+//		}
+//		
+//		for (Class<?> c : temp.keySet()) {
+//			temp.get(c).add(new Identity<?>());
+//		}
+//		
+//		simplifiers = temp;
+//	}
 	
 	// TODO: we currently only assume that all inputs are pure inputs and all
 	// outputs are pure outputs. This logic will have to be improved.
@@ -745,13 +881,12 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	private void simplifyInfo(OpInfo info, String names) {
 		Type opType = info.opType();
 		if (!(opType instanceof ParameterizedType)) return;
-		ParameterizedType pType = (ParameterizedType) opType;
 		Type[] args = OpUtils.inputTypes(info.struct()); 
 //		args.remove(args.size() - 1);
-		List<List<Simplifier<?, ?>>> simplifications = simplifyArgs(Arrays.asList(args));
-		for (List<Simplifier<?, ?>> simplification : simplifications) {
+		List<List<OpInfo>> simplifications = focusArgs(Arrays.asList(args));
+		for (List<OpInfo> simplification : simplifications) {
 			// only add the simplification if it changes the signature.
-			if (simplification.stream().allMatch(s -> s instanceof Identity)) continue;
+			if (simplification.stream().allMatch(s -> s.opType() instanceof Identity)) continue;
 			addToOpIndex(new SimplifiedOpInfo(info, simplification), names);
 		}
 	}
@@ -770,7 +905,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		for (String opName : parsedOpNames) {
 			if (!opDirectory.containsKey(opName))
 				opDirectory.put(opName, new TreeSet<>());
-			opDirectory.get(opName).add(opInfo);
+			boolean success = opDirectory.get(opName).add(opInfo);
+			if(!success) System.out.println("Did not add OpInfo "+ opInfo);
 		}
 	}
 

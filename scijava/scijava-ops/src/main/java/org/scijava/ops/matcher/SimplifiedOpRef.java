@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.scijava.ops.OpInfo;
 import org.scijava.ops.simplify.Identity;
 import org.scijava.ops.simplify.Simplifier;
 
@@ -16,28 +17,43 @@ import org.scijava.ops.simplify.Simplifier;
  */
 public class SimplifiedOpRef extends OpRef {
 
-	private final List<Simplifier<?, ?>> simplifiers;
+	private final OpRef originalRef;
+	private final List<OpInfo> simplifiers;
 
+	// TODO: we need the original OpRef so that we can find the correct
+	// simplifiers. Is there a better way to ensure that we get one?
 	public SimplifiedOpRef(String name, Type type, Type outType, Type[] args) {
 		super(name, type, outType, args);
-		simplifiers = null;
+		throw new UnsupportedOperationException("Must provide an original OpRef!");
 	}
 
-	public SimplifiedOpRef(String name, Type type, Type outType, Type[] args, List<Simplifier<?, ?>> simplifiers) {
+	public SimplifiedOpRef(String name, Type type, Type outType, Type[] args, List<OpInfo> simplifiers) {
 		super(name, type, outType, args);
+		throw new UnsupportedOperationException("Must provide an original OpRef!");
+	}
+
+	public SimplifiedOpRef(OpRef originalRef, Type type, Type outType, Type[] args, List<OpInfo> simplifiers) {
+		super(originalRef.getName(), type, outType, args);
+		this.originalRef = originalRef;
 		this.simplifiers = simplifiers;
 	}
 
 	public static SimplifiedOpRef identitySimplification(OpRef ref) {
-		List<Simplifier<?, ?>> identityList = Arrays.stream(ref.getArgs()).map(
-			type -> new Identity<>(type)).collect(Collectors.toList());
+		// This seems slow. Can we make this faster?
+		OpInfo identityInfo = new OpClassInfo(Identity.class);
+		List<OpInfo> identityList = Arrays.stream(ref.getArgs()).map(
+			type -> identityInfo).collect(Collectors.toList());
 		// TODO: can we make a constructor that takes an original OpRef and a list
 		// of Simplifiers?
-		return new SimplifiedOpRef(ref.getName(), ref.getType(), ref.getOutType(),
+		return new SimplifiedOpRef(ref, ref.getType(), ref.getOutType(),
 			ref.getArgs(), identityList);
 	}
 
-	public List<Simplifier<?, ?>> getSimplifiers() {
+	public List<OpInfo> simplifierInfos() {
 		return simplifiers;
+	}
+
+	public OpRef srcRef() {
+		return originalRef;
 	}
 }

@@ -3,16 +3,18 @@ package org.scijava.ops.matcher;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.scijava.Priority;
 import org.scijava.log.Logger;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpUtils;
 import org.scijava.ops.conversionLoss.LossReporter;
 import org.scijava.ops.core.Op;
-import org.scijava.ops.matcher.OpCandidate.StatusCode;
 import org.scijava.struct.ItemIO;
 import org.scijava.struct.StructInstance;
 import org.scijava.types.Nil;
@@ -23,9 +25,6 @@ public class SimplifiedOpCandidate extends OpCandidate {
 	private SimplifiedOpInfo info;
 	private SimplifiedOpRef ref;
 
-	final Type[] originalRefTypes;
-	final Type[] originalInfoTypes;
-
 	public SimplifiedOpCandidate(OpEnvironment env, Logger log,
 		SimplifiedOpRef ref, SimplifiedOpInfo info,
 		Map<TypeVariable<?>, Type> typeVarAssigns)
@@ -33,16 +32,6 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		super(env, log, ref, info, typeVarAssigns);
 		this.info = info;
 		this.ref = ref;
-
-		originalRefTypes = ref.getSimplifiers().stream().map(s -> s.focusedType())
-			.toArray(Type[]::new);
-		originalInfoTypes = info.simplifiers.stream().map(s -> s.focusedType())
-			.toArray(Type[]::new);
-
-		if (originalRefTypes.length != originalInfoTypes.length) {
-			throw new IllegalStateException(
-				"The OpRef and OpInfo do not use the same amount of Simplifiers!");
-		}
 	}
 
 	public SimplifiedOpCandidate(OpEnvironment env, Logger log, OpRef ref,
@@ -60,8 +49,38 @@ public class SimplifiedOpCandidate extends OpCandidate {
 					"Status of candidate to create op from indicates a problem: " + getStatus());
 		}
 
-		StructInstance<?> inst = opInfo().createOpInstance(dependencies, ref.getSimplifiers());
+		// resolve simplifiers
+		// TODO: consider correct parsing here.
+		List<OpInfo> refSimplifiers = ref.simplifierInfos();
+		Type[] originalInputs = ref.srcRef().getArgs();
+		Type[] simpleInputs = ref.getArgs();
+		List<Function<?, ?>> simplifiers = findArgMutators(refSimplifiers, originalInputs, simpleInputs);
+
+		// resolve focusers
+		// TODO: consider correct parsing here.
+		List<OpInfo> infoFocusers = info.focuserInfos();
+		Type[] unfocusedInputs = OpUtils.inputTypes(info.srcInfo().struct());
+		Type[] focusedInputs = OpUtils.inputTypes(info.struct());
+		List<Function<?, ?>> focusers = findArgMutators(refSimplifiers, originalInputs, simpleInputs);
+
+		StructInstance<?> inst = opInfo().createOpInstance(dependencies, simplifiers, refSimplifiers, focusers);
 		return inst;
+	}
+
+	private List<Function<?, ?>> findArgMutators(List<OpInfo> mutatorInfos,
+		Type[] originalInputs, Type[] mutatedInputs)
+	{
+		if (mutatorInfos.size() != originalInputs.length)
+			throw new IllegalStateException(
+				"Mismatch between number of argument mutators and arguments in ref:\n" +
+					ref);
+		
+		List<Function<?, ?>> mutators = new ArrayList<>();
+		for(int i = 0; i < mutatorInfos.size(); i++) {
+			Type opType = Types.parameterize(Function.class, new Type[] {originalInputs[i], mutatedInputs[i]});
+			env().op(mutatorInfos.get(i), Nil.of(opType), new Nil<?>[] {Nil.of(originalInputs[i])}, Nil.of(mutatedInputs[i]));
+		}
+		return mutators;
 	}
 
 	@Override
@@ -96,19 +115,21 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		double base = Priority.VERY_LOW;
 
 		// ORIGINAL PRIORITY
-		double originalPriority = info.priority();
+		double originalPriority = info.srcInfo().priority();
 
 		// PENALTY
 		double penalty = 0;
 
 		// TODO: will these ever be incorrectly ordered?
-		Nil<?>[] refInTypes = ref.getSimplifiers().stream().map(s -> Nil.of(s
-			.focusedType())).toArray(Nil[]::new);
-		Nil<?>[] infoInTypes = info.simplifiers.stream().map(s -> Nil.of(s
-			.focusedType())).toArray(Nil[]::new);
+		Type[] refInTypes = ref.srcRef().getArgs();
+		Type[] infoInTypes = OpUtils.inputTypes(info.srcInfo().struct());
+//		Nil<?>[] refInTypes = ref.simplifierInfos().stream().map(s -> Nil.of(s
+//			.inputs().get(0).getType())).toArray(Nil[]::new);
+//		Nil<?>[] infoInTypes = info.focuserInfos().stream().map(s -> Nil.of(s
+//			.output().getType())).toArray(Nil[]::new);
 
 		for (int i = 0; i < refInTypes.length; i++) {
-			penalty += determineLoss(refInTypes[i], infoInTypes[i]);
+			penalty += determineLoss(Nil.of(refInTypes[i]), Nil.of(infoInTypes[i]));
 		}
 
 		// TODO: is this right?
