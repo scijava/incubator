@@ -401,8 +401,6 @@ public final class OpUtils {
 
 			if (!typeOnly) {
 				sb.append(" " + item.getKey());
-				if (!((ParameterMember<?>) item).isRequired())
-					sb.append("?");
 			}
 		}
 		return sb.toString();
