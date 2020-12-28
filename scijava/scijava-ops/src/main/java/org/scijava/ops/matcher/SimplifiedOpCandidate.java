@@ -4,6 +4,7 @@ package org.scijava.ops.matcher;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -59,11 +60,12 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		// resolve focusers
 		// TODO: consider correct parsing here.
 		List<OpInfo> infoFocusers = info.focuserInfos();
-		Type[] unfocusedInputs = OpUtils.inputTypes(info.srcInfo().struct());
-		Type[] focusedInputs = OpUtils.inputTypes(info.struct());
-		List<Function<?, ?>> focusers = findArgMutators(refSimplifiers, originalInputs, simpleInputs);
+		Type[] unfocusedInputs = OpUtils.inputTypes(info.struct());
+		Type[] focusedInputs = OpUtils.inputTypes(info.srcInfo().struct());
+		List<Function<?, ?>> focusers = findArgMutators(infoFocusers, unfocusedInputs, focusedInputs);
+		SimplificationTypings typings = new SimplificationTypings(originalInputs, simpleInputs, unfocusedInputs, focusedInputs);
 
-		StructInstance<?> inst = opInfo().createOpInstance(dependencies, simplifiers, refSimplifiers, focusers);
+		StructInstance<?> inst = opInfo().createOpInstance(dependencies, simplifiers, refSimplifiers, focusers, typings);
 		return inst;
 	}
 
@@ -78,7 +80,10 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		List<Function<?, ?>> mutators = new ArrayList<>();
 		for(int i = 0; i < mutatorInfos.size(); i++) {
 			Type opType = Types.parameterize(Function.class, new Type[] {originalInputs[i], mutatedInputs[i]});
-			env().op(mutatorInfos.get(i), Nil.of(opType), new Nil<?>[] {Nil.of(originalInputs[i])}, Nil.of(mutatedInputs[i]));
+			Function<?, ?> mutator = (Function<?, ?>) env().op(mutatorInfos.get(i),
+				Nil.of(opType), new Nil<?>[] { Nil.of(originalInputs[i]) }, Nil.of(
+					mutatedInputs[i]));
+			mutators.add(mutator);
 		}
 		return mutators;
 	}
@@ -136,6 +141,7 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		Nil<?> infoOutType = Nil.of(info.output().getType());
 		Nil<?> refOutType = Nil.of(ref.getOutType());
 
+		// TODO: only calculate the loss once
 		penalty += determineLoss(refOutType, infoOutType);
 
 		// PRIORITY = BASE + ORIGINAL - PENALTY

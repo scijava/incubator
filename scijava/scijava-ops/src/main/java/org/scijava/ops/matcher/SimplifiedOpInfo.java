@@ -158,20 +158,28 @@ public class SimplifiedOpInfo implements OpInfo {
 		final List<Member<?>> newItems = new ArrayList<>();
 		final Map<TypeVariable<?>, Type> map = new HashMap<>();
 		Type[] originalMemberType = new Type[1];
-		Type[] simpleMemberType = new Type[1];
+		Type[] simpleInput = new Type[1];
+		Type simpleMemberType;
 		for (Member<?> m : originalItems) {
 			if (m.isInput()) {
 				try {
-					map.clear();
-					// we assume here that if there is a type variable somewhere in the
-					// type, it is indicative of an identity simplification.
 					originalMemberType[0] = m.getType();
-					simpleMemberType[0] = itr.next().inputs().get(0).getType();
-					MatchingUtils.inferTypeVariables(simpleMemberType, originalMemberType, map);
-					Type mappedSimpleType = Types.mapVarToTypes(simpleMemberType[0], map);
+					OpInfo focuser = itr.next();
+					simpleInput[0] = focuser.output().getType();
+					simpleMemberType = focuser.inputs().get(0).getType();
 
+					// if there are type variables, we have to reify them
+					if (Types.containsTypeVars(simpleInput[0])) {
+						map.clear();
+						// we assume here that if there is a type variable somewhere in the
+						// type, it is indicative of an identity simplification.
+						// TODO: we might have to infer the type variables against the input
+						// to the simplifier, NOT the output (which is SimpleMemberType)
+						MatchingUtils.inferTypeVariables(simpleInput, originalMemberType, map);
+						simpleMemberType = Types.mapVarToTypes(simpleMemberType, map);
+					}
 					// create simplifiedMember from m
-					SimplifiedMember<?> sm = new SimplifiedMember<>(m, mappedSimpleType);
+					SimplifiedMember<?> sm = new SimplifiedMember<>(m, simpleMemberType);
 					newItems.add(sm);
 				}
 				catch (NoSuchElementException e) {
@@ -237,10 +245,10 @@ public class SimplifiedOpInfo implements OpInfo {
 	 * @see #createOpInstance(List) - used when there are no associated
 	 *      {@code refSimplifier}s.
 	 */
-	public StructInstance<?> createOpInstance(List<?> dependencies, List<Function<?, ?>> simplifiers, List<OpInfo> simplifierInfos, List<Function<?, ?>> focusers) {
+	public StructInstance<?> createOpInstance(List<?> dependencies, List<Function<?, ?>> simplifiers, List<OpInfo> simplifierInfos, List<Function<?, ?>> focusers, SimplificationTypings typings) {
 		final Object op = srcInfo.createOpInstance(dependencies).object();
 		try {
-			return struct().createInstance(javassistOp(op, simplifiers, simplifierInfos, focusers, focuserInfos));
+			return struct().createInstance(javassistOp(op, simplifiers, simplifierInfos, focusers, focuserInfos, typings));
 		}
 		catch (Throwable ex) {
 			throw new IllegalStateException(
@@ -296,7 +304,7 @@ public class SimplifiedOpInfo implements OpInfo {
 	 *         injected.
 	 * @throws Throwable
 	 */
-	private Object javassistOp(Object originalOp, List<Function<?, ?>> simplifiers, List<OpInfo> simplifierInfos, List<Function<?, ?>> focusers, List<OpInfo> focuserInfos) throws Throwable {
+	private Object javassistOp(Object originalOp, List<Function<?, ?>> simplifiers, List<OpInfo> simplifierInfos, List<Function<?, ?>> focusers, List<OpInfo> focuserInfos, SimplificationTypings typings) throws Throwable {
 		ClassPool pool = ClassPool.getDefault();
 
 		// Create wrapper class
@@ -307,13 +315,13 @@ public class SimplifiedOpInfo implements OpInfo {
 			c = pool.getClassLoader().loadClass(className);
 		}
 		catch (ClassNotFoundException e) {
-			CtClass cc = generateSimplifiedWrapper(pool, className, opType, simplifierInfos, focuserInfos);
+			CtClass cc = generateSimplifiedWrapper(pool, className, opType, simplifierInfos, focuserInfos, typings);
 			c = cc.toClass(MethodHandles.lookup());
 		}
 
 		// Return Op instance
 		List<Class<?>> constructorArgs = Streams.concat(simplifiers.stream(), focusers.stream()).map(
-			simplifier -> Simplifier.class).collect(Collectors.toList());
+			simplifier -> Function.class).collect(Collectors.toList());
 		constructorArgs.add(opType);
 		List<Object> args = new ArrayList<>(simplifiers);
 		args.addAll(focusers);
@@ -395,7 +403,7 @@ public class SimplifiedOpInfo implements OpInfo {
 //	}
 
 	private CtClass generateSimplifiedWrapper(ClassPool pool, String className,
-		Class<?> opType, List<OpInfo> simplifiers, List<OpInfo> focusers) throws Throwable
+		Class<?> opType, List<OpInfo> simplifiers, List<OpInfo> focusers, SimplificationTypings typings) throws Throwable
 	{
 		CtClass cc = pool.makeClass(className);
 
@@ -425,7 +433,7 @@ public class SimplifiedOpInfo implements OpInfo {
 		cc.addConstructor(constructor);
 
 		// add functional interface method
-		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(opType, simplifiers, focusers),
+		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(opType, simplifiers, focusers, typings),
 			cc);
 		cc.addMethod(functionalMethod);
 		return cc;
@@ -559,7 +567,7 @@ public class SimplifiedOpInfo implements OpInfo {
 //		return sb.toString();
 //	}
 
-	private String createFunctionalMethod(Class<?> opType, List<OpInfo> simplifierInfos, List<OpInfo> focuserInfos) {
+	private String createFunctionalMethod(Class<?> opType, List<OpInfo> simplifierInfos, List<OpInfo> focuserInfos, SimplificationTypings typings) {
 		StringBuilder sb = new StringBuilder();
 
 		// determine the name of the functional method
@@ -582,17 +590,17 @@ public class SimplifiedOpInfo implements OpInfo {
 		sb.append(" ) {");
 		// simplify all inputs
 		for (int i = 0; i < simplifierInfos.size(); i++) {
-			Type focused = simplifierInfos.get(i).inputs().get(0).getType();
-			Type simple = simplifierInfos.get(i).output().getType();
-			sb.append(simple.getTypeName() + " simple" + i + " = (" + simple.getTypeName() + ") refSimplifier" + i +
-				".simplify((" + focused.getTypeName() + ") in" + i + ");");
+			Type focused = typings.originalTypes()[i];
+			Type simple = typings.simpleTypes()[i];
+			sb.append(simple.getTypeName() + " simple" + i + " = (" + simple.getTypeName() + ") simplifier" + i +
+				".apply((" + focused.getTypeName() + ") in" + i + ");");
 		}
 		// focus all inputs
 		for (int i = 0; i < simplifierInfos.size(); i++) {
-			Type focused = focuserInfos.get(i).inputs().get(0).getType();
-			Type simple = focuserInfos.get(i).output().getType();
-			sb.append(focused.getTypeName() + " focused" + i + " = (" + focused.getTypeName() + ") infoSimplifier" + i +
-				".focus((" + simple.getTypeName() + ") simple" + i + ");");
+			Type focused = typings.focusedTypes()[i];
+			Type unfocused = typings.unfocusedTypes()[i];
+			sb.append(focused.getTypeName() + " focused" + i + " = (" + focused.getTypeName() + ") focuser" + i +
+				".apply((" + unfocused.getTypeName() + ") simple" + i + ");");
 		}
 
 		// call the op, return the output

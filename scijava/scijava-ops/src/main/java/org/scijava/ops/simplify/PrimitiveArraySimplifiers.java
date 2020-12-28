@@ -1,47 +1,78 @@
+
 package org.scijava.ops.simplify;
 
+import java.util.function.Function;
+
+import org.scijava.ops.OpField;
+import org.scijava.ops.core.OpCollection;
 import org.scijava.plugin.Plugin;
 import org.scijava.util.ObjectArray;
 
+/**
+ * A collection of Ops for simplifying and focusing primitive arrays
+ *
+ * @author Gabriel Selzer
+ */
+@Plugin(type = OpCollection.class)
 public class PrimitiveArraySimplifiers {
-	
-	@Plugin(type = Simplifier.class)
-	public static class ByteArraySimplifier implements Simplifier<ObjectArray<Number>, Byte[]> {
 
-		@Override
-		public ObjectArray<Number> simplify(Byte[] p) {
-			return new ObjectArray<>(p);
-		}
+	@Unsimplifiable
+	@OpField(names = "simplify")
+	public final Function<Byte[], ObjectArray<Number>> byteArrSimplifier =
+		b -> new ObjectArray<>(b);
 
-		@Override
-		public Byte[] focus(ObjectArray<Number> g) {
-			return g.stream().map(e -> e.byteValue()).toArray(Byte[]::new);
-		}
+	@Unsimplifiable
+	@OpField(names = "focus")
+	public final Function<ObjectArray<Number>, Byte[]> byteArrFocuser = o -> o
+		.stream().map(b -> b.byteValue()).toArray(Byte[]::new);
 
-		@Override
-		public String toString() {
-			return "Byte[] Simplifier";
-		}
+	@Unsimplifiable
+	@OpField(names = "simplify")
+	public final Function<Integer[], ObjectArray<Number>> intArrSimplifier =
+		i -> new ObjectArray<>(i);
 
-	}
-	
-	@Plugin(type = Simplifier.class)
-	public static class IntegerArraySimplifier implements Simplifier<ObjectArray<Number>, Integer[]> {
+	@Unsimplifiable
+	@OpField(names = "focus")
+	public final Function<ObjectArray<Number>, Integer[]> intArrFocuser = o -> o
+		.stream().map(i -> i.intValue()).toArray(Integer[]::new);
 
-		@Override
-		public ObjectArray<Number> simplify(Integer[] p) {
-			return new ObjectArray<>(p);
-		}
+	@Unsimplifiable
+	@OpField(names = "simplify")
+	public final Function<Short[], ObjectArray<Number>> shortArrSimplifier =
+		s -> new ObjectArray<>(s);
 
-		@Override
-		public Integer[] focus(ObjectArray<Number> g) {
-			return g.stream().map(e -> e.intValue()).toArray(Integer[]::new);
-		}
+	@Unsimplifiable
+	@OpField(names = "focus")
+	public final Function<ObjectArray<Number>, Short[]> shortArrFocuser = o -> o
+		.stream().map(s -> s.shortValue()).toArray(Short[]::new);
 
-		@Override
-		public String toString() {
-			return "Integer[] Simplifier";
-		}
+	@Unsimplifiable
+	@OpField(names = "simplify")
+	public final Function<Long[], ObjectArray<Number>> longArrSimplifier =
+		l -> new ObjectArray<>(l);
 
-	}
+	@Unsimplifiable
+	@OpField(names = "focus")
+	public final Function<ObjectArray<Number>, Long[]> longArrFocuser = o -> o
+		.stream().map(l -> l.shortValue()).toArray(Long[]::new);
+
+	@Unsimplifiable
+	@OpField(names = "simplify")
+	public final Function<Float[], ObjectArray<Number>> floatArrSimplifier =
+		f -> new ObjectArray<>(f);
+
+	@Unsimplifiable
+	@OpField(names = "focus")
+	public final Function<ObjectArray<Number>, Float[]> floatArrFocuser = o -> o
+		.stream().map(f -> f.shortValue()).toArray(Float[]::new);
+
+	@Unsimplifiable
+	@OpField(names = "simplify")
+	public final Function<Double[], ObjectArray<Number>> doubleArrSimplifier =
+		d -> new ObjectArray<>(d);
+
+	@Unsimplifiable
+	@OpField(names = "focus")
+	public final Function<ObjectArray<Number>, Double[]> doubleArrFocuser = o -> o
+		.stream().map(d -> d.shortValue()).toArray(Double[]::new);
 }

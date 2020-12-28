@@ -157,6 +157,12 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	@Override
 	public Iterable<OpInfo> infos() {
 		if (opDirectory == null) initOpDirectory();
+		// Simplify all ops here
+		for (String name : opDirectory.keySet()) {
+			if(!simplifiedNames.contains(name)) {
+				simplifyInfos(name);
+			}
+		}
 		return opDirectory.values().stream().flatMap(list -> list.stream()).collect(Collectors.toList());
 	}
 
@@ -164,6 +170,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	public Iterable<OpInfo> infos(String name) {
 		if (opDirectory == null) initOpDirectory();
 		if (name == null || name.isEmpty()) return infos();
+		// initialize all SimplifiedInfos with matching name
+		if(!simplifiedNames.contains(name)) {
+			simplifyInfos(name);
+		}
 		return opsOfName(name);
 	}
 
@@ -245,6 +255,9 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				"The given OpRef and OpInfo are not compatible!");
 		OpCandidate candidate = new OpCandidate(this, this.log, ref, info,
 			typeVarAssigns);
+		// TODO: can this be replaced by simply setting the status code to match?
+		if (!matcher.typesMatch(candidate)) throw new OpMatchingException(
+			"The given OpRef and OpInfo are not compatible!");
 		// obtain Op instance (with dependencies)
 		Object op = instantiateOp(candidate);
 
@@ -331,12 +344,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	private OpCandidate simplifiedOp(OpRef ref) throws OpMatchingException {
-		// simplify all potential matches
-		String opName = ref.getName();
-		if(!simplifiedNames.contains(opName)) {
-			simplifyInfos(ref.getName());
-		}
-
 		// obtain simplifications for ref
 		List<OpRef> simplifiedRefs = getRefSimplifications(ref);
 
@@ -694,6 +701,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				continue;
 			}
 
+			if(adaptor instanceof SimplifiedOpInfo) {
+				log.debug(adaptor + " has been simplified. This is likely a typo.");
+			}
+
 			try {
 				// resolve adaptor dependencies
 				final List<Object> dependencies = resolveOpDependencies(adaptor, map);
@@ -886,8 +897,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		List<List<OpInfo>> simplifications = focusArgs(Arrays.asList(args));
 		for (List<OpInfo> simplification : simplifications) {
 			// only add the simplification if it changes the signature.
-			if (simplification.stream().allMatch(s -> s.opType() instanceof Identity)) continue;
-			addToOpIndex(new SimplifiedOpInfo(info, simplification), names);
+			SimplifiedOpInfo simpleInfo = new SimplifiedOpInfo(info, simplification);
+			Type[] simpleArgs = OpUtils.inputTypes(simpleInfo.struct());
+			if(!Arrays.equals(args, simpleArgs))
+				addToOpIndex(simpleInfo, names);
 		}
 	}
 
