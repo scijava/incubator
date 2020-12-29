@@ -75,7 +75,13 @@ public class PrimitiveLossReporters {
 		return maxValue - converted;
 	};
 
-//	@Unsimplifiable
-//	@Plugin(type = Op.class)
-//	static class DoubleIntegerReporter extends LosslessReporter<Double, Integer> {}
+	@Unsimplifiable
+	@OpField(names = "lossReporter")
+	public final LossReporter<Number, Double> NumberDoubleReporter = (from,
+		to) -> LongDoubleReporter.apply(Nil.of(Long.class), Nil.of(Double.class));
+
+	@Unsimplifiable
+	@OpField(names = "lossReporter")
+	public final LossReporter<Number, Long> NumberLongReporter = (from,
+		to) -> DoubleLongReporter.apply(Nil.of(Double.class), Nil.of(Long.class));
 }

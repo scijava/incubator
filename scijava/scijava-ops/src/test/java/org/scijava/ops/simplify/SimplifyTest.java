@@ -3,9 +3,9 @@ package org.scijava.ops.simplify;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
@@ -13,6 +13,7 @@ import org.scijava.ops.OpField;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
 import org.scijava.plugin.Plugin;
+import org.scijava.util.ObjectArray;
 
 /**
  * Basic simplify test
@@ -64,6 +65,15 @@ public class SimplifyTest extends AbstractTestEnvironment {
 		Double result = ops.op("test.math.powDouble").input(number, exponent)
 			.outType(Double.class).apply();
 		assertEquals(8.0, result, 0);
+	}
+
+	@Test
+	public void testSimplifiedOp() {
+		BiFunction<Number, Number, Double> numFunc = ops.op("test.math.powDouble")
+			.inType(Number.class, Number.class).outType(Double.class).function();
+		
+		Double result = numFunc.apply(3., 4.);
+		assertEquals(81., result, 0);
 	}
 
 //	@Test
