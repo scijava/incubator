@@ -433,7 +433,7 @@ public class SimplifiedOpInfo implements OpInfo {
 		cc.addConstructor(constructor);
 
 		// add functional interface method
-		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(opType, simplifiers, focusers, typings),
+		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(opType, typings),
 			cc);
 		cc.addMethod(functionalMethod);
 		return cc;
@@ -567,11 +567,81 @@ public class SimplifiedOpInfo implements OpInfo {
 //		return sb.toString();
 //	}
 
-	private String createFunctionalMethod(Class<?> opType, List<OpInfo> simplifierInfos, List<OpInfo> focuserInfos, SimplificationTypings typings) {
+	/**
+	 * Creates the functional method of a simplified Op. This functional method
+	 * must:
+	 * <ol>
+	 * <li>Simplify all inputs using the {@link Function}s provided by the
+	 * {@link SimplifiedOpRef}
+	 * <li>Focus the simplified inputs using the {@link Function}s provided by the
+	 * {@link SimplifiedOpInfo}
+	 * <li>Call the {@code Op} using the focused inputs.
+	 * </ol>
+	 * <b>NB</b> The Javassist compiler
+	 * <a href="https://www.javassist.org/tutorial/tutorial3.html#generics">does
+	 * not fully support generics</a>, so we must ensure that the types are raw.
+	 * At compile time, the raw types are equivalent to the generic types, so this
+	 * should not pose any issues.
+	 * 
+	 * @param opType - used to determine what the call to the original Op should
+	 *          look like.
+	 * @param typings - a {@link SimplificationTypings} object declaring the
+	 *          typing transformation from original {@OpRef} input to original
+	 *          {@link OpInfo} input.
+	 * @return a {@link String} that can be used by
+	 *         {@link CtMethod#make(String, CtClass)} to generate the functional
+	 *         method of the simplified Op
+	 */
+	private String createFunctionalMethod(Class<?> opType, SimplificationTypings typings) {
 		StringBuilder sb = new StringBuilder();
 
 		// determine the name of the functional method
 		Method m = ParameterStructs.singularAbstractMethod(opType);
+
+		//-- signature -- //
+		sb.append(generateSignature(m));
+
+		//-- body --//
+		sb.append(" {");
+		sb.append(fMethodPreprocessing(typings));
+
+		// call the op, return the output
+		sb.append("return op." + m.getName() + "(");
+		for (int i = 0; i < typings.numTypes(); i++) {
+			sb.append(" focused" + i);
+			if (i + 1 < typings.numTypes()) sb.append(",");
+		}
+
+		sb.append("); }");
+		return sb.toString();
+	}
+
+	private String fMethodPreprocessing(SimplificationTypings typings) {
+		StringBuilder sb = new StringBuilder();
+
+		// simplify all inputs
+		for (int i = 0; i < typings.numTypes(); i++) {
+			Type focused = Types.raw(typings.originalTypes()[i]);
+			Type simple = Types.raw(typings.simpleTypes()[i]);
+			sb.append(simple.getTypeName() + " simple" + i + " = (" + simple
+				.getTypeName() + ") simplifier" + i + ".apply((" + focused
+					.getTypeName() + ") in" + i + ");");
+		}
+
+		// focus all inputs
+		for (int i = 0; i < typings.numTypes(); i++) {
+			Type focused = Types.raw(typings.focusedTypes()[i]);
+			Type unfocused = Types.raw(typings.unfocusedTypes()[i]);
+			sb.append(focused.getTypeName() + " focused" + i + " = (" + focused
+				.getTypeName() + ") focuser" + i + ".apply((" + unfocused
+					.getTypeName() + ") simple" + i + ");");
+		}
+
+	return sb.toString();
+}
+
+	private String generateSignature(Method m) {
+		StringBuilder sb = new StringBuilder();
 		String methodName = m.getName();
 
 		// method modifiers
@@ -579,38 +649,14 @@ public class SimplifiedOpInfo implements OpInfo {
 		sb.append("public " + (isVoid ? "void" : "Object") + " " + methodName +
 			"(");
 
-		// method inputs
 		int applyInputs = OpUtils.inputs(struct()).size();
 		for (int i = 0; i < applyInputs; i++) {
 			sb.append(" Object in" + i);
 			if (i < applyInputs - 1) sb.append(",");
 		}
 
-		// method body
-		sb.append(" ) {");
-		// simplify all inputs
-		for (int i = 0; i < simplifierInfos.size(); i++) {
-			Type focused = typings.originalTypes()[i];
-			Type simple = typings.simpleTypes()[i];
-			sb.append(simple.getTypeName() + " simple" + i + " = (" + simple.getTypeName() + ") simplifier" + i +
-				".apply((" + focused.getTypeName() + ") in" + i + ");");
-		}
-		// focus all inputs
-		for (int i = 0; i < simplifierInfos.size(); i++) {
-			Type focused = typings.focusedTypes()[i];
-			Type unfocused = typings.unfocusedTypes()[i];
-			sb.append(focused.getTypeName() + " focused" + i + " = (" + focused.getTypeName() + ") focuser" + i +
-				".apply((" + unfocused.getTypeName() + ") simple" + i + ");");
-		}
+		sb.append(" )");
 
-		// call the op, return the output
-		sb.append("return op." + methodName + "(");
-		for (int i = 0; i < simplifierInfos.size(); i++) {
-			sb.append(" focused" + i);
-			if (i + 1 < simplifierInfos.size()) sb.append(",");
-		}
-
-		sb.append("); }");
 		return sb.toString();
 	}
 
