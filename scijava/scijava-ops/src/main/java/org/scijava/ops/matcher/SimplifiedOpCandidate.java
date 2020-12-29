@@ -150,7 +150,8 @@ public class SimplifiedOpCandidate extends OpCandidate {
 
 	/**
 	 * Calls a {@code lossReporter} {@link Op} to determine the <b>worst-case</b>
-	 * loss from a {@code T} to a {@code R}.
+	 * loss from a {@code T} to a {@code R}. If no {@code lossReporter} exists for
+	 * such a conversion, we assume infinite loss.
 	 * 
 	 * @param <T> -the generic type we are converting from.
 	 * @param <R> - generic type we are converting to.
@@ -166,9 +167,15 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		@SuppressWarnings("unchecked")
 		Nil<LossReporter<T, R>> specialTypeNil = (Nil<LossReporter<T, R>>) Nil.of(
 			specialType);
-		LossReporter<T, R> op = env().op("lossReporter", specialTypeNil, new Nil[] {
-			from, to }, Nil.of(Double.class));
-		return op.apply(from, to);
+		try {
+			LossReporter<T, R> op = env().op("lossReporter", specialTypeNil, new Nil[] {
+				from, to }, Nil.of(Double.class));
+			return op.apply(from, to);
+		} catch(IllegalArgumentException e) {
+			if (e.getCause() instanceof OpMatchingException)
+				return Double.POSITIVE_INFINITY;
+			throw e;
+		}
 	}
 
 }
