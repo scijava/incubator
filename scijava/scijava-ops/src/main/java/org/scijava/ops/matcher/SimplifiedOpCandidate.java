@@ -168,8 +168,10 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		Nil<LossReporter<T, R>> specialTypeNil = (Nil<LossReporter<T, R>>) Nil.of(
 			specialType);
 		try {
+			Type nilFromType = Types.parameterize(Nil.class, new Type[] {from.getType()});
+			Type nilToType = Types.parameterize(Nil.class, new Type[] {to.getType()});
 			LossReporter<T, R> op = env().op("lossReporter", specialTypeNil, new Nil[] {
-				from, to }, Nil.of(Double.class));
+				Nil.of(nilFromType), Nil.of(nilToType) }, Nil.of(Double.class));
 			return op.apply(from, to);
 		} catch(IllegalArgumentException e) {
 			if (e.getCause() instanceof OpMatchingException)

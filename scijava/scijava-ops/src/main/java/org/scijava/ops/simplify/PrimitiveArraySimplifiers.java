@@ -54,7 +54,7 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Long[]> longArrFocuser = o -> o
-		.stream().map(l -> l.shortValue()).toArray(Long[]::new);
+		.stream().map(l -> l.longValue()).toArray(Long[]::new);
 
 	@Unsimplifiable
 	@OpField(names = "simplify")
@@ -64,7 +64,7 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Float[]> floatArrFocuser = o -> o
-		.stream().map(f -> f.shortValue()).toArray(Float[]::new);
+		.stream().map(f -> f.floatValue()).toArray(Float[]::new);
 
 	@Unsimplifiable
 	@OpField(names = "simplify")
@@ -74,5 +74,5 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Double[]> doubleArrFocuser = o -> o
-		.stream().map(d -> d.shortValue()).toArray(Double[]::new);
+		.stream().map(d -> d.doubleValue()).toArray(Double[]::new);
 }

@@ -52,6 +52,7 @@ public class SimplifiedOpInfo implements OpInfo {
 
 	final OpInfo srcInfo;
 	final List<OpInfo> focuserInfos;
+	final OpInfo outputSimplifier;
 
 	private Struct struct;
 	private ParameterizedType simplifiedType;
@@ -65,9 +66,10 @@ public class SimplifiedOpInfo implements OpInfo {
 	 * @param simplification - the set of Ops used to simplify an Op defined by
 	 *          {@code info} into an Op of type {@code newType}
 	 */
-	public SimplifiedOpInfo(OpInfo info, List<OpInfo> simplification) {
+	public SimplifiedOpInfo(OpInfo info, List<OpInfo> focuserInfos, OpInfo outputSimplifier) {
 		this.srcInfo = info;
-		this.focuserInfos = simplification;
+		this.focuserInfos = focuserInfos;
+		this.outputSimplifier = outputSimplifier;
 
 		// NOTE: we lazily initialize this struct since we already know that it is fundamentally valid
 //		try {

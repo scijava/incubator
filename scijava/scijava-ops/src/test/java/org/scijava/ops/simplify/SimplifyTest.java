@@ -3,17 +3,13 @@ package org.scijava.ops.simplify;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
 import org.scijava.ops.OpField;
 import org.scijava.ops.core.OpCollection;
-import org.scijava.ops.function.Computers;
 import org.scijava.plugin.Plugin;
-import org.scijava.util.ObjectArray;
 
 /**
  * Basic simplify test
@@ -33,12 +29,6 @@ public class SimplifyTest extends AbstractTestEnvironment {
 
 	@OpField(names = "test.math.powDouble", params = "base, exponent, result")
 	public final BiFunction<Integer[], Double, Double> powOpArray = (b, e) -> Math.pow(b[0], e);
-
-	@OpField(names = "test.math.powDouble", params = "base, exponent, result")
-	public final Computers.Arity2<Long, Long, List<Long>> powOpLArray = (b, e, list) -> {
-		list.clear();
-		list.add((long) Math.pow(b, e));
-	};
 
 	@Test
 	public void testSimplify() {
@@ -76,14 +66,4 @@ public class SimplifyTest extends AbstractTestEnvironment {
 		assertEquals(81., result, 0);
 	}
 
-//	@Test
-//	public void testSimplifyComputer() {
-//		Integer number = 2;
-//		Integer exponent = 4;
-//		List<Long> list = new ArrayList<>();
-//		list.add(5l);
-//		ops.op("test.math.powDouble").input(number, exponent)
-//			.output(list).compute();
-//		assertEquals(16l, list.get(0), 0);
-//	}
 }

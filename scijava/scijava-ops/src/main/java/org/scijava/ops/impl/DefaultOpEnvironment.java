@@ -364,102 +364,96 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		throws OpMatchingException
 	{
 
-		// simplify all inputs and outputs
-		List<Type> typeList = Arrays.asList(ref.getArgs());
-		
+		// simplify all inputs
 		// TODO: these will be needed to ensure that the simplified parameters
 		// satisfy the class' type variables.
-		List<List<OpInfo>> simplifications = simplifyArgs(typeList);
+		Type[] originalArgs = ref.getArgs();
+		List<List<OpInfo>> simplifications = simplifyArgs(Arrays.asList(originalArgs));
+
+		// focus the output
+		// TODO: these will be needed to ensure that the simplified parameters
+		// satisfy the class' type variables.
+		List<OpInfo> focusedOutputs = getFocusers(ref.getOutType());
+
+		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 
 		// build a list of new OpRefs based on simplified inputs
 		List<OpRef> simplifiedRefs = new ArrayList<>();
 		for (List<OpInfo> simplification : simplifications) {
+			for (OpInfo outputFocuser: focusedOutputs) {
 
-			// avoid recursion by ignoring the identity simplification.
-			if (isIdentity(simplification)) continue;
+				// TODO: ensure that the given type parameters are within the bounds of
+				// the op type's type parameters.
+				// For all built-in op types (e.g. Function, Computer), the type
+				// parameters are unbounded. But, for extensibility, we should check.
+				Type[] simplifierInputs = simplification.stream().map(info -> info.inputs().get(0).getType()).toArray(Type[]::new);
+				Type[] newArgs = simplification.stream().map(info -> info.output().getType()).toArray(Type[]::new);
+				// TODO: this seems really inefficient. Can we improve?
+				for(int i = 0; i < newArgs.length; i++) {
+					typeVarAssigns.clear();
+					MatchingUtils.inferTypeVariables(new Type[] {simplifierInputs[i]}, new Type[] {originalArgs[i]}, typeVarAssigns);
+					newArgs[i] = Types.mapVarToTypes(newArgs[i], typeVarAssigns);
+				}
+				Type focuserOutput = outputFocuser.output().getType();
+				Type newReturnType = outputFocuser.inputs().get(0).getType();
+				typeVarAssigns.clear();
+				MatchingUtils.inferTypeVariables(new Type[] {focuserOutput}, new Type[] {ref.getOutType()}, typeVarAssigns);
+				newReturnType = Types.mapVarToTypes(newReturnType, typeVarAssigns);
 
-			// TODO: ensure that the given type parameters are within the bounds of
-			// the op type's type parameters.
-			// For all built-in op types (e.g. Function, Computer), the type
-			// parameters are unbounded. But, for extensibility, we should check.
-			Type[] newArgsList = simplification.stream().map(s -> s.output().getType())
-				.toArray(Type[]::new);
-
-			// TODO: not correct whenever there is a return type
-			Type newType = retype(ref.getType(), newArgsList);
-			// HACK: we assume that the output is a pure output and does not belong
-			// within the args
-			OpRef simplifiedRef = new SimplifiedOpRef(ref, newType, ref.getOutType(),
-				newArgsList, simplification);
-			simplifiedRefs.add(simplifiedRef);
+				// TODO: not correct whenever there is a return type
+				Type newType = retypeOpRef(ref.getType(), newArgs, newReturnType);
+				OpRef simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType,
+					newArgs, simplification, outputFocuser);
+				simplifiedRefs.add(simplifiedRef);
+			}
 		}
 		if (simplifiedRefs.size() == 0) throw new OpMatchingException(
 			"No simplifications exist for ref: \n" + ref);
 		return simplifiedRefs;
 	}
-	
-	private boolean isIdentity(List<OpInfo> simplification) {
-		return simplification
-				.parallelStream()
-				.allMatch(simplifier -> simplifier instanceof Identity);
-	}
 
 	/**
-	 * FIXME: We assume that the last type parameter is a pure output and all
-	 * other parameters are pure inputs
+	 * Determines the {@code type} of a (new) {@link OpRef} using its old
+	 * {@code type}, a new set of {@code args} and a new {@code outType}. Used to
+	 * create {@link SimplifiedOpRef}s. <b>This method assumes that
+	 * {@code originalOpRefType} is (or is a subtype of) some
+	 * {@link FunctionalInterface} and that all {@link TypeVariable}s declared by
+	 * that {@code FunctionalInterface} are present in the signature of that
+	 * interface's single abstract method.</b>
 	 * 
-	 * Suppose oldType is BiFunction<Integer, Long, Double>
-	 * Suppose the simplifiers being used are Identity<T>, Identity<T>
-	 * So newArgList will be [T, T]
-	 * 
-	 * @param originalType
-	 * @param newInputTypes
-	 * @return - a new type
+	 * @param originalOpRefType - the {@link Type} declared by the source
+	 *          {@link OpRef}
+	 * @param newArgs - the new argument {@link Type}s requested by the
+	 *          {@link OpRef}.
+	 * @param newOutType - the new output {@link Type} requested by the
+	 *          {@link OpRef}.
+	 * @return - a new {@code type} for a {@link SimplifiedOpRef}.
 	 */
-	private Type retype(Type originalType, Type[] newInputTypes) {
+	private Type retypeOpRef(Type originalOpRefType, Type[] newArgs, Type newOutType) {
 			// only retype types that we know how to retype
-			if (!(originalType instanceof ParameterizedType))
+			if (!(originalOpRefType instanceof ParameterizedType))
 				throw new IllegalStateException("We hadn't thought about this yet.");
+			Class<?> opType = Types.raw(originalOpRefType);
+			Class<?> fIface = ParameterStructs.findFunctionalInterface(opType);
+			Method fMethod = ParameterStructs.singularAbstractMethod(fIface);
+			Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 
-			// obtain list of original inputs
-			ParameterizedType pType = (ParameterizedType) originalType;
-			Type[] originalTypeArgs = pType.getActualTypeArguments();
-			Type[] originalInputTypes = new Type[newInputTypes.length];
-			System.arraycopy(originalTypeArgs, 0, originalInputTypes, 0, originalInputTypes.length);
-			
-			// Resolve type variables within newInputTypes
-			// We assume that any typeVariables within newInputTypes are due to
-			// identity simplifications, and that they should thus be mapped to the
-			// original input types
-			Map<TypeVariable<?>, Type> map = new HashMap<>();
-			Type[] originalTypeArg = new Type[1];
-			Type[] newTypeArg = new Type[1];
-			// TODO: do we need to call this on a per type basis if there are two identity
-			// simplifications for two different original types?
-			for(int i = 0; i < newInputTypes.length; i++) {
-				if (newInputTypes[i] instanceof TypeVariable<?>) {
-					map.clear();
-					originalTypeArg[0] = originalInputTypes[i];
-					newTypeArg[0] = newInputTypes[i];
-					// TODO: make less cryptic
-					MatchingUtils.inferTypeVariables(newTypeArg, originalTypeArg, map);
-					newInputTypes[i] = map.get(newInputTypes[i]);
-				}
+			// solve input types
+			Type[] genericParameterTypes = fMethod.getGenericParameterTypes();
+			MatchingUtils.inferTypeVariables(genericParameterTypes, newArgs, typeVarAssigns);
+
+			// solve output type
+			Type genericReturnType = fMethod.getGenericReturnType();
+			if (genericReturnType != void.class) {
+				MatchingUtils.inferTypeVariables(new Type[] {genericReturnType}, new Type[] {newOutType}, typeVarAssigns);
 			}
+			// TODO: if the output is also an input (i.e. we have a void return), do
+			// we need to ensure that the output focuser is the inverse of the input
+			// simplifier pertaining to the input/output argument?
 
-			// Obtain return type
-			// TODO: can we do some simplification here as well?
-			Type returnType = originalTypeArgs[originalTypeArgs.length - 1];
-
-			// Combine new inputs with return
-			Type[] newTypeArgs = new Type[originalTypeArgs.length];
-			System.arraycopy(newInputTypes, 0, newTypeArgs, 0, newInputTypes.length);
-//			List<Type> newTypeParams = new ArrayList<>(newArgList);
-			newTypeArgs[newTypeArgs.length - 1] = returnType;
-
-			// Make new (simplfied) Op type
-			Class<?> opClass = Types.raw(originalType);
-			return Types.parameterize(opClass, newTypeArgs);
+			// build new (read: simplified) Op type
+			Type newType = Types.parameterize(opType, typeVarAssigns);
+			return newType;
 	}
 	
 	private List<List<OpInfo>> simplifyArgs(List<Type> t){
@@ -893,14 +887,18 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		Type opType = info.opType();
 		if (!(opType instanceof ParameterizedType)) return;
 		Type[] args = OpUtils.inputTypes(info.struct()); 
+		Type outType = info.output().getType();
 //		args.remove(args.size() - 1);
-		List<List<OpInfo>> simplifications = focusArgs(Arrays.asList(args));
-		for (List<OpInfo> simplification : simplifications) {
-			// only add the simplification if it changes the signature.
-			SimplifiedOpInfo simpleInfo = new SimplifiedOpInfo(info, simplification);
-			Type[] simpleArgs = OpUtils.inputTypes(simpleInfo.struct());
-			if(!Arrays.equals(args, simpleArgs))
-				addToOpIndex(simpleInfo, names);
+		List<List<OpInfo>> inputFocuserSets = focusArgs(Arrays.asList(args));
+		List<OpInfo> outputSimplifiers = getSimplifiers(outType);
+		for (List<OpInfo> inputFocusers : inputFocuserSets) {
+			for(OpInfo outputSimplifier: outputSimplifiers) {
+				// only add the simplification if it changes the signature.
+				SimplifiedOpInfo simpleInfo = new SimplifiedOpInfo(info, inputFocusers, outputSimplifier);
+				Type[] simpleArgs = OpUtils.inputTypes(simpleInfo.struct());
+				if(!Arrays.equals(args, simpleArgs))
+					addToOpIndex(simpleInfo, names);
+			}
 		}
 	}
 
