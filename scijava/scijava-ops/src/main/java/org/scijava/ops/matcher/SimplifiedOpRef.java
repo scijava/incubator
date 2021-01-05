@@ -3,9 +3,11 @@ package org.scijava.ops.matcher;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.function.Computers;
 import org.scijava.ops.simplify.Identity;
 import org.scijava.ops.simplify.Simplifier;
 
@@ -20,6 +22,7 @@ public class SimplifiedOpRef extends OpRef {
 	private final OpRef originalRef;
 	private final List<OpInfo> simplifiers;
 	private final OpInfo outputFocuser;
+	private final Optional<Computers.Arity1<?, ?>> copyOp;
 
 	// TODO: we need the original OpRef so that we can find the correct
 	// simplifiers. Is there a better way to ensure that we get one?
@@ -38,6 +41,15 @@ public class SimplifiedOpRef extends OpRef {
 		this.originalRef = originalRef;
 		this.simplifiers = simplifiers;
 		this.outputFocuser = outputFocuser;
+		this.copyOp = Optional.empty();
+	}
+
+	public SimplifiedOpRef(OpRef originalRef, Type type, Type outType, Type[] args, List<OpInfo> simplifiers, OpInfo outputFocuser, Computers.Arity1<?, ?> copyOp) {
+		super(originalRef.getName(), type, outType, args);
+		this.originalRef = originalRef;
+		this.simplifiers = simplifiers;
+		this.outputFocuser = outputFocuser;
+		this.copyOp = Optional.of(copyOp);
 	}
 
 	public static SimplifiedOpRef identitySimplification(OpRef ref) {
@@ -57,6 +69,10 @@ public class SimplifiedOpRef extends OpRef {
 
 	public OpInfo focuserInfo() {
 		return outputFocuser;
+	}
+
+	public Optional<Computers.Arity1<?, ?>> copyOp() {
+		return copyOp;
 	}
 
 	public OpRef srcRef() {

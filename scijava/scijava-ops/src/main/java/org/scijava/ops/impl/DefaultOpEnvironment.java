@@ -65,6 +65,8 @@ import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.core.OpCollection;
+import org.scijava.ops.function.Computers;
+import org.scijava.ops.function.Computers.Arity1;
 import org.scijava.ops.matcher.DefaultOpMatcher;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
@@ -376,7 +378,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		// satisfy the class' type variables.
 		List<OpInfo> focusedOutputs = getFocusers(ref.getOutType());
 
-		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
+//		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 
 		// build a list of new OpRefs based on simplified inputs
 		List<OpRef> simplifiedRefs = new ArrayList<>();
@@ -391,20 +393,36 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				Type[] newArgs = simplification.stream().map(info -> info.output().getType()).toArray(Type[]::new);
 				// TODO: this seems really inefficient. Can we improve?
 				for(int i = 0; i < newArgs.length; i++) {
-					typeVarAssigns.clear();
-					MatchingUtils.inferTypeVariables(new Type[] {simplifierInputs[i]}, new Type[] {originalArgs[i]}, typeVarAssigns);
-					newArgs[i] = Types.mapVarToTypes(newArgs[i], typeVarAssigns);
+					newArgs[i] = SimplificationUtils.resolveMutatorTypeArgs(originalArgs[i], simplifierInputs[i], newArgs[i]);
+//					typeVarAssigns.clear();
+//					MatchingUtils.inferTypeVariables(new Type[] {simplifierInputs[i]}, new Type[] {originalArgs[i]}, typeVarAssigns);
+//					newArgs[i] = Types.mapVarToTypes(newArgs[i], typeVarAssigns);
 				}
 				Type focuserOutput = outputFocuser.output().getType();
 				Type newReturnType = outputFocuser.inputs().get(0).getType();
-				typeVarAssigns.clear();
-				MatchingUtils.inferTypeVariables(new Type[] {focuserOutput}, new Type[] {ref.getOutType()}, typeVarAssigns);
-				newReturnType = Types.mapVarToTypes(newReturnType, typeVarAssigns);
-
-				// TODO: not correct whenever there is a return type
+				newReturnType = SimplificationUtils.resolveMutatorTypeArgs(ref.getOutType(), focuserOutput, newReturnType);
+//				typeVarAssigns.clear();
+//				MatchingUtils.inferTypeVariables(new Type[] {focuserOutput}, new Type[] {ref.getOutType()}, typeVarAssigns);
+//				newReturnType = Types.mapVarToTypes(newReturnType, typeVarAssigns);
 				Type newType = SimplificationUtils.retypeOpType(ref.getType(), newArgs, newReturnType);
-				OpRef simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType,
-					newArgs, simplification, outputFocuser);
+				// if the Op's output is mutable, we will also need a copy Op for it.
+
+				Class<?> opType = Types.raw(ref.getType());
+				OpRef simplifiedRef;
+				int mutableIndex = SimplificationUtils.findMutableArgIndex(opType);
+				if( mutableIndex!= -1) {
+					Type copyType = originalArgs[mutableIndex];
+					Type copierType = Types.parameterize(Computers.Arity1.class, new Type[] {copyType, copyType});
+					Computers.Arity1<?, ?> copyOp = (Arity1<?, ?>) op("copy", Nil.of(
+						copierType), new Nil<?>[] { Nil.of(copyType) }, Nil.of(copyType));
+					simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType, newArgs, simplification, outputFocuser, copyOp);
+					
+				}
+				else {
+					// TODO: not correct whenever there is a return type
+					simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType,
+						newArgs, simplification, outputFocuser);
+				}
 				simplifiedRefs.add(simplifiedRef);
 			}
 		}

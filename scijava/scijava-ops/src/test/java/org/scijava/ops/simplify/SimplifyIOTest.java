@@ -3,15 +3,20 @@ package org.scijava.ops.simplify;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpField;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
+import org.scijava.param.Mutable;
 import org.scijava.plugin.Plugin;
 
 @Plugin(type = OpCollection.class)
@@ -45,3 +50,4 @@ public class SimplifyIOTest extends AbstractTestEnvironment{
 	}
 
 }
+

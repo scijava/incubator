@@ -1,6 +1,7 @@
 package org.scijava.ops.simplify;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -15,6 +16,8 @@ import org.scijava.ops.OpInfo;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpRef;
 import org.scijava.ops.matcher.SimplifiedOpRef;
+import org.scijava.ops.util.AnnotationUtils;
+import org.scijava.param.Mutable;
 import org.scijava.param.ParameterStructs;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
@@ -45,8 +48,7 @@ public class SimplificationUtils {
 			if (!(originalOpType instanceof ParameterizedType))
 				throw new IllegalStateException("We hadn't thought about this yet.");
 			Class<?> opType = Types.raw(originalOpType);
-			Class<?> fIface = ParameterStructs.findFunctionalInterface(opType);
-			Method fMethod = ParameterStructs.singularAbstractMethod(fIface);
+			Method fMethod = findFMethod(opType);
 			Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 
 			// solve input types
@@ -65,7 +67,33 @@ public class SimplificationUtils {
 			// build new (read: simplified) Op type
 			return Types.parameterize(opType, typeVarAssigns);
 	}
-	
+
+	public static Method findFMethod(Class<?> c) {
+			Class<?> fIface = ParameterStructs.findFunctionalInterface(c);
+			if(fIface == null) throw new IllegalArgumentException("Class " + c +" does not implement a functional interface!");
+			return ParameterStructs.singularAbstractMethod(fIface);
+	}
+
+	/**
+	 * Finds the {@link Mutable} argument of a {@link FunctionalInterface}'s
+	 * singular abstract method. If there is no argument annotated with
+	 * {@code Mutable}, then it is assumed that no arguments are mutable and that
+	 * the output of the functional {@link Method} is its output. We also assume
+	 * that only one argument is annotated.
+	 * 
+	 * @param c - the {@link Class} extending a {@link FunctionalInterface}
+	 * @return the index of the mutable argument (or -1 iff the output is
+	 *         returned).
+	 */
+	public static int findMutableArgIndex(Class<?> c) {
+		Method fMethod = findFMethod(c);
+		for (int i = 0; i < fMethod.getParameterCount(); i++) {
+			if (AnnotationUtils.getMethodParameterAnnotation(fMethod, i,
+				Mutable.class) != null) return i;
+		}
+		return -1;
+	}
+
 	/**
 	 * Given a simplifier or focuser (henceforth called mutators), it is often
 	 * helpful to discern its output/input type given its input/output type.

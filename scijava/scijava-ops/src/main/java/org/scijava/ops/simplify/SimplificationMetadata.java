@@ -10,6 +10,7 @@ import java.util.function.Function;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.function.Computers;
 import org.scijava.ops.matcher.SimplifiedOpCandidate;
 import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
@@ -37,6 +38,8 @@ public class SimplificationMetadata {
 	private final OpInfo refFocuser;
 	private final Function<?, ?> outputFocuser;
 
+	private final Optional<Computers.Arity1<?, ?>> copyOp;
+
 	private final int numInputs;
 
 	public SimplificationMetadata(SimplifiedOpRef ref, SimplifiedOpInfo info,
@@ -56,6 +59,8 @@ public class SimplificationMetadata {
 
 		this.refFocuser = ref.focuserInfo();
 		this.outputFocuser = outputFocuser(ref, env, this.refFocuser);
+
+		this.copyOp = ref.copyOp();
 
 		if (refSimplifiers.size() != infoFocusers.size())
 			throw new IllegalArgumentException(
@@ -157,6 +162,14 @@ public class SimplificationMetadata {
 
 	public Class<?> opType() {
 		return Types.raw(info.opType());
+	}
+
+	public boolean hasCopyOp() {
+		return copyOp.isPresent();
+	}
+
+	public Computers.Arity1<?, ?> copyOp() {
+		return copyOp.get();
 	}
 
 	/**

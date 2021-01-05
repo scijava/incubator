@@ -670,14 +670,14 @@ public class SimplifiedOpInfo implements OpInfo {
 		sb.append(");");
 
 		// postprocessing
-		sb.append(fMethodPostProcessing(metadata, opOutput));
+		sb.append(fMethodPostprocessing(metadata, opOutput));
 
 		sb.append("return out;");
 		sb.append("}");
 		return sb.toString();
 	}
 
-	private String fMethodPostProcessing(SimplificationMetadata metadata, String opOutput) {
+	private String fMethodPostprocessing(SimplificationMetadata metadata, String opOutput) {
 		StringBuilder sb = new StringBuilder();
 
 		// simplify output
@@ -692,7 +692,12 @@ public class SimplifiedOpInfo implements OpInfo {
 		sb.append(focused.getTypeName() + " out = (" + focused
 			.getTypeName() + ") outputFocuser0.apply((" + unfocused
 				.getTypeName() + ") simpleOut);");
-		
+
+		// call copy op iff it exists
+		if(metadata.hasCopyOp()) {
+			
+		}
+
 		return sb.toString();
 	}
 
