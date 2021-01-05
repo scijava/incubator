@@ -3,6 +3,7 @@ package org.scijava.ops.matcher;
 
 import com.google.common.collect.Streams;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -638,6 +639,15 @@ public class SimplifiedOpInfo implements OpInfo {
 
 		// determine the name of the functional method
 		Method m = ParameterStructs.singularAbstractMethod(metadata.opType());
+		// determine the name of the output:
+		String opOutput = "";
+		int ioIndex = metadata.ioArgIndex();
+		if(ioIndex == -1) {
+			opOutput = "originalOut";
+		}
+		else {
+			opOutput = "focused" + ioIndex;
+		}
 
 		//-- signature -- //
 		sb.append(generateSignature(m));
@@ -649,7 +659,9 @@ public class SimplifiedOpInfo implements OpInfo {
 		sb.append(fMethodPreprocessing(metadata));
 
 		// processing
-		sb.append(metadata.originalOutput().getTypeName() + " originalOut = ");
+		if (metadata.pureOutput()) {
+			sb.append(metadata.originalOutput().getTypeName() + " " + opOutput + " = ");
+		}
 		sb.append("op." + m.getName() + "(");
 		for (int i = 0; i < metadata.numInputs(); i++) {
 			sb.append(" focused" + i);
@@ -658,14 +670,14 @@ public class SimplifiedOpInfo implements OpInfo {
 		sb.append(");");
 
 		// postprocessing
-		sb.append(fMethodPostProcessing(metadata));
+		sb.append(fMethodPostProcessing(metadata, opOutput));
 
 		sb.append("return out;");
 		sb.append("}");
 		return sb.toString();
 	}
 
-	private String fMethodPostProcessing(SimplificationMetadata metadata) {
+	private String fMethodPostProcessing(SimplificationMetadata metadata, String opOutput) {
 		StringBuilder sb = new StringBuilder();
 
 		// simplify output
@@ -673,7 +685,7 @@ public class SimplifiedOpInfo implements OpInfo {
 		Type simple = Types.raw(metadata.simpleOutput());
 		sb.append(simple.getTypeName() + " simpleOut = (" + simple
 			.getTypeName() + ") outputSimplifier0.apply((" + original
-				.getTypeName() + ") originalOut);");	
+				.getTypeName() + ") " + opOutput + ");");	
 	
 		Type focused = Types.raw(metadata.focusedOutput());
 		Type unfocused = Types.raw(metadata.unfocusedOutput());

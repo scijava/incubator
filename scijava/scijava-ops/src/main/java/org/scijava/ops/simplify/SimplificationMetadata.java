@@ -3,8 +3,8 @@ package org.scijava.ops.simplify;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.scijava.ops.OpEnvironment;
@@ -13,6 +13,7 @@ import org.scijava.ops.OpUtils;
 import org.scijava.ops.matcher.SimplifiedOpCandidate;
 import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
+import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.util.Types;
 
@@ -204,6 +205,23 @@ public class SimplificationMetadata {
 		args.add(outputFocuser);
 		args.add(op);
 		return args.toArray();
+	}
+
+	/**
+	 * Returns the index of the argument that is both the input and the output. <b>If there is no such argument (i.e. the Op produces a pure output), -1 is returned</b>
+	 * 
+	 * @return the index of the mutable argument.
+	 */
+	public int ioArgIndex() {
+		List<Member<?>> inputs = OpUtils.inputs(info.struct());
+		Optional<Member<?>> ioArg = inputs.stream().filter(m -> m.isInput() && m.isOutput()).findFirst();
+		if(ioArg.isEmpty()) return -1;
+		Member<?> ioMember = ioArg.get();
+		return inputs.indexOf(ioMember);
+	}
+
+	public boolean pureOutput() {
+		return ioArgIndex() == -1;
 	}
 
 }
