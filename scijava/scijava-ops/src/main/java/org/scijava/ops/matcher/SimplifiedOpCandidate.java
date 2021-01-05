@@ -16,6 +16,8 @@ import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.conversionLoss.LossReporter;
 import org.scijava.ops.core.Op;
+import org.scijava.ops.simplify.SimplificationMetadata;
+import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.struct.ItemIO;
 import org.scijava.struct.StructInstance;
 import org.scijava.types.Nil;
@@ -50,43 +52,37 @@ public class SimplifiedOpCandidate extends OpCandidate {
 					"Status of candidate to create op from indicates a problem: " + getStatus());
 		}
 
-		// resolve simplifiers
-		// TODO: consider correct parsing here.
-		List<OpInfo> refSimplifiers = ref.simplifierInfos();
-		Type[] originalInputs = ref.srcRef().getArgs();
-		Type[] simpleInputs = ref.getArgs();
-		List<Function<?, ?>> simplifiers = findArgMutators(refSimplifiers, originalInputs, simpleInputs);
+//		// obtain input simplifiers
+//		List<OpInfo> refSimplifiers = ref.simplifierInfos();
+//		Type[] originalInputs = ref.srcRef().getArgs();
+//		Type[] simpleInputs = ref.getArgs();
+//		List<Function<?, ?>> inputSimplifiers = SimplificationUtils.findArgMutators(env(), refSimplifiers, originalInputs, simpleInputs);
+//
+//		// obtain input focusers
+//		List<OpInfo> infoFocusers = opInfo().focuserInfos();
+//		Type[] unfocusedInputs = OpUtils.inputTypes(info.struct());
+//		Type[] focusedInputs = OpUtils.inputTypes(info.srcInfo().struct());
+//		List<Function<?, ?>> inputFocusers = SimplificationUtils.findArgMutators(env(), infoFocusers, unfocusedInputs, focusedInputs);
+//
+//		// obtain output simplifier
+//		OpInfo infoSimplifier = opInfo().simplifierInfo();
+//		Type originalOutput = OpUtils.outputs(info.srcInfo().struct()).get(0).getType();
+//		Type simpleOutput = OpUtils.outputs(info.struct()).get(0).getType();
+//		Function<?, ?> outputSimplifier = SimplificationUtils.findArgMutator(env(), infoSimplifier, originalOutput, simpleOutput);
+//
+//		// obtain output focuser
+//		OpInfo refFocuser = ref.focuserInfo();
+//		Type unfocusedOutput = ref.getOutType();
+//		Type focusedOutput = ref.srcRef().getOutType();
+//		Function<?, ?> outputFocuser = SimplificationUtils.findArgMutator(env(), refFocuser, unfocusedOutput, focusedOutput);
+//
+		SimplificationMetadata metadata = new SimplificationMetadata(ref, info, env());
 
-		// resolve focusers
-		// TODO: consider correct parsing here.
-		List<OpInfo> infoFocusers = info.focuserInfos();
-		Type[] unfocusedInputs = OpUtils.inputTypes(info.struct());
-		Type[] focusedInputs = OpUtils.inputTypes(info.srcInfo().struct());
-		List<Function<?, ?>> focusers = findArgMutators(infoFocusers, unfocusedInputs, focusedInputs);
-		SimplificationTypings typings = new SimplificationTypings(originalInputs, simpleInputs, unfocusedInputs, focusedInputs);
-
-		StructInstance<?> inst = opInfo().createOpInstance(dependencies, simplifiers, refSimplifiers, focusers, typings);
+		StructInstance<?> inst = opInfo().createOpInstance(dependencies, metadata);
 		return inst;
 	}
 
-	private List<Function<?, ?>> findArgMutators(List<OpInfo> mutatorInfos,
-		Type[] originalInputs, Type[] mutatedInputs)
-	{
-		if (mutatorInfos.size() != originalInputs.length)
-			throw new IllegalStateException(
-				"Mismatch between number of argument mutators and arguments in ref:\n" +
-					ref);
-		
-		List<Function<?, ?>> mutators = new ArrayList<>();
-		for(int i = 0; i < mutatorInfos.size(); i++) {
-			Type opType = Types.parameterize(Function.class, new Type[] {originalInputs[i], mutatedInputs[i]});
-			Function<?, ?> mutator = (Function<?, ?>) env().op(mutatorInfos.get(i),
-				Nil.of(opType), new Nil<?>[] { Nil.of(originalInputs[i]) }, Nil.of(
-					mutatedInputs[i]));
-			mutators.add(mutator);
-		}
-		return mutators;
-	}
+
 
 	@Override
 	public SimplifiedOpInfo opInfo() {

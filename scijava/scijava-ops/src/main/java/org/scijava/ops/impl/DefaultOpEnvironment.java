@@ -79,6 +79,7 @@ import org.scijava.ops.matcher.OpRef;
 import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.ops.simplify.Identity;
+import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.Simplifier;
 import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.util.OpWrapper;
@@ -401,7 +402,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				newReturnType = Types.mapVarToTypes(newReturnType, typeVarAssigns);
 
 				// TODO: not correct whenever there is a return type
-				Type newType = retypeOpRef(ref.getType(), newArgs, newReturnType);
+				Type newType = SimplificationUtils.retypeOpType(ref.getType(), newArgs, newReturnType);
 				OpRef simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType,
 					newArgs, simplification, outputFocuser);
 				simplifiedRefs.add(simplifiedRef);
@@ -412,50 +413,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return simplifiedRefs;
 	}
 
-	/**
-	 * Determines the {@code type} of a (new) {@link OpRef} using its old
-	 * {@code type}, a new set of {@code args} and a new {@code outType}. Used to
-	 * create {@link SimplifiedOpRef}s. <b>This method assumes that
-	 * {@code originalOpRefType} is (or is a subtype of) some
-	 * {@link FunctionalInterface} and that all {@link TypeVariable}s declared by
-	 * that {@code FunctionalInterface} are present in the signature of that
-	 * interface's single abstract method.</b>
-	 * 
-	 * @param originalOpRefType - the {@link Type} declared by the source
-	 *          {@link OpRef}
-	 * @param newArgs - the new argument {@link Type}s requested by the
-	 *          {@link OpRef}.
-	 * @param newOutType - the new output {@link Type} requested by the
-	 *          {@link OpRef}.
-	 * @return - a new {@code type} for a {@link SimplifiedOpRef}.
-	 */
-	private Type retypeOpRef(Type originalOpRefType, Type[] newArgs, Type newOutType) {
-			// only retype types that we know how to retype
-			if (!(originalOpRefType instanceof ParameterizedType))
-				throw new IllegalStateException("We hadn't thought about this yet.");
-			Class<?> opType = Types.raw(originalOpRefType);
-			Class<?> fIface = ParameterStructs.findFunctionalInterface(opType);
-			Method fMethod = ParameterStructs.singularAbstractMethod(fIface);
-			Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
-
-			// solve input types
-			Type[] genericParameterTypes = fMethod.getGenericParameterTypes();
-			MatchingUtils.inferTypeVariables(genericParameterTypes, newArgs, typeVarAssigns);
-
-			// solve output type
-			Type genericReturnType = fMethod.getGenericReturnType();
-			if (genericReturnType != void.class) {
-				MatchingUtils.inferTypeVariables(new Type[] {genericReturnType}, new Type[] {newOutType}, typeVarAssigns);
-			}
-			// TODO: if the output is also an input (i.e. we have a void return), do
-			// we need to ensure that the output focuser is the inverse of the input
-			// simplifier pertaining to the input/output argument?
-
-			// build new (read: simplified) Op type
-			Type newType = Types.parameterize(opType, typeVarAssigns);
-			return newType;
-	}
-	
 	private List<List<OpInfo>> simplifyArgs(List<Type> t){
 		return simplifyArgsFast(t);
 //		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
@@ -894,10 +851,11 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		for (List<OpInfo> inputFocusers : inputFocuserSets) {
 			for(OpInfo outputSimplifier: outputSimplifiers) {
 				// only add the simplification if it changes the signature.
-				SimplifiedOpInfo simpleInfo = new SimplifiedOpInfo(info, inputFocusers, outputSimplifier);
-				Type[] simpleArgs = OpUtils.inputTypes(simpleInfo.struct());
-				if(!Arrays.equals(args, simpleArgs))
-					addToOpIndex(simpleInfo, names);
+				try {
+					SimplifiedOpInfo simpleInfo = new SimplifiedOpInfo(info, inputFocusers, outputSimplifier);
+					Type[] simpleArgs = OpUtils.inputTypes(simpleInfo.struct());
+					if (!Arrays.equals(args, simpleArgs)) addToOpIndex(simpleInfo, names);
+				} catch(IllegalArgumentException e) {}
 			}
 		}
 	}

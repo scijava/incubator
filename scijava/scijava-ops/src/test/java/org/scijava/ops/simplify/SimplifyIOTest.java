@@ -3,6 +3,8 @@ package org.scijava.ops.simplify;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 import org.junit.Test;
@@ -18,13 +20,6 @@ public class SimplifyIOTest extends AbstractTestEnvironment{
 	@OpField(names = "test.math.square")
 	public final Function<Double, Double> squareOp = in -> in * in;
 
-	@OpField(names = "test.math.square")
-	public final Computers.Arity1<Double[], Double[]> squareArray = (in, out) -> {
-		for(int i = 0; i < in.length && i < out.length; i++) {
-			out[i] = squareOp.apply(in[i]);
-		}
-	};
-	
 	@Test
 	public void testFunctionOutputSimplification() {
 		Integer in = 4;
@@ -32,6 +27,13 @@ public class SimplifyIOTest extends AbstractTestEnvironment{
 		
 		assertEquals(square, 16, 0.);
 	}
+	
+	@OpField(names = "test.math.square")
+	public final Computers.Arity1<Double[], Double[]> squareArray = (in, out) -> {
+		for(int i = 0; i < in.length && i < out.length; i++) {
+			out[i] = squareOp.apply(in[i]);
+		}
+	};
 	
 	@Test
 	public void basicComputerTest() {
