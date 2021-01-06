@@ -191,10 +191,14 @@ public class SimplificationMetadata {
 	public Class<?>[] constructorClasses() {
 		// there are 2*numInputs input mutators, 2 output mutators
 		int numMutators = numInputs() * 2 + 2;
-		Class<?>[] args = new Class<?>[numMutators + 1];
+		// orignal Op plus a output copier if applicable
+		int numOps = hasCopyOp() ? 2 : 1;
+		Class<?>[] args = new Class<?>[numMutators + numOps];
 		for (int i = 0; i < numMutators; i++)
 			args[i] = Function.class;
-		args[args.length - 1] = opType();
+		args[args.length - numOps] = opType();
+		if(hasCopyOp())
+			args[args.length - 1] = Computers.Arity1.class;
 		return args;
 	}
 
@@ -217,6 +221,9 @@ public class SimplificationMetadata {
 		args.add(outputSimplifier);
 		args.add(outputFocuser);
 		args.add(op);
+		if(hasCopyOp())
+			args.add(copyOp.get());
+
 		return args.toArray();
 	}
 

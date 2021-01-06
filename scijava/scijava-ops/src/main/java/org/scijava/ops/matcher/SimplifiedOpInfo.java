@@ -27,6 +27,7 @@ import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.function.Computers;
 import org.scijava.ops.simplify.SimplificationMetadata;
 import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.SimplifiedMember;
@@ -208,7 +209,7 @@ public class SimplifiedOpInfo implements OpInfo {
 		}
 		struct = () -> newItems;
 	}
-	
+
 	private SimplifiedMember<?> createSimpleMember(Member<?> m, Type simpleInput, Type simpleOutput){
 		Map<TypeVariable<?>, Type> map = new HashMap<>();
 		// if there are type variables, we have to reify them
@@ -446,12 +447,19 @@ public class SimplifiedOpInfo implements OpInfo {
 		generateNFields(pool, cc, "outputFocuser", 1);
 
 		// Add Op field
-		CtField opField = createOpField(pool, cc, metadata.opType());
+		CtField opField = createOpField(pool, cc, metadata.opType(), "op");
 		cc.addField(opField);
+
+		// Add copy Op field iff not pure output
+		if(metadata.hasCopyOp()) {
+			CtField copyOpField = createOpField(pool, cc, Computers.Arity1.class,
+				"copyOp");
+			cc.addField(copyOpField);
+		}
 
 		// Add constructor to take the Simplifiers, as well as the original op.
 		CtConstructor constructor = CtNewConstructor.make(createConstructor(cc,
-			metadata.opType(), metadata.numInputs()), cc);
+			metadata), cc);
 		cc.addConstructor(constructor);
 
 		// add functional interface method
@@ -465,7 +473,7 @@ public class SimplifiedOpInfo implements OpInfo {
 		int numFields) throws NotFoundException, CannotCompileException
 	{
 		for (int i = 0; i < numFields; i++) {
-			CtField f = createMutatorField(pool, cc, base, i);
+			CtField f = createMutatorField(pool, cc, Function.class, base + i);
 			cc.addField(f);
 		}
 	}
@@ -489,21 +497,20 @@ public class SimplifiedOpInfo implements OpInfo {
 		return sb.toString();
 	}
 
-	private CtField createMutatorField(ClassPool pool, CtClass cc, String name, int i) throws NotFoundException,
+	private CtField createMutatorField(ClassPool pool, CtClass cc, Class<?> fieldType, String name) throws NotFoundException,
 		CannotCompileException
 	{
-		Class<?> simplifierClass = Function.class;
-		CtClass fType = pool.get(simplifierClass.getName());
-		CtField f = new CtField(fType, name + i, cc);
+		CtClass fType = pool.get(fieldType.getName());
+		CtField f = new CtField(fType, name, cc);
 		f.setModifiers(Modifier.PRIVATE + Modifier.FINAL);
 		return f;
 	}
 
-	private CtField createOpField(ClassPool pool, CtClass cc, Class<?> opType)
+	private CtField createOpField(ClassPool pool, CtClass cc, Class<?> opType, String fieldName)
 		throws NotFoundException, CannotCompileException
 	{
 		CtClass fType = pool.get(opType.getName());
-		CtField f = new CtField(fType, "op", cc);
+		CtField f = new CtField(fType, fieldName, cc);
 		f.setModifiers(Modifier.PRIVATE + Modifier.FINAL);
 		return f;
 	}
@@ -530,18 +537,18 @@ public class SimplifiedOpInfo implements OpInfo {
 		return sb.toString();
 	}
 
-	private String createConstructor(CtClass cc, Class<?> opClass, int numInputs) {
+	private String createConstructor(CtClass cc, SimplificationMetadata metadata) {
 		StringBuilder sb = new StringBuilder();
 		// constructor signature
 		sb.append("public " + cc.getSimpleName() + "(");
 		Class<?> depClass = Function.class;
 		// input simplifiers
-		for (int i = 0; i < numInputs; i++) {
+		for (int i = 0; i < metadata.numInputs(); i++) {
 			sb.append(depClass.getName() + " inputSimplifier" + i);
 			sb.append(",");
 		}
 		// input focusers
-		for (int i = 0; i < numInputs; i++) {
+		for (int i = 0; i < metadata.numInputs(); i++) {
 			sb.append(depClass.getName() + " inputFocuser" + i);
 			sb.append(",");
 		}
@@ -552,19 +559,28 @@ public class SimplifiedOpInfo implements OpInfo {
 		sb.append(depClass.getName() + " outputFocuser0" );
 		sb.append(",");
 		// op
+		Class<?> opClass = metadata.opType();
 		sb.append(" " + opClass.getName() + " op");
+		// copy op
+		if(metadata.hasCopyOp()) {
+			Class<?> copyOpClass = Computers.Arity1.class;
+			sb.append(", " + copyOpClass.getName() + " copyOp");
+		}
 		sb.append(") {");
 
 		// assign dependencies to field
-		for (int i = 0; i < numInputs; i++) {
+		for (int i = 0; i < metadata.numInputs(); i++) {
 			sb.append("this.inputSimplifier" + i + " = inputSimplifier" + i + ";");
 		}
-		for (int i = 0; i < numInputs; i++) {
+		for (int i = 0; i < metadata.numInputs(); i++) {
 			sb.append("this.inputFocuser" + i + " = inputFocuser" + i + ";");
 		}
 		sb.append("this.outputSimplifier0" + " = outputSimplifier0" + ";");
 		sb.append("this.outputFocuser0" + " = outputFocuser0" + ";");
 		sb.append("this.op = op;");
+		if(metadata.hasCopyOp()) {
+			sb.append("this.copyOp = copyOp;");
+		}
 		sb.append("}");
 		return sb.toString();
 	}
@@ -672,7 +688,10 @@ public class SimplifiedOpInfo implements OpInfo {
 		// postprocessing
 		sb.append(fMethodPostprocessing(metadata, opOutput));
 
-		sb.append("return out;");
+		// if pure output, return it
+		if (metadata.pureOutput()) {
+			sb.append("return out;");
+		}
 		sb.append("}");
 		return sb.toString();
 	}
@@ -695,6 +714,10 @@ public class SimplifiedOpInfo implements OpInfo {
 
 		// call copy op iff it exists
 		if(metadata.hasCopyOp()) {
+			int ioIndex = metadata.ioArgIndex();
+			Type ioType = metadata.originalInputs()[ioIndex];
+			String originalIOArg = "in" + ioIndex;
+			sb.append("copyOp.compute((" + focused.getTypeName() + ") out, (" + ioType.getTypeName() + ") " + originalIOArg + ");");
 			
 		}
 

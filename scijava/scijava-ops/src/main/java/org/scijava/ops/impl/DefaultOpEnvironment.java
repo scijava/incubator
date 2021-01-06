@@ -413,8 +413,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				if( mutableIndex!= -1) {
 					Type copyType = originalArgs[mutableIndex];
 					Type copierType = Types.parameterize(Computers.Arity1.class, new Type[] {copyType, copyType});
-					Computers.Arity1<?, ?> copyOp = (Arity1<?, ?>) op("copy", Nil.of(
-						copierType), new Nil<?>[] { Nil.of(copyType) }, Nil.of(copyType));
+					Computers.Arity1<?, ?> copyOp;
+					try {
+						copyOp = (Arity1<?, ?>) findOpInstance("copy", Nil.of(
+							copierType), new Nil<?>[] { Nil.of(copyType), Nil.of(copyType) }, Nil.of(copyType));
+					} catch (OpMatchingException e) {
+						continue;
+					}
 					simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType, newArgs, simplification, outputFocuser, copyOp);
 					
 				}

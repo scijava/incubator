@@ -286,7 +286,7 @@ public final class ParameterStructs {
 
 	public static Method singularAbstractMethod(Class<?> functionalInterface) {
 		Method[] typeMethods = Arrays.stream(functionalInterface
-			.getDeclaredMethods()).filter(method -> Modifier.isAbstract(method
+			.getMethods()).filter(method -> Modifier.isAbstract(method
 				.getModifiers())).toArray(Method[]::new);
 		if (typeMethods.length != 1) {
 			throw new IllegalArgumentException(functionalInterface +
