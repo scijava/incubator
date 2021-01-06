@@ -49,23 +49,51 @@ public class SimplificationUtils {
 				throw new IllegalStateException("We hadn't thought about this yet.");
 			Class<?> opType = Types.raw(originalOpType);
 			Method fMethod = findFMethod(opType);
+
 			Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
 
 			// solve input types
-			Type[] genericParameterTypes = fMethod.getGenericParameterTypes();
+			Type[] genericParameterTypes = paramTypesFromOpType(opType, fMethod);
 			MatchingUtils.inferTypeVariables(genericParameterTypes, newArgs, typeVarAssigns);
 
 			// solve output type
-			Type genericReturnType = fMethod.getGenericReturnType();
+			Type genericReturnType = returnTypeFromOpType(opType, fMethod);
 			if (genericReturnType != void.class) {
 				MatchingUtils.inferTypeVariables(new Type[] {genericReturnType}, new Type[] {newOutType}, typeVarAssigns);
 			}
-			// TODO: if the output is also an input (i.e. we have a void return), do
-			// we need to ensure that the output focuser is the inverse of the input
-			// simplifier pertaining to the input/output argument?
 
 			// build new (read: simplified) Op type
 			return Types.parameterize(opType, typeVarAssigns);
+	}
+
+	static Type[] paramTypesFromOpType(Class<?> opType,
+		Method fMethod)
+	{
+		Type[] genericParameterTypes = fMethod.getGenericParameterTypes();
+		if(fMethod.getDeclaringClass().equals(opType))
+			return genericParameterTypes;
+		return typesFromOpType(opType, fMethod, genericParameterTypes);
+		
+	}
+
+	static Type returnTypeFromOpType(Class<?> opType,
+		Method fMethod)
+	{
+		Type genericReturnType = fMethod.getGenericReturnType();
+		if(fMethod.getDeclaringClass().equals(opType))
+			return genericReturnType;
+		return typesFromOpType(opType, fMethod, genericReturnType)[0];
+	}
+
+	private static Type[] typesFromOpType(Class<?> opType, Method fMethod, Type... types) {
+		Map<TypeVariable<?>, Type> map = new HashMap<>();
+		Class<?> declaringClass = fMethod.getDeclaringClass();
+		Type genericDeclaringClass = Types.parameterizeRaw(declaringClass);
+		Type genericClass = Types.parameterizeRaw(opType);
+		Type superGenericClass = Types.getExactSuperType(genericClass, declaringClass);
+		MatchingUtils.inferTypeVariables(new Type[] {genericDeclaringClass}, new Type[] {superGenericClass}, map);
+
+		return Types.mapVarToTypes(types, map);
 	}
 
 	public static Method findFMethod(Class<?> c) {
