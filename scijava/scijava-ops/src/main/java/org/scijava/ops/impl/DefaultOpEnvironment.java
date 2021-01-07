@@ -144,13 +144,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * whether the Ops associated with that particular name. 
 	 */
 	private Set<String> simplifiedNames;
-	
-	/**
-	 * Data structure storing all known {@link Simplifier}s. A set of suitable
-	 * {@code Simplifier}s can be retrieved by providing the raw
-	 * {@code focusedType} of the {@code Simplifier}
-	 */
-	private Map<Class<?>, List<Simplifier<?, ?>>> simplifiers;
 
 	public DefaultOpEnvironment(final Context context) {
 		context.inject(this);
