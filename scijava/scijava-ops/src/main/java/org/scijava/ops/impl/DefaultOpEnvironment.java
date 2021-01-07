@@ -359,7 +359,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	private List<OpRef> getRefSimplifications(OpRef ref)
 		throws OpMatchingException
 	{
-
 		// simplify all inputs
 		// TODO: these will be needed to ensure that the simplified parameters
 		// satisfy the class' type variables.
@@ -371,62 +370,62 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		// satisfy the class' type variables.
 		List<OpInfo> focusedOutputs = getFocusers(ref.getOutType());
 
-//		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
-
 		// build a list of new OpRefs based on simplified inputs
 		List<OpRef> simplifiedRefs = new ArrayList<>();
 		for (List<OpInfo> simplification : simplifications) {
-			for (OpInfo outputFocuser: focusedOutputs) {
-
-				// TODO: ensure that the given type parameters are within the bounds of
-				// the op type's type parameters.
-				// For all built-in op types (e.g. Function, Computer), the type
-				// parameters are unbounded. But, for extensibility, we should check.
-				Type[] simplifierInputs = simplification.stream().map(info -> info.inputs().get(0).getType()).toArray(Type[]::new);
-				Type[] newArgs = simplification.stream().map(info -> info.output().getType()).toArray(Type[]::new);
-				// TODO: this seems really inefficient. Can we improve?
-				for(int i = 0; i < newArgs.length; i++) {
-					newArgs[i] = SimplificationUtils.resolveMutatorTypeArgs(originalArgs[i], simplifierInputs[i], newArgs[i]);
-//					typeVarAssigns.clear();
-//					MatchingUtils.inferTypeVariables(new Type[] {simplifierInputs[i]}, new Type[] {originalArgs[i]}, typeVarAssigns);
-//					newArgs[i] = Types.mapVarToTypes(newArgs[i], typeVarAssigns);
+			for (OpInfo outputFocuser : focusedOutputs) {
+				try {
+					SimplifiedOpRef simplifiedRef = generateSimplifiedRef(simplification,
+						outputFocuser, ref);
+					simplifiedRefs.add(simplifiedRef);
 				}
-				Type focuserOutput = outputFocuser.output().getType();
-				Type newReturnType = outputFocuser.inputs().get(0).getType();
-				newReturnType = SimplificationUtils.resolveMutatorTypeArgs(ref.getOutType(), focuserOutput, newReturnType);
-//				typeVarAssigns.clear();
-//				MatchingUtils.inferTypeVariables(new Type[] {focuserOutput}, new Type[] {ref.getOutType()}, typeVarAssigns);
-//				newReturnType = Types.mapVarToTypes(newReturnType, typeVarAssigns);
-				Type newType = SimplificationUtils.retypeOpType(ref.getType(), newArgs, newReturnType);
-				// if the Op's output is mutable, we will also need a copy Op for it.
-
-				Class<?> opType = Types.raw(ref.getType());
-				OpRef simplifiedRef;
-				int mutableIndex = SimplificationUtils.findMutableArgIndex(opType);
-				if( mutableIndex!= -1) {
-					Type copyType = originalArgs[mutableIndex];
-					Type copierType = Types.parameterize(Computers.Arity1.class, new Type[] {copyType, copyType});
-					Computers.Arity1<?, ?> copyOp;
-					try {
-						copyOp = (Arity1<?, ?>) findOpInstance("copy", Nil.of(
-							copierType), new Nil<?>[] { Nil.of(copyType), Nil.of(copyType) }, Nil.of(copyType));
-					} catch (OpMatchingException e) {
-						continue;
-					}
-					simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType, newArgs, simplification, outputFocuser, copyOp);
-					
+				catch (OpMatchingException e) {
+					continue;
 				}
-				else {
-					// TODO: not correct whenever there is a return type
-					simplifiedRef = new SimplifiedOpRef(ref, newType, newReturnType,
-						newArgs, simplification, outputFocuser);
-				}
-				simplifiedRefs.add(simplifiedRef);
 			}
 		}
 		if (simplifiedRefs.size() == 0) throw new OpMatchingException(
 			"No simplifications exist for ref: \n" + ref);
 		return simplifiedRefs;
+	}
+
+	private SimplifiedOpRef generateSimplifiedRef(List<OpInfo> simplification, OpInfo outputFocuser, OpRef originalRef) throws OpMatchingException {
+		// TODO: ensure that the given type parameters are within the bounds of
+		// the op type's type parameters.
+		// For all built-in op types (e.g. Function, Computer), the type
+		// parameters are unbounded. But, for extensibility, we should check.
+		Type[] simplifierInputs = simplification.stream().map(info -> info.inputs().get(0).getType()).toArray(Type[]::new);
+		Type[] newArgs = simplification.stream().map(info -> info.output().getType()).toArray(Type[]::new);
+		// TODO: this seems really inefficient. Can we improve?
+		for(int i = 0; i < newArgs.length; i++) {
+			newArgs[i] = SimplificationUtils.resolveMutatorTypeArgs(originalRef.getArgs()[i], simplifierInputs[i], newArgs[i]);
+		}
+		Type focuserOutput = outputFocuser.output().getType();
+		Type newReturnType = outputFocuser.inputs().get(0).getType();
+		newReturnType = SimplificationUtils.resolveMutatorTypeArgs(originalRef.getOutType(), focuserOutput, newReturnType);
+		Type newType = SimplificationUtils.retypeOpType(originalRef.getType(), newArgs, newReturnType);
+		// if the Op's output is mutable, we will also need a copy Op for it.
+
+		Class<?> opType = Types.raw(originalRef.getType());
+		int mutableIndex = SimplificationUtils.findMutableArgIndex(opType);
+		if( mutableIndex!= -1) {
+			Computers.Arity1<?, ?> copyOp = simplifierCopyOp(originalRef.getArgs()[mutableIndex]);
+			return new SimplifiedOpRef(originalRef, newType, newReturnType, newArgs, simplification, outputFocuser, copyOp);
+		}
+		return new SimplifiedOpRef(originalRef, newType, newReturnType,
+			newArgs, simplification, outputFocuser);
+	}
+
+	// WARNING: If no copy Computers.Arity1 exists for copyType (i.e. a
+	// Computers.Arity1<copyType, copyType>) then this method will result in an
+	// infinite recursive loop. This problem can be immediately solved by ensuring
+	// that a copy Op Computers.Arity1<copyType, copyType> exists, and will be
+	// permanently fixed with the introduction of hints (see
+	// scijava/scijava-ops#43)
+	private Computers.Arity1<?, ?> simplifierCopyOp(Type copyType) throws OpMatchingException{
+			Type copierType = Types.parameterize(Computers.Arity1.class, new Type[] {copyType, copyType});
+			return (Arity1<?, ?>) findOpInstance("copy", Nil.of(
+				copierType), new Nil<?>[] { Nil.of(copyType), Nil.of(copyType) }, Nil.of(copyType));
 	}
 
 	private List<List<OpInfo>> simplifyArgs(List<Type> t){
