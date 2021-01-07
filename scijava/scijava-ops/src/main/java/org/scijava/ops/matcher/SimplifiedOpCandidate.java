@@ -52,32 +52,7 @@ public class SimplifiedOpCandidate extends OpCandidate {
 					"Status of candidate to create op from indicates a problem: " + getStatus());
 		}
 
-//		// obtain input simplifiers
-//		List<OpInfo> refSimplifiers = ref.simplifierInfos();
-//		Type[] originalInputs = ref.srcRef().getArgs();
-//		Type[] simpleInputs = ref.getArgs();
-//		List<Function<?, ?>> inputSimplifiers = SimplificationUtils.findArgMutators(env(), refSimplifiers, originalInputs, simpleInputs);
-//
-//		// obtain input focusers
-//		List<OpInfo> infoFocusers = opInfo().focuserInfos();
-//		Type[] unfocusedInputs = OpUtils.inputTypes(info.struct());
-//		Type[] focusedInputs = OpUtils.inputTypes(info.srcInfo().struct());
-//		List<Function<?, ?>> inputFocusers = SimplificationUtils.findArgMutators(env(), infoFocusers, unfocusedInputs, focusedInputs);
-//
-//		// obtain output simplifier
-//		OpInfo infoSimplifier = opInfo().simplifierInfo();
-//		Type originalOutput = OpUtils.outputs(info.srcInfo().struct()).get(0).getType();
-//		Type simpleOutput = OpUtils.outputs(info.struct()).get(0).getType();
-//		Function<?, ?> outputSimplifier = SimplificationUtils.findArgMutator(env(), infoSimplifier, originalOutput, simpleOutput);
-//
-//		// obtain output focuser
-//		OpInfo refFocuser = ref.focuserInfo();
-//		Type unfocusedOutput = ref.getOutType();
-//		Type focusedOutput = ref.srcRef().getOutType();
-//		Function<?, ?> outputFocuser = SimplificationUtils.findArgMutator(env(), refFocuser, unfocusedOutput, focusedOutput);
-//
 		SimplificationMetadata metadata = new SimplificationMetadata(ref, info, env());
-
 		StructInstance<?> inst = opInfo().createOpInstance(dependencies, metadata);
 		return inst;
 	}
@@ -124,10 +99,6 @@ public class SimplifiedOpCandidate extends OpCandidate {
 		// TODO: will these ever be incorrectly ordered?
 		Type[] refInTypes = ref.srcRef().getArgs();
 		Type[] infoInTypes = OpUtils.inputTypes(info.srcInfo().struct());
-//		Nil<?>[] refInTypes = ref.simplifierInfos().stream().map(s -> Nil.of(s
-//			.inputs().get(0).getType())).toArray(Nil[]::new);
-//		Nil<?>[] infoInTypes = info.focuserInfos().stream().map(s -> Nil.of(s
-//			.output().getType())).toArray(Nil[]::new);
 
 		for (int i = 0; i < refInTypes.length; i++) {
 			penalty += determineLoss(Nil.of(refInTypes[i]), Nil.of(infoInTypes[i]));

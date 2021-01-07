@@ -404,8 +404,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		Type newReturnType = outputFocuser.inputs().get(0).getType();
 		newReturnType = SimplificationUtils.resolveMutatorTypeArgs(originalRef.getOutType(), focuserOutput, newReturnType);
 		Type newType = SimplificationUtils.retypeOpType(originalRef.getType(), newArgs, newReturnType);
-		// if the Op's output is mutable, we will also need a copy Op for it.
 
+		// if the Op's output is mutable, we will also need a copy Op for it.
 		Class<?> opType = Types.raw(originalRef.getType());
 		int mutableIndex = SimplificationUtils.findMutableArgIndex(opType);
 		if( mutableIndex!= -1) {
@@ -428,63 +428,29 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				copierType), new Nil<?>[] { Nil.of(copyType), Nil.of(copyType) }, Nil.of(copyType));
 	}
 
-	private List<List<OpInfo>> simplifyArgs(List<Type> t){
-		return simplifyArgsFast(t);
-//		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
-	}
-
-	private List<List<OpInfo>> focusArgs(List<Type> t){
-		return focusArgsFast(t);
-//		return simplifyArgs(t, 0, new ArrayList<Simplifier<?, ?>>());
-	}
-	
-//	private List<List<Simplifier<?, ?>>> simplifyArgs(List<Type> t, int i, List<Simplifier<?, ?>> simplifiers){
-//		if (i >= t.size()) return Collections.singletonList(simplifiers);
-//		List<List<Simplifier<?, ?>>> result = new ArrayList<>();
-//		Type original = t.get(i);
-//		List<Simplifier<?, ?>> simplifiedArgs = getSimplifiers(original);
-//		for (Simplifier<?, ?> simplified : simplifiedArgs) {
-//			List<Simplifier<?, ?>> copy = new ArrayList<>(simplifiers);
-//			copy.add(i, simplified);
-//			result.addAll(simplifyArgs(t, i + 1, copy));
-//		}
-//		return result;
-//	}
-//	
 	/**
 	 * Uses Google Guava to generate a list of permutations of each available
 	 * simplification possibility
 	 */
-	private List<List<OpInfo>> simplifyArgsFast(List<Type> t){
-		// TODO: can we use parallelStream?
-//		List<List<Function<?, ? >>> typeSimplifiers = t.stream() //
-//				.map(type -> StreamSupport.stream(infos("simplify").spliterator().) //
-//				.collect(Collectors.toList());
-//		return Lists.cartesianProduct(typeSimplifiers);
+	private List<List<OpInfo>> focusArgs(List<Type> t){
+		List<List<OpInfo>> typeSimplifiers = t.stream() //
+				.map(type -> getFocusers(type)) //
+				.collect(Collectors.toList());
+		return Lists.cartesianProduct(typeSimplifiers);
+	}
+
+	/**
+	 * Uses Google Guava to generate a list of permutations of each available
+	 * simplification possibility
+	 */
+	private List<List<OpInfo>> simplifyArgs(List<Type> t){
 		// TODO: can we use parallelStream?
 		List<List<OpInfo>> typeSimplifiers = t.stream() //
 				.map(type -> getSimplifiers(type)) //
 				.collect(Collectors.toList());
 		return Lists.cartesianProduct(typeSimplifiers);
 	}
-	
-	/**
-	 * Uses Google Guava to generate a list of permutations of each available
-	 * simplification possibility
-	 */
-	private List<List<OpInfo>> focusArgsFast(List<Type> t){
-		// TODO: can we use parallelStream?
-//		List<List<Function<?, ? >>> typeSimplifiers = t.stream() //
-//				.map(type -> StreamSupport.stream(infos("simplify").spliterator().) //
-//				.collect(Collectors.toList());
-//		return Lists.cartesianProduct(typeSimplifiers);
-		// TODO: can we use parallelStream?
-		List<List<OpInfo>> typeSimplifiers = t.stream() //
-				.map(type -> getFocusers(type)) //
-				.collect(Collectors.toList());
-		return Lists.cartesianProduct(typeSimplifiers);
-	}
-	
+
 	/**
 	 * Obtains all {@link Simplifier}s known to the environment that can operate
 	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
@@ -501,12 +467,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				.filter(info -> Types.isAssignable(t, info.inputs().get(0).getType())) //
 				.collect(Collectors.toList());
 		return list;
-//		System.out.println("Simplifier request made");
-//		if (simplifiers == null) initSimplifiers();
-//		List<Simplifier<?, ?>> list = simplifiers.get(Types.raw(t));
-//		// TODO: if t is generic, we might need to do further work
-//		if (list != null) return list;
-//		return Collections.singletonList(new Identity<>(t)); 
 	}
 
 	/**
@@ -525,12 +485,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				.filter(info -> Types.isAssignable(t, info.output().getType())) //
 				.collect(Collectors.toList());
 		return list;
-//		System.out.println("Simplifier request made");
-//		if (simplifiers == null) initSimplifiers();
-//		List<Simplifier<?, ?>> list = simplifiers.get(Types.raw(t));
-//		// TODO: if t is generic, we might need to do further work
-//		if (list != null) return list;
-//		return Collections.singletonList(new Identity<>(t)); 
 	}
 
 	/**
@@ -833,25 +787,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		simplifiedNames = new HashSet<>();
 	}
 	
-//	private synchronized void initSimplifiers() {
-//		if(simplifiers != null) return;
-//		Map<Class<?>, List<OpInfo>> temp = new HashMap<>();
-//		for (OpInfo s : infos("simplify")) {
-//			if(Types.raw(s.opType()) != Function.class) continue;
-//			Class<?> focused = Types.raw(s.inputs().get(0).getType());
-//			if(!temp.containsKey(focused)) {
-//				temp.put(focused, new ArrayList<>());
-//			}
-//				temp.get(focused).add(s);
-//		}
-//		
-//		for (Class<?> c : temp.keySet()) {
-//			temp.get(c).add(new Identity<?>());
-//		}
-//		
-//		simplifiers = temp;
-//	}
-	
 	// TODO: we currently only assume that all inputs are pure inputs and all
 	// outputs are pure outputs. This logic will have to be improved.
 	// TODO: think of a better name
@@ -860,7 +795,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		if (!(opType instanceof ParameterizedType)) return;
 		Type[] args = OpUtils.inputTypes(info.struct()); 
 		Type outType = info.output().getType();
-//		args.remove(args.size() - 1);
 		List<List<OpInfo>> inputFocuserSets = focusArgs(Arrays.asList(args));
 		List<OpInfo> outputSimplifiers = getSimplifiers(outType);
 		for (List<OpInfo> inputFocusers : inputFocuserSets) {

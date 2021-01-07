@@ -72,35 +72,8 @@ public class SimplifiedOpInfo implements OpInfo {
 		this.srcInfo = info;
 		this.focuserInfos = focuserInfos;
 		this.outputSimplifier = outputSimplifier;
-
-		// NOTE: we lazily initialize this struct since we already know that it is fundamentally valid
-//		try {
-//			Iterator<Simplifier<?, ?>> itr = simplification.iterator();
-//			final List<Member<?>> originalItems = info.struct().members();
-//			final List<Member<?>> newItems = new ArrayList<>();
-//			for (Member<?> m : originalItems) {
-//				if(m.isInput()) {
-//					try {
-//						SimplifiedMember<?> sm = new SimplifiedMember<>(m, itr.next().simpleType());
-//						newItems.add(sm);
-//					} catch(NoSuchElementException e) {
-//						throw e;
-//					}
-//				}
-//				else {
-//					newItems.add(m);
-//				}
-//			}
-//			struct = () -> newItems;
-//		}
-//		catch (ValidityException e) {
-//			validityException = e;
-//		}
 	}
 
-	// TODO: We assume that this is a Function of some type.
-	// We also assume that simplifiers exist for all inputs ONLY.
-	// FIXME: generalize
 	/**
 	 * Generates the type of the Op where all inputs have been simplified by the
 	 * use of {@link Simplifier}s. NB: This generation is done lazily to
@@ -120,16 +93,6 @@ public class SimplifiedOpInfo implements OpInfo {
 		Type simpleOutType = simpleOutTypes[0];
 
 		simplifiedType = SimplificationUtils.retypeOpType(originalInfo.opType(), simpleTypeArgs, simpleOutType);
-
-//		// generate simplified type
-//		List<Type> simplifiedTypes = focuserInfos.stream().map(s -> s.output().getType())
-//			.collect(Collectors.toList());
-//		if (!(originalInfo.opType() instanceof ParameterizedType))
-//			throw new UnsupportedOperationException(
-//				"I am not smart enough to handle this yet.");
-//		simplifiedTypes.add(srcInfo.output().getType());
-//		Class<?> rawType = Types.raw(originalInfo.opType());
-//		simplifiedType = Types.parameterize(rawType, simplifiedTypes.toArray(Type[]::new));
 	}
 
 	@Override
@@ -210,21 +173,6 @@ public class SimplifiedOpInfo implements OpInfo {
 		struct = () -> newItems;
 	}
 
-	private SimplifiedMember<?> createSimpleMember(Member<?> m, Type simpleInput, Type simpleOutput){
-		Map<TypeVariable<?>, Type> map = new HashMap<>();
-		// if there are type variables, we have to reify them
-		if (Types.containsTypeVars(simpleInput)) {
-			// we assume here that if there is a type variable somewhere in the
-			// type, it is indicative of an identity simplification.
-			// TODO: we might have to infer the type variables against the input
-			// to the simplifier, NOT the output (which is SimpleMemberType)
-			MatchingUtils.inferTypeVariables(new Type[] {simpleInput}, new Type[] {m.getType()}, map);
-			simpleOutput = Types.mapVarToTypes(simpleOutput, map);
-		}
-		// create simplifiedMember from m
-		return new SimplifiedMember<>(m, simpleOutput);	
-	}
-
 	@Override
 	public double priority() {
 		// The original info should hold priority over this one
@@ -252,16 +200,6 @@ public class SimplifiedOpInfo implements OpInfo {
 	public StructInstance<?> createOpInstance(List<?> dependencies) {
 		throw new UnsupportedOperationException(
 			"This Op cannot be instantiated without simplifiers/focusers");
-//		final Object op = srcInfo.createOpInstance(dependencies).object();
-//		try {
-//			return struct().createInstance(javassistOp(op));
-//		}
-//		catch (Throwable ex) {
-//			throw new IllegalStateException(
-//				"Failed to invoke simplification of Op: \n" + srcInfo +
-//					"\nProvided Op dependencies were: " + Objects.toString(dependencies),
-//				ex);
-//		}
 	}
 
 	/**
@@ -353,78 +291,6 @@ public class SimplifiedOpInfo implements OpInfo {
 		return c.getDeclaredConstructor(metadata.constructorClasses())
 			.newInstance(metadata.constructorArgs(originalOp));
 	}
-	
-	// TODO: delete. We cannot instantiate the Op without having the simplifier/focuser Functions
-//	/**
-//	 * Creates a Class given an Op and a set of {@link Simplifier}s. This class:
-//	 * <ul>
-//	 * <li>is of the same functional type as the given Op
-//	 * <li>has type arguments that are of the simplified form of the type
-//	 * arguments of the given Op (these arguments are dictated by the list of
-//	 * {@code Simplifier}s.
-//	 * <li>
-//	 * 
-//	 * @param m - the {@link OpMethod}
-//	 * @param dependencies - the {@OpDependency}s associated with {@code m}
-//	 * @return a partial application of {@code m} with all {@link OpDependency}s
-//	 *         injected.
-//	 * @throws Throwable
-//	 */
-//	private Object javassistOp(Object originalOp) throws Throwable {
-//		ClassPool pool = ClassPool.getDefault();
-//
-//		// Create wrapper class
-//		String className = formClassName(srcInfo);
-//		Class<?> opType = Types.raw(srcInfo.opType());
-//		Class<?> c;
-//		try {
-//			c = pool.getClassLoader().loadClass(className);
-//		}
-//		catch (ClassNotFoundException e) {
-//			CtClass cc = generateSimplifiedWrapper(pool, className, opType);
-//			c = cc.toClass(MethodHandles.lookup());
-//		}
-
-//		// Return Op instance
-//		List<Class<?>> constructorArgs = simplifiers.stream().map(
-//			simplifier -> Simplifier.class).collect(Collectors.toList());
-//		constructorArgs.add(opType);
-//		List<Object> args = new ArrayList<>(simplifiers);
-//		args.add(originalOp);
-//		return c.getDeclaredConstructor(constructorArgs.toArray(Class[]::new))
-//			.newInstance(args.toArray());
-//	}
-
-//	private CtClass generateSimplifiedWrapper(ClassPool pool, String className,
-//		Class<?> opType) throws Throwable
-//	{
-//		CtClass cc = pool.makeClass(className);
-//
-//		// Add implemented interface
-//		CtClass jasOpType = pool.get(opType.getName());
-//		cc.addInterface(jasOpType);
-//
-//		// Add Simplifier fields
-//		for (int i = 0; i < simplifiers.size(); i++) {
-//			CtField f = createMutatorField(pool, cc, "simplifier", i);
-//			cc.addField(f);
-//		}
-//
-//		// Add Op field
-//		CtField opField = createOpField(pool, cc, opType);
-//		cc.addField(opField);
-//
-//		// Add constructor to take the Simplifiers, as well as the original op.
-//		CtConstructor constructor = CtNewConstructor.make(createConstructor(cc,
-//			opType), cc);
-//		cc.addConstructor(constructor);
-//
-//		// add functional interface method
-//		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(opType),
-//			cc);
-//		cc.addMethod(functionalMethod);
-//		return cc;
-//	}
 
 	private CtClass generateSimplifiedWrapper(ClassPool pool, String className, SimplificationMetadata metadata) throws Throwable
 	{
@@ -513,28 +379,6 @@ public class SimplifiedOpInfo implements OpInfo {
 		CtField f = new CtField(fType, fieldName, cc);
 		f.setModifiers(Modifier.PRIVATE + Modifier.FINAL);
 		return f;
-	}
-
-	private String createConstructor(CtClass cc, Class<?> opClass) {
-		StringBuilder sb = new StringBuilder();
-		// constructor signature
-		sb.append("public " + cc.getSimpleName() + "(");
-		for (int i = 0; i < focuserInfos.size(); i++) {
-			// TODO: can this just be Simplifier.class?
-			Class<?> depClass = Simplifier.class;
-			sb.append(depClass.getName() + " simplifier" + i);
-			sb.append(",");
-		}
-		sb.append(" " + opClass.getName() + " op");
-		sb.append(") {");
-
-		// assign dependencies to field
-		for (int i = 0; i < focuserInfos.size(); i++) {
-			sb.append("this.simplifier" + i + " = simplifier" + i + ";");
-		}
-		sb.append("this.op = op;");
-		sb.append("}");
-		return sb.toString();
 	}
 
 	private String createConstructor(CtClass cc, SimplificationMetadata metadata) {
@@ -641,11 +485,8 @@ public class SimplifiedOpInfo implements OpInfo {
 	 * At compile time, the raw types are equivalent to the generic types, so this
 	 * should not pose any issues.
 	 * 
-	 * @param opType - used to determine what the call to the original Op should
-	 *          look like.
-	 * @param typings - a {@link SimplificationTypings} object declaring the
-	 *          typing transformation from original {@OpRef} input to original
-	 *          {@link OpInfo} input.
+	 * @param metadata - the {@link SimplificationMetadata} containing the
+	 *          information needed to write the method.
 	 * @return a {@link String} that can be used by
 	 *         {@link CtMethod#make(String, CtClass)} to generate the functional
 	 *         method of the simplified Op
