@@ -69,8 +69,7 @@ import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers.Arity1;
 import org.scijava.ops.matcher.DefaultOpMatcher;
-import org.scijava.ops.matcher.GraphBasedSimplifiedOpInfo;
-import org.scijava.ops.matcher.GraphBasedSimplifiedOpRef;
+import org.scijava.ops.matcher.MatchingResult;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
@@ -83,6 +82,9 @@ import org.scijava.ops.matcher.OpMethodInfo;
 import org.scijava.ops.matcher.OpRef;
 import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
+import org.scijava.ops.simplify.GraphBasedSimplifiedOpCandidate;
+import org.scijava.ops.simplify.GraphBasedSimplifiedOpInfo;
+import org.scijava.ops.simplify.GraphBasedSimplifiedOpRef;
 import org.scijava.ops.simplify.Identity;
 import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.Simplifier;
@@ -170,9 +172,9 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		if (opDirectory == null) initOpDirectory();
 		if (name == null || name.isEmpty()) return infos();
 		// initialize all SimplifiedInfos with matching name
-		if(!simplifiedNames.contains(name)) {
-			simplifyInfos(name);
-		}
+//		if(!simplifiedNames.contains(name)) {
+//			simplifyInfos(name);
+//		}
 		return opsOfName(name);
 	}
 
@@ -348,10 +350,19 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		GraphBasedSimplifiedOpRef simplifiedRef = getRefSimplifications(ref);
 		Class<?> functionalType = Types.raw(simplifiedRef.getType());
 		Stream<OpInfo> infoStream = StreamSupport.stream(infos(ref.getName()).spliterator(), true);
-		GraphBasedSimplifiedOpInfo[] simpleInfos = infoStream.filter(info -> Types
+		List<GraphBasedSimplifiedOpCandidate> candidates = infoStream.filter(info -> Types
 			.isAssignable(Types.raw(info.opType()), functionalType))//
-			.filter(info -> simplifiedRef.matchExists(info)).toArray(
-				GraphBasedSimplifiedOpInfo[]::new);
+			.map(info -> new GraphBasedSimplifiedOpCandidate(this, log, simplifiedRef, info))
+			.collect(Collectors.toList());
+		List<GraphBasedSimplifiedOpCandidate> matches = candidates.parallelStream()
+			.filter(candidate -> candidate.getStatusCode() == StatusCode.MATCH)
+			.collect(Collectors.toList());
+		// HACK
+		return matches.get(0);
+//		List<OpRef> originalQueries = new ArrayList<>();
+//		originalQueries.add(ref);
+//		return new MatchingResult(candidates, matches, originalQueries).singleMatch();
+
 
 		// find match based on simplifications
 //		return matcher.findMatch(this, simplifiedRefs).singleMatch();
@@ -367,8 +378,16 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	private GraphBasedSimplifiedOpRef getRefSimplifications(OpRef ref)
-//		throws OpMatchingException
+		throws OpMatchingException
 	{
+		// if the Op's output is mutable, we will also need a copy Op for it.
+		Class<?> opType = Types.raw(ref.getType());
+		int mutableIndex = SimplificationUtils.findMutableArgIndex(opType);
+		if (mutableIndex != -1) {
+			Computers.Arity1<?, ?> copyOp = simplifierCopyOp(ref
+				.getArgs()[mutableIndex]);
+			return new GraphBasedSimplifiedOpRef(ref, this, copyOp);
+		}
 		return new GraphBasedSimplifiedOpRef(ref, this);
 //		// simplify all inputs
 //		// TODO: these will be needed to ensure that the simplified parameters
@@ -743,22 +762,25 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	// outputs are pure outputs. This logic will have to be improved.
 	// TODO: think of a better name
 	private void simplifyInfo(OpInfo info, String names) {
-		Type opType = info.opType();
-		if (!(opType instanceof ParameterizedType)) return;
-		Type[] args = OpUtils.inputTypes(info.struct()); 
-		Type outType = info.output().getType();
-		List<List<OpInfo>> inputFocuserSets = focusArgs(Arrays.asList(args));
-		List<OpInfo> outputSimplifiers = getSimplifiers(outType);
-		for (List<OpInfo> inputFocusers : inputFocuserSets) {
-			for(OpInfo outputSimplifier: outputSimplifiers) {
-				// only add the simplification if it changes the signature.
-				try {
-					SimplifiedOpInfo simpleInfo = new SimplifiedOpInfo(info, inputFocusers, outputSimplifier);
-					Type[] simpleArgs = OpUtils.inputTypes(simpleInfo.struct());
-					if (!Arrays.equals(args, simpleArgs)) addToOpIndex(simpleInfo, names);
-				} catch(IllegalArgumentException e) {}
-			}
-		}
+		GraphBasedSimplifiedOpInfo simpleInfo = new GraphBasedSimplifiedOpInfo(info, this);
+		addToOpIndex(simpleInfo, names);
+
+//		Type opType = info.opType();
+//		if (!(opType instanceof ParameterizedType)) return;
+//		Type[] args = OpUtils.inputTypes(info.struct()); 
+//		Type outType = info.output().getType();
+//		List<List<OpInfo>> inputFocuserSets = focusArgs(Arrays.asList(args));
+//		List<OpInfo> outputSimplifiers = getSimplifiers(outType);
+//		for (List<OpInfo> inputFocusers : inputFocuserSets) {
+//			for(OpInfo outputSimplifier: outputSimplifiers) {
+//				// only add the simplification if it changes the signature.
+//				try {
+//					SimplifiedOpInfo simpleInfo = new SimplifiedOpInfo(info, inputFocusers, outputSimplifier);
+//					Type[] simpleArgs = OpUtils.inputTypes(simpleInfo.struct());
+//					if (!Arrays.equals(args, simpleArgs)) addToOpIndex(simpleInfo, names);
+//				} catch(IllegalArgumentException e) {}
+//			}
+//		}
 	}
 
 	private void addToOpIndex(final OpInfo opInfo, final String opNames) {
