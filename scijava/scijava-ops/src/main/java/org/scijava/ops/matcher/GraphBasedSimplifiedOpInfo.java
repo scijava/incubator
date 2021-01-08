@@ -4,7 +4,10 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpUtils;
+import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.param.ValidityException;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
@@ -12,11 +15,26 @@ import org.scijava.struct.StructInstance;
 
 public class GraphBasedSimplifiedOpInfo implements OpInfo {
 
-	List<OpInfo>[] focuserSets;
-	OpInfo srcInfo;
+	private final OpInfo srcInfo;
+	private final List<List<OpInfo>> focuserSets;
+	private final List<OpInfo> outputSimplifiers;
 
-	public List<OpInfo> getFocusers(int arg){
-		return focuserSets[arg];
+	public GraphBasedSimplifiedOpInfo(OpInfo info, OpEnvironment env) {
+		this.srcInfo = info;
+		Type[] args = OpUtils.inputs(srcInfo.struct()).stream() //
+				.map(m -> m.getType()) //
+				.toArray(Type[]::new);
+		this.focuserSets = SimplificationUtils.focusArgs(env, args);
+		Type outType = info.output().getType();
+		this.outputSimplifiers = SimplificationUtils.getSimplifiers(env, outType);
+	}
+
+	public List<List<OpInfo>> getFocusers(){
+		return focuserSets;
+	}
+
+	public List<OpInfo> getOutputSimplifiers(){
+		return outputSimplifiers;
 	}
 
 	public OpInfo srcInfo() {

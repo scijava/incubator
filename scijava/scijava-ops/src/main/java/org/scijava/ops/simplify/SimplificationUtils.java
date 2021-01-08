@@ -1,15 +1,21 @@
 package org.scijava.ops.simplify;
 
+import com.google.common.collect.Lists;
+
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
@@ -178,5 +184,63 @@ public class SimplificationUtils {
 					mutatedInput));
 			return mutator;
 	}
+
+	/**
+	 * Uses Google Guava to generate a list of permutations of each available
+	 * simplification possibility
+	 */
+	public static List<List<OpInfo>> simplifyArgs(OpEnvironment env, Type... t){
+		return Arrays.stream(t) //
+				.map(type -> getSimplifiers(env, type)) //
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Obtains all {@link Simplifier}s known to the environment that can operate
+	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
+	 * {@code t}, an {@link Identity} simplifier will be created.
+	 * 
+	 * @param t - the {@link Type} we are interested in simplifying.
+	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
+	 */
+	public static List<OpInfo> getSimplifiers(OpEnvironment env, Type t) {
+		// TODO: optimize
+		Stream<OpInfo> infoStream = StreamSupport.stream(env.infos("simplify").spliterator(), true);
+		List<OpInfo> list = infoStream//
+				.filter(info -> Function.class.isAssignableFrom(Types.raw(info.opType()))) //
+				.filter(info -> Types.isAssignable(t, info.inputs().get(0).getType())) //
+				.collect(Collectors.toList());
+		return list;
+	}
+
+	/**
+	 * Uses Google Guava to generate a list of permutations of each available
+	 * simplification possibility
+	 */
+	public static List<List<OpInfo>> focusArgs(OpEnvironment env, Type... t){
+		return Arrays.stream(t) //
+			.map(type -> getFocusers(env, type)) //
+			.collect(Collectors.toList());
+	}
+
+
+	/**
+	 * Obtains all {@link Simplifier}s known to the environment that can operate
+	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
+	 * {@code t}, an {@link Identity} simplifier will be created.
+	 * 
+	 * @param t - the {@link Type} we are interested in simplifying.
+	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
+	 */
+	public static List<OpInfo> getFocusers(OpEnvironment env, Type t) {
+		// TODO: optimize
+		Stream<OpInfo> infoStream = StreamSupport.stream(env.infos("focus").spliterator(), true);
+		List<OpInfo> list = infoStream//
+				.filter(info -> Function.class.isAssignableFrom(Types.raw(info.opType()))) //
+				.filter(info -> Types.isAssignable(t, info.output().getType())) //
+				.collect(Collectors.toList());
+		return list;
+	}
+
 
 }

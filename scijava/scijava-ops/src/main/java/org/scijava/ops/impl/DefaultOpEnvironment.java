@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.scijava.AbstractContextual;
@@ -68,6 +69,8 @@ import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers.Arity1;
 import org.scijava.ops.matcher.DefaultOpMatcher;
+import org.scijava.ops.matcher.GraphBasedSimplifiedOpInfo;
+import org.scijava.ops.matcher.GraphBasedSimplifiedOpRef;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
@@ -341,10 +344,17 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 
 	private OpCandidate simplifiedOp(OpRef ref) throws OpMatchingException {
 		// obtain simplifications for ref
-		List<OpRef> simplifiedRefs = getRefSimplifications(ref);
+//		List<OpRef> simplifiedRefs = getRefSimplifications(ref);
+		GraphBasedSimplifiedOpRef simplifiedRef = getRefSimplifications(ref);
+		Class<?> functionalType = Types.raw(simplifiedRef.getType());
+		Stream<OpInfo> infoStream = StreamSupport.stream(infos(ref.getName()).spliterator(), true);
+		GraphBasedSimplifiedOpInfo[] simpleInfos = infoStream.filter(info -> Types
+			.isAssignable(Types.raw(info.opType()), functionalType))//
+			.filter(info -> simplifiedRef.matchExists(info)).toArray(
+				GraphBasedSimplifiedOpInfo[]::new);
 
 		// find match based on simplifications
-		return matcher.findMatch(this, simplifiedRefs).singleMatch();
+//		return matcher.findMatch(this, simplifiedRefs).singleMatch();
 	}
 
 	private synchronized void simplifyInfos(String name) {
@@ -356,37 +366,38 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		simplifiedNames.add(name);
 	}
 
-	private List<OpRef> getRefSimplifications(OpRef ref)
-		throws OpMatchingException
+	private GraphBasedSimplifiedOpRef getRefSimplifications(OpRef ref)
+//		throws OpMatchingException
 	{
-		// simplify all inputs
-		// TODO: these will be needed to ensure that the simplified parameters
-		// satisfy the class' type variables.
-		Type[] originalArgs = ref.getArgs();
-		List<List<OpInfo>> simplifications = simplifyArgs(Arrays.asList(originalArgs));
-
-		// focus the output
-		// TODO: these will be needed to ensure that the simplified parameters
-		// satisfy the class' type variables.
-		List<OpInfo> focusedOutputs = getFocusers(ref.getOutType());
-
-		// build a list of new OpRefs based on simplified inputs
-		List<OpRef> simplifiedRefs = new ArrayList<>();
-		for (List<OpInfo> simplification : simplifications) {
-			for (OpInfo outputFocuser : focusedOutputs) {
-				try {
-					SimplifiedOpRef simplifiedRef = generateSimplifiedRef(simplification,
-						outputFocuser, ref);
-					simplifiedRefs.add(simplifiedRef);
-				}
-				catch (OpMatchingException e) {
-					continue;
-				}
-			}
-		}
-		if (simplifiedRefs.size() == 0) throw new OpMatchingException(
-			"No simplifications exist for ref: \n" + ref);
-		return simplifiedRefs;
+		return new GraphBasedSimplifiedOpRef(ref, this);
+//		// simplify all inputs
+//		// TODO: these will be needed to ensure that the simplified parameters
+//		// satisfy the class' type variables.
+//		Type[] originalArgs = ref.getArgs();
+//		List<List<OpInfo>> simplifications = simplifyArgs(Arrays.asList(originalArgs));
+//
+//		// focus the output
+//		// TODO: these will be needed to ensure that the simplified parameters
+//		// satisfy the class' type variables.
+//		List<OpInfo> focusedOutputs = getFocusers(ref.getOutType());
+//
+//		// build a list of new OpRefs based on simplified inputs
+//		List<OpRef> simplifiedRefs = new ArrayList<>();
+//		for (List<OpInfo> simplification : simplifications) {
+//			for (OpInfo outputFocuser : focusedOutputs) {
+//				try {
+//					SimplifiedOpRef simplifiedRef = generateSimplifiedRef(simplification,
+//						outputFocuser, ref);
+//					simplifiedRefs.add(simplifiedRef);
+//				}
+//				catch (OpMatchingException e) {
+//					continue;
+//				}
+//			}
+//		}
+//		if (simplifiedRefs.size() == 0) throw new OpMatchingException(
+//			"No simplifications exist for ref: \n" + ref);
+//		return simplifiedRefs;
 	}
 
 	private SimplifiedOpRef generateSimplifiedRef(List<OpInfo> simplification, OpInfo outputFocuser, OpRef originalRef) throws OpMatchingException {
@@ -426,65 +437,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			Type copierType = Types.parameterize(Computers.Arity1.class, new Type[] {copyType, copyType});
 			return (Arity1<?, ?>) findOpInstance("copy", Nil.of(
 				copierType), new Nil<?>[] { Nil.of(copyType), Nil.of(copyType) }, Nil.of(copyType));
-	}
-
-	/**
-	 * Uses Google Guava to generate a list of permutations of each available
-	 * simplification possibility
-	 */
-	private List<List<OpInfo>> focusArgs(List<Type> t){
-		List<List<OpInfo>> typeSimplifiers = t.stream() //
-				.map(type -> getFocusers(type)) //
-				.collect(Collectors.toList());
-		return Lists.cartesianProduct(typeSimplifiers);
-	}
-
-	/**
-	 * Uses Google Guava to generate a list of permutations of each available
-	 * simplification possibility
-	 */
-	private List<List<OpInfo>> simplifyArgs(List<Type> t){
-		// TODO: can we use parallelStream?
-		List<List<OpInfo>> typeSimplifiers = t.stream() //
-				.map(type -> getSimplifiers(type)) //
-				.collect(Collectors.toList());
-		return Lists.cartesianProduct(typeSimplifiers);
-	}
-
-	/**
-	 * Obtains all {@link Simplifier}s known to the environment that can operate
-	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
-	 * {@code t}, an {@link Identity} simplifier will be created.
-	 * 
-	 * @param t - the {@link Type} we are interested in simplifying.
-	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
-	 */
-	private List<OpInfo> getSimplifiers(Type t) {
-		// TODO: optimize
-		Set<OpInfo> infos = opsOfName("simplify");
-		List<OpInfo> list = infos.parallelStream() //
-				.filter(info -> Function.class.isAssignableFrom(Types.raw(info.opType()))) //
-				.filter(info -> Types.isAssignable(t, info.inputs().get(0).getType())) //
-				.collect(Collectors.toList());
-		return list;
-	}
-
-	/**
-	 * Obtains all {@link Simplifier}s known to the environment that can operate
-	 * on {@code t}. If no {@code Simplifier}s are known to explicitly work on
-	 * {@code t}, an {@link Identity} simplifier will be created.
-	 * 
-	 * @param t - the {@link Type} we are interested in simplifying.
-	 * @return a list of {@link Simplifier}s that can simplify {@code t}.
-	 */
-	private List<OpInfo> getFocusers(Type t) {
-		// TODO: optimize
-		Set<OpInfo> infos = opsOfName("focus");
-		List<OpInfo> list = infos.parallelStream() //
-				.filter(info -> Function.class.isAssignableFrom(Types.raw(info.opType()))) //
-				.filter(info -> Types.isAssignable(t, info.output().getType())) //
-				.collect(Collectors.toList());
-		return list;
 	}
 
 	/**
