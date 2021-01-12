@@ -5,20 +5,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.scijava.Priority;
 import org.scijava.log.Logger;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
-import org.scijava.ops.OpUtils;
 import org.scijava.ops.conversionLoss.LossReporter;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.matcher.OpCandidate;
@@ -29,22 +25,29 @@ import org.scijava.struct.StructInstance;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
 
-public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
+public class SimplifiedOpCandidate extends OpCandidate {
 
-	private final GraphBasedSimplifiedOpInfo info;
-	private final GraphBasedSimplifiedOpRef ref;
+	private final SimplifiedOpInfo info;
+	private final SimplifiedOpRef ref;
 	private final TypePair[] argPairings;
 	private final TypePair outPairing;
 	private final Map<TypePair, ChainCluster> pathways;
 
-	public GraphBasedSimplifiedOpCandidate(OpEnvironment env, Logger log,
-		GraphBasedSimplifiedOpRef ref, OpInfo info)
+	public SimplifiedOpCandidate(OpEnvironment env, Logger log, OpRef ref,
+		SimplifiedOpInfo info)
 	{
-		this(env, log, ref, new GraphBasedSimplifiedOpInfo(info, env));
+		super(env, log, ref, info, new HashMap<>());
+		throw new UnsupportedOperationException("TODO: support info-only simplification");
 	}
 
-	public GraphBasedSimplifiedOpCandidate(OpEnvironment env, Logger log,
-		GraphBasedSimplifiedOpRef ref, GraphBasedSimplifiedOpInfo info)
+	public SimplifiedOpCandidate(OpEnvironment env, Logger log,
+		SimplifiedOpRef ref, OpInfo info)
+	{
+		this(env, log, ref, new SimplifiedOpInfo(info, env));
+	}
+
+	public SimplifiedOpCandidate(OpEnvironment env, Logger log,
+		SimplifiedOpRef ref, SimplifiedOpInfo info)
 	{
 		super(env, log, ref, info, new HashMap<>());
 		setStatus(StatusCode.MATCH);
@@ -70,14 +73,6 @@ public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
 
 	}
 
-
-	public GraphBasedSimplifiedOpCandidate(OpEnvironment env, Logger log, OpRef ref,
-		GraphBasedSimplifiedOpInfo info)
-	{
-		super(env, log, ref, info, new HashMap<>());
-		throw new UnsupportedOperationException("TODO: support info-only simplification");
-	}
-
 	@Override
 	public StructInstance<?> createOpInstance(List<?> dependencies) throws OpMatchingException
 	{
@@ -85,7 +80,7 @@ public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
 			throw new OpMatchingException(
 					"Status of candidate to create op from indicates a problem: " + getStatus());
 		}
-		
+
 		Map<TypePair, MutatorChain> chains = new HashMap<>();
 		pathways.forEach((pair, cluster) -> chains.put(pair, resolveCluster(cluster)));
 
@@ -97,11 +92,11 @@ public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
 
 
 	@Override
-	public GraphBasedSimplifiedOpInfo opInfo() {
+	public SimplifiedOpInfo opInfo() {
 		return info;
 	}
 
-	private static Map<TypePair, ChainCluster> findPathways(GraphBasedSimplifiedOpRef ref, GraphBasedSimplifiedOpInfo info) {
+	private static Map<TypePair, ChainCluster> findPathways(SimplifiedOpRef ref, SimplifiedOpInfo info) {
 		if (ref.srcRef().getArgs().length != info.inputs().size())
 			throw new IllegalArgumentException(
 				"ref and info must have the same number of arguments!");
@@ -132,8 +127,8 @@ public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
 		return pathways;
 	}
 
-	private static TypePair[] generatePairings(GraphBasedSimplifiedOpRef ref,
-		GraphBasedSimplifiedOpInfo info)
+	private static TypePair[] generatePairings(SimplifiedOpRef ref,
+		SimplifiedOpInfo info)
 	{
 		Type[] originalArgs = ref.srcRef().getArgs();
 		Type[] originalParams = info.srcInfo().inputs().stream().map(m -> m.getType())
@@ -144,7 +139,7 @@ public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
 		return pairings;
 	}
 
-	private static TypePair generateOutPairing(GraphBasedSimplifiedOpRef ref, GraphBasedSimplifiedOpInfo info) {
+	private static TypePair generateOutPairing(SimplifiedOpRef ref, SimplifiedOpInfo info) {
 		return new TypePair(info.srcInfo().output().getType(), ref.srcRef().getOutType());
 	}
 
@@ -164,7 +159,7 @@ public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
 	}
 
 	/**
-	 * We define the priority of any {@link GraphBasedSimplifiedOpCandidate} as the sum of
+	 * We define the priority of any {@link SimplifiedOpCandidate} as the sum of
 	 * the following:
 	 * <ul>
 	 * <li>{@link Priority#VERY_LOW} to ensure that simplifications are not chosen
@@ -243,15 +238,13 @@ public class GraphBasedSimplifiedOpCandidate extends OpCandidate {
 class ChainCluster {
 
 	private final List<MutatorChain> chains;
-	private final TypePair typeConversion;
 
-	public ChainCluster(TypePair typeConversion) {
+	private ChainCluster() {
 		this.chains = new ArrayList<>();
-		this.typeConversion = typeConversion;
 	}
 	
 	public static ChainCluster generateCluster(TypePair pairing, List<OpInfo> simplifiers, List<OpInfo> focusers) {
-		ChainCluster cluster = new ChainCluster(pairing);
+		ChainCluster cluster = new ChainCluster();
 		List<List<OpInfo>> chains = Lists.cartesianProduct(simplifiers, focusers);
 
 		for(List<OpInfo> chainList : chains) {

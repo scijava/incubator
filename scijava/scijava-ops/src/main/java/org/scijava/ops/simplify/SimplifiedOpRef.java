@@ -15,21 +15,21 @@ import org.scijava.ops.OpInfo;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.matcher.OpRef;
 
-public class GraphBasedSimplifiedOpRef extends OpRef {
+public class SimplifiedOpRef extends OpRef {
 
 	private final OpRef srcRef;
 	private final List<List<OpInfo>> simplifierSets;
 	private final List<OpInfo> outputFocusers;
 	private final Optional<Computers.Arity1<?, ?>> copyOp;
 
-	public GraphBasedSimplifiedOpRef(String name, Type type, Type outType,
+	public SimplifiedOpRef(String name, Type type, Type outType,
 		Type[] args)
 	{
 		super(name, type, outType, args);
 		throw new UnsupportedOperationException("Simplified OpRef requires original OpRef!");
 	}
 
-	public GraphBasedSimplifiedOpRef(OpRef ref, OpEnvironment env) {
+	public SimplifiedOpRef(OpRef ref, OpEnvironment env) {
 		// TODO: this is probably incorrect
 		super(ref.getName(), ref.getType(), ref.getOutType(), ref.getArgs());
 		this.srcRef = ref;
@@ -38,7 +38,7 @@ public class GraphBasedSimplifiedOpRef extends OpRef {
 		this.copyOp = Optional.empty();
 	}
 
-	public GraphBasedSimplifiedOpRef(OpRef ref, OpEnvironment env, Computers.Arity1<?, ?> copyOp) {
+	public SimplifiedOpRef(OpRef ref, OpEnvironment env, Computers.Arity1<?, ?> copyOp) {
 		// TODO: this is probably incorrect
 		super(ref.getName(), ref.getType(), ref.getOutType(), ref.getArgs());
 		this.srcRef = ref;
@@ -47,7 +47,7 @@ public class GraphBasedSimplifiedOpRef extends OpRef {
 		this.copyOp = Optional.of(copyOp);
 	}
 
-	public boolean matchExists(GraphBasedSimplifiedOpInfo info) {
+	public boolean matchExists(SimplifiedOpInfo info) {
 
 		if (srcRef.getArgs().length != info.inputs().size())
 			throw new IllegalArgumentException(

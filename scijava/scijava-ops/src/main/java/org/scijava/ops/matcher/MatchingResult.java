@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.simplify.GraphBasedSimplifiedOpCandidate;
+import org.scijava.ops.simplify.SimplifiedOpCandidate;
 
 /**
  * Class representing the result from type matching done by the
@@ -60,9 +60,9 @@ public class MatchingResult {
 		}
 		// HACK: If all matches are SimplifiedOpCandidates with the same source
 		// OpInfo, it does not matter which is returned.
-		if (matches.size() > 1 && matches.stream().allMatch(c -> c instanceof GraphBasedSimplifiedOpCandidate)) {
+		if (matches.size() > 1 && matches.stream().allMatch(c -> c instanceof SimplifiedOpCandidate)) {
 			boolean simplifiedFromSameInfo = matches.parallelStream()
-					.map(c -> (GraphBasedSimplifiedOpCandidate) c) // cast all OpCandidates
+					.map(c -> (SimplifiedOpCandidate) c) // cast all OpCandidates
 					.map(sc -> sc.opInfo().srcInfo()) // obtain each OpInfo
 					.collect(Collectors.toSet()).size() == 1; // determine if all OpInfos are the same
 			

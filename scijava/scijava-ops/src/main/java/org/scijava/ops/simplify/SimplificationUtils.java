@@ -21,7 +21,6 @@ import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpRef;
-import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.ops.util.AnnotationUtils;
 import org.scijava.param.Mutable;
 import org.scijava.param.ParameterStructs;

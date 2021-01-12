@@ -4,7 +4,6 @@ package org.scijava.ops.simplify;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,9 +14,7 @@ import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.struct.Member;
-import org.scijava.struct.Struct;
 import org.scijava.util.Types;
 
 /**
@@ -28,7 +25,7 @@ import org.scijava.util.Types;
  */
 public class SimplificationMetadata {
 
-	private final GraphBasedSimplifiedOpInfo info;
+	private final SimplifiedOpInfo info;
 	private final Class<?> opType;
 //	private final SimplifiedOpRef ref;
 	private final MutatorChain[] argChains;
@@ -47,34 +44,7 @@ public class SimplificationMetadata {
 
 	private final int numInputs;
 
-//	public SimplificationMetadata(SimplifiedOpRef ref, SimplifiedOpInfo info,
-//		OpEnvironment env)
-//	{
-//		this.ref = ref;
-//		this.info = info;
-//
-//		this.refSimplifiers = ref.simplifierInfos();
-//		this.inputSimplifiers = inputSimplifiers(ref, env, this.refSimplifiers);
-//
-//		this.infoFocusers = info.focuserInfos();
-//		this.inputFocusers = inputFocusers(info, env, this.infoFocusers);
-//
-//		this.infoSimplifier = info.simplifierInfo();
-//		this.outputSimplifier = outputSimplifier(info, env, this.infoSimplifier);
-//
-//		this.refFocuser = ref.focuserInfo();
-//		this.outputFocuser = outputFocuser(ref, env, this.refFocuser);
-//
-//		this.copyOp = ref.copyOp();
-//
-//		if (refSimplifiers.size() != infoFocusers.size())
-//			throw new IllegalArgumentException(
-//				"Invalid SimplificationMetadata for Op" + info +
-//					"\n - incompatible number of input simplifiers and focusers");
-//		numInputs = refSimplifiers.size();
-//	}
-
-	public SimplificationMetadata(GraphBasedSimplifiedOpRef ref, GraphBasedSimplifiedOpInfo info, TypePair[] argPairs, TypePair outPair, Map<TypePair, MutatorChain> mutators,
+	public SimplificationMetadata(SimplifiedOpRef ref, SimplifiedOpInfo info, TypePair[] argPairs, TypePair outPair, Map<TypePair, MutatorChain> mutators,
 		OpEnvironment env)
 	{
 		this.info = info;
@@ -274,7 +244,7 @@ public class SimplificationMetadata {
 		return ioArgIndex() == -1;
 	}
 
-	public GraphBasedSimplifiedOpInfo info() {
+	public SimplifiedOpInfo info() {
 		return info;
 	}
 

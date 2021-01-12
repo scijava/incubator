@@ -38,13 +38,13 @@ import javassist.CtNewMethod;
 import javassist.NotFoundException;
 
 
-public class GraphBasedSimplifiedOpInfo implements OpInfo {
+public class SimplifiedOpInfo implements OpInfo {
 
 	private final OpInfo srcInfo;
 	private final List<List<OpInfo>> focuserSets;
 	private final List<OpInfo> outputSimplifiers;
 
-	public GraphBasedSimplifiedOpInfo(OpInfo info, OpEnvironment env) {
+	public SimplifiedOpInfo(OpInfo info, OpEnvironment env) {
 		this.srcInfo = info;
 		Type[] args = OpUtils.inputs(srcInfo.struct()).stream() //
 				.map(m -> m.getType()) //
@@ -154,12 +154,12 @@ public class GraphBasedSimplifiedOpInfo implements OpInfo {
 		if(implNameDiff != 0) return implNameDiff; 
 
 		// compare structs if the OpInfos are "sibling" SimplifiedOpInfos
-		if(that instanceof GraphBasedSimplifiedOpInfo) return compareToSimplifiedInfo((GraphBasedSimplifiedOpInfo) that);
+		if(that instanceof SimplifiedOpInfo) return compareToSimplifiedInfo((SimplifiedOpInfo) that);
 
 		return 0;
 	}
 
-	private int compareToSimplifiedInfo(GraphBasedSimplifiedOpInfo that) {
+	private int compareToSimplifiedInfo(SimplifiedOpInfo that) {
 		// Compare structs
 		List<Member<?>> theseMembers = new ArrayList<>();
 		this.struct().forEach(theseMembers::add);
