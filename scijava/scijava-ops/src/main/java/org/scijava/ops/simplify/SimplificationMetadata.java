@@ -15,8 +15,6 @@ import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.matcher.SimplifiedOpCandidate;
-import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
@@ -274,6 +272,10 @@ public class SimplificationMetadata {
 
 	public boolean pureOutput() {
 		return ioArgIndex() == -1;
+	}
+
+	public GraphBasedSimplifiedOpInfo info() {
+		return info;
 	}
 
 }

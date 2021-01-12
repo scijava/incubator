@@ -80,7 +80,6 @@ import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
 import org.scijava.ops.matcher.OpRef;
-import org.scijava.ops.matcher.SimplifiedOpInfo;
 import org.scijava.ops.matcher.SimplifiedOpRef;
 import org.scijava.ops.simplify.GraphBasedSimplifiedOpCandidate;
 import org.scijava.ops.simplify.GraphBasedSimplifiedOpInfo;
@@ -333,13 +332,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					return simplifiedOp(ref);
 				}
 				catch (OpMatchingException e3) {
-					// TODO: do something
+					// no direct, adapted, or simplified matches
+					OpMatchingException adaptedMatchException = new OpMatchingException(
+						"No Op available for request: " + ref, e1);
+					adaptedMatchException.addSuppressed(e2);
+					adaptedMatchException.addSuppressed(e3);
+					throw adaptedMatchException;
 				}
-				// no adapted match
-				OpMatchingException adaptedMatchException = new OpMatchingException(
-					"No Op available for request: " + ref, e2);
-				adaptedMatchException.addSuppressed(e1);
-				throw adaptedMatchException;
 			}
 		}
 	}
@@ -357,15 +356,11 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		List<GraphBasedSimplifiedOpCandidate> matches = candidates.parallelStream()
 			.filter(candidate -> candidate.getStatusCode() == StatusCode.MATCH)
 			.collect(Collectors.toList());
+
 		// HACK
+		if(matches.isEmpty())
+			throw new OpMatchingException("No simplifications found for ref " + ref);
 		return matches.get(0);
-//		List<OpRef> originalQueries = new ArrayList<>();
-//		originalQueries.add(ref);
-//		return new MatchingResult(candidates, matches, originalQueries).singleMatch();
-
-
-		// find match based on simplifications
-//		return matcher.findMatch(this, simplifiedRefs).singleMatch();
 	}
 
 	private synchronized void simplifyInfos(String name) {
@@ -592,7 +587,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				continue;
 			}
 
-			if(adaptor instanceof SimplifiedOpInfo) {
+			if(adaptor instanceof GraphBasedSimplifiedOpInfo) {
 				log.debug(adaptor + " has been simplified. This is likely a typo.");
 			}
 

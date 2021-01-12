@@ -1,11 +1,14 @@
 package org.scijava.ops.simplify;
 
+import com.google.common.collect.Streams;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -123,7 +126,7 @@ public class GraphBasedSimplifiedOpInfo implements OpInfo {
 			return struct().createInstance(javassistOp(op, metadata));
 		}
 		catch (Throwable ex) {
-			throw new IllegalStateException(
+			throw new IllegalArgumentException(
 				"Failed to invoke simplification of Op: \n" + srcInfo +
 					"\nProvided Op dependencies were: " + Objects.toString(dependencies),
 				ex);
@@ -186,7 +189,7 @@ public class GraphBasedSimplifiedOpInfo implements OpInfo {
 		ClassPool pool = ClassPool.getDefault();
 
 		// Create wrapper class
-		String className = formClassName(srcInfo);
+		String className = formClassName(metadata);
 		Class<?> c;
 		try {
 			c = pool.getClassLoader().loadClass(className);
@@ -202,22 +205,44 @@ public class GraphBasedSimplifiedOpInfo implements OpInfo {
 	}
 
 	// TODO: consider correctness
-	private String formClassName(OpInfo original) {
+	private String formClassName(SimplificationMetadata metadata) {
 		// package name - required to be this package for the Lookup to work
 		String packageName = this.getClass().getPackageName();
-		StringBuilder sb = new StringBuilder(packageName);
+		StringBuilder sb = new StringBuilder(packageName + ".");
 
 		// class name
-		String implementationName = original.implementationName();
+		String implementationName = metadata.info().implementationName();
 		String originalName = implementationName.substring(implementationName
-			.lastIndexOf('.')); // we only want the class name (with a preceeding dot)
-		sb.append(originalName + "_simplified_");
-		Stream<String> memberNames = struct().members().stream().map(
-			member -> member.getRawType().getSimpleName());
+			.lastIndexOf('.') + 1); // we only want the class name
+		Stream<String> memberNames = //
+			Streams.concat(Arrays.stream(metadata.originalInputs()), //
+				Stream.of(metadata.originalOutput())) //
+				.map(type -> getClassName(Types.raw(type)));
 		Iterable<String> iterableNames = (Iterable<String>) memberNames::iterator;
 		String simplifiedParameters = String.join("_", iterableNames);
-		sb.append(simplifiedParameters);
+		String className = originalName.concat("_simplified_" + simplifiedParameters);
+		if(className.chars().anyMatch(c -> !Character.isJavaIdentifierPart(c)))
+			throw new IllegalArgumentException(className + " is not a valid class name!");
+
+		sb.append(className);
 		return sb.toString();
+	}
+
+	/**
+	 * {@link Class}es of array types return "[]" when
+	 * {@link Class#getSimpleName()} is called. Those characters are invalid in a
+	 * class name, so we exchange them for the suffix "_Arr".
+	 * 
+	 * @param c - the {@link Class} for which we need a name
+	 * @return - a name that is legal as part of a class name.
+	 */
+	private String getClassName(Class<?> clazz) {
+		String className = clazz.getSimpleName();
+		if(className.chars().allMatch(c -> Character.isJavaIdentifierPart(c)))
+			return className;
+		if(clazz.isArray())
+			return clazz.getComponentType().getSimpleName() + "_Arr";
+		return className;
 	}
 
 	private CtClass generateSimplifiedWrapper(ClassPool pool, String className, SimplificationMetadata metadata) throws Throwable
