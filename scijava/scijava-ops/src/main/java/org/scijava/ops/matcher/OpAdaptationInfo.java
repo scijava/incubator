@@ -23,15 +23,15 @@ import org.scijava.struct.StructInstance;
  */
 public class OpAdaptationInfo implements OpInfo {
 
-	private OpInfo srcInfo;
+	private OpCandidate srcCandidate;
 	private Type type;
 	private Function<Object, Object> adaptor;
 
 	private Struct struct;
 	private ValidityException validityException;
 
-	public OpAdaptationInfo(OpInfo srcInfo, Type type, Function<Object, Object> adaptor) {
-		this.srcInfo = srcInfo;
+	public OpAdaptationInfo(OpCandidate srcCandidate, Type type, Function<Object, Object> adaptor) {
+		this.srcCandidate = srcCandidate;
 		this.type = type;
 		this.adaptor = adaptor;
 
@@ -47,7 +47,7 @@ public class OpAdaptationInfo implements OpInfo {
 	
 	@Override
 	public List<OpDependencyMember<?>> dependencies() {
-		return srcInfo.dependencies();
+		return srcCandidate.opInfo().dependencies();
 	}
 
 	@Override
@@ -63,12 +63,13 @@ public class OpAdaptationInfo implements OpInfo {
 	// we want the original op to have priority over this one.
 	@Override
 	public double priority() {
-		return srcInfo.priority() - 1;
+		return srcCandidate.priority() - 1;
 	}
 
 	@Override
 	public String implementationName() {
-		return srcInfo.implementationName() + " adapted to " + type.toString();
+		return srcCandidate.opInfo().implementationName() + " adapted to " + type
+			.toString();
 	}
 
 	/**
@@ -76,7 +77,7 @@ public class OpAdaptationInfo implements OpInfo {
 	 */
 	@Override
 	public StructInstance<?> createOpInstance(List<?> dependencies) {
-		final Object op = srcInfo.createOpInstance(dependencies).object();
+		final Object op = srcCandidate.createOpInstance(dependencies).object();
 		final Object adaptedOp = adaptor.apply(op);
 		return struct().createInstance(adaptedOp);
 	}

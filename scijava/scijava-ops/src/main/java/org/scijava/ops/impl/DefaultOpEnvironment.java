@@ -296,10 +296,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 		catch (OpMatchingException e1) {
 			// no direct match; find an adapted match
-			if (!adaptable) throw new OpMatchingException(
-				"No matching Op for request: " + ref + "\n(adaptation is disabled)",
-				e1);
 			try {
+				if (!adaptable) throw new OpMatchingException(
+					"No matching Op for request: " + ref + "\n(adaptation is disabled)",
+					e1);
 				return adaptOp(ref);
 			}
 			catch (OpMatchingException e2) {
@@ -524,8 +524,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				Type srcOpType = Types.substituteTypeVariables(adaptor.inputs().get(0)
 					.getType(), map);
 				final OpRef srcOpRef = inferOpRef(srcOpType, ref.getName(), map);
-				final OpCandidate srcCandidate = matcher.findSingleMatch(this,
-					srcOpRef);
+				final OpCandidate srcCandidate = findOpCandidate(srcOpRef, false);
 				map.putAll(srcCandidate.typeVarAssigns());
 				Type adapterOpType = Types.substituteTypeVariables(adaptor.output()
 					.getType(), map);
