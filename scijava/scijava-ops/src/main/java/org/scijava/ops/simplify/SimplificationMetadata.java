@@ -27,7 +27,6 @@ public class SimplificationMetadata {
 
 	private final SimplifiedOpInfo info;
 	private final Class<?> opType;
-//	private final SimplifiedOpRef ref;
 	private final MutatorChain[] argChains;
 	private final MutatorChain outChain;
 
