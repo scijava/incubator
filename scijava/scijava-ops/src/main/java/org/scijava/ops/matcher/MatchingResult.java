@@ -2,10 +2,9 @@ package org.scijava.ops.matcher;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.simplify.SimplifiedOpCandidate;
+import org.scijava.ops.simplify.SimplifiedOpInfo;
 
 /**
  * Class representing the result from type matching done by the
@@ -57,18 +56,6 @@ public class MatchingResult {
 			// }
 
 			return matches.get(0);
-		}
-		// HACK: If all matches are SimplifiedOpCandidates with the same source
-		// OpInfo, it does not matter which is returned.
-		if (matches.size() > 1 && matches.stream().allMatch(c -> c instanceof SimplifiedOpCandidate)) {
-			boolean simplifiedFromSameInfo = matches.parallelStream()
-					.map(c -> (SimplifiedOpCandidate) c) // cast all OpCandidates
-					.map(sc -> sc.opInfo().srcInfo()) // obtain each OpInfo
-					.collect(Collectors.toSet()).size() == 1; // determine if all OpInfos are the same
-			
-			if(simplifiedFromSameInfo) {
-				return matches.get(0);
-			}
 		}
 
 		// There is no clear matching Op

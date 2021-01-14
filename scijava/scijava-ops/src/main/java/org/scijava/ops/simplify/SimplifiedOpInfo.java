@@ -6,38 +6,48 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.scijava.Priority;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.conversionLoss.LossReporter;
+import org.scijava.ops.core.Op;
+import org.scijava.ops.matcher.OpMatchingException;
+import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
+import org.scijava.struct.ItemIO;
 import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
+import org.scijava.types.Nil;
+import org.scijava.types.Types;
 import org.scijava.util.MiscUtils;
 
 
 public class SimplifiedOpInfo implements OpInfo {
 
 	private final OpInfo srcInfo;
-	private final List<List<OpInfo>> focuserSets;
-	private final List<OpInfo> outputSimplifiers;
+	private final SimplificationMetadata metadata;
+	private final Type opType;
+	private final double priority;
 
-	public SimplifiedOpInfo(OpInfo info, OpEnvironment env) {
+	private Struct struct;
+	private ValidityException validityException;
+
+	public SimplifiedOpInfo(OpInfo info, OpEnvironment env, SimplificationMetadata metadata) {
 		this.srcInfo = info;
-		Type[] args = OpUtils.inputs(srcInfo.struct()).stream() //
-				.map(m -> m.getType()) //
-				.toArray(Type[]::new);
-		this.focuserSets = SimplificationUtils.focusArgs(env, args);
-		Type outType = info.output().getType();
-		this.outputSimplifiers = SimplificationUtils.getSimplifiers(env, outType);
-	}
+		this.metadata = metadata;
+		Type[] inputs = metadata.originalInputs();
+		Type output = metadata.focusedOutput();
+		this.opType = SimplificationUtils.retypeOpType(info.opType(), inputs, output);
+		try {
+			this.struct = ParameterStructs.structOf(info, opType);
+		}
+		catch (ValidityException exc) {
+			validityException = exc;
+		}
 
-	public List<List<OpInfo>> getFocusers(){
-		return focuserSets;
-	}
-
-	public List<OpInfo> getOutputSimplifiers(){
-		return outputSimplifiers;
+		this.priority = calculatePriority(info, metadata, env);
 	}
 
 	public OpInfo srcInfo() {
@@ -46,29 +56,100 @@ public class SimplifiedOpInfo implements OpInfo {
 
 	@Override
 	public Type opType() {
-		return srcInfo.opType();
+		return opType;
 	}
 
 	@Override
 	public Struct struct() {
-		// TODO Auto-generated method stub
-		return srcInfo.struct();
+		return struct;
 	}
 
 	@Override
 	public double priority() {
-		return srcInfo.priority() - 1;
+		return priority;
+	}
+
+	/**
+	 * We define the priority of any {@link SimplifiedOpInfo} as the sum of the
+	 * following:
+	 * <ul>
+	 * <li>{@link Priority#VERY_LOW} to ensure that simplifications are not chosen
+	 * over a direct match.
+	 * <li>The {@link OpInfo#priority} of the source info to ensure that a
+	 * simplification of a higher-priority Op wins out over a simplification of a
+	 * lower-priority Op, all else equal.
+	 * <li>a penalty defined as a lossiness heuristic of this simplification. This
+	 * penalty is the sum of:
+	 * <ul>
+	 * <li>the loss undertaken by converting each of the Op's inputs (as defined
+	 * by an {@link ItemIO#INPUT} or {@link ItemIO#BOTH} annotation) from the ref
+	 * type to the info type
+	 * <li>the loss undertaken by converting each of the Op's outputs (as defined
+	 * by an {@link ItemIO#OUTPUT} or {@link ItemIO#BOTH} annotation) from the
+	 * info type to the ref type
+	 * </ul>
+	 * </ul>
+	 */
+	private static double calculatePriority(OpInfo srcInfo, SimplificationMetadata metadata, OpEnvironment env) {
+		// BASE PRIORITY
+		double base = Priority.VERY_LOW;
+
+		// ORIGINAL PRIORITY
+		double originalPriority = srcInfo.priority();
+
+		// PENALTY
+		double penalty = 0;
+
+		Type[] originalInputs = metadata.originalInputs();
+		Type[] opInputs = metadata.focusedInputs();
+		for (int i = 0; i < metadata.numInputs(); i++) {
+			penalty += determineLoss(env, Nil.of(originalInputs[i]), Nil.of(opInputs[i]));
+		}
+
+		// TODO: only calculate the loss once
+		Type opOutput = metadata.focusedOutput();
+		Type originalOutput = metadata.originalOutput();
+		penalty += determineLoss(env, Nil.of(opOutput), Nil.of(originalOutput));
+
+		// PRIORITY = BASE + ORIGINAL - PENALTY
+		return base + originalPriority - penalty;
+	}
+
+	/**
+	 * Calls a {@code lossReporter} {@link Op} to determine the <b>worst-case</b>
+	 * loss from a {@code T} to a {@code R}. If no {@code lossReporter} exists for
+	 * such a conversion, we assume infinite loss.
+	 * 
+	 * @param <T> -the generic type we are converting from.
+	 * @param <R> - generic type we are converting to.
+	 * @param from - a {@link Nil} describing the type we are converting from
+	 * @param to - a {@link Nil} describing the type we are converting to
+	 * @return - a {@code double} describing the magnitude of the <worst-case>
+	 *         loss in a conversion from an instance of {@code T} to an instance
+	 *         of {@code R}
+	 */
+	private static <T, R> double determineLoss(OpEnvironment env, Nil<T> from, Nil<R> to) {
+		Type specialType = Types.parameterize(LossReporter.class, new Type[] { from
+			.getType(), to.getType() });
+		@SuppressWarnings("unchecked")
+		Nil<LossReporter<T, R>> specialTypeNil = (Nil<LossReporter<T, R>>) Nil.of(
+			specialType);
+		try {
+			Type nilFromType = Types.parameterize(Nil.class, new Type[] {from.getType()});
+			Type nilToType = Types.parameterize(Nil.class, new Type[] {to.getType()});
+			LossReporter<T, R> op = env.op("lossReporter", specialTypeNil, new Nil[] {
+				Nil.of(nilFromType), Nil.of(nilToType) }, Nil.of(Double.class));
+			return op.apply(from, to);
+		} catch(IllegalArgumentException e) {
+			if (e.getCause() instanceof OpMatchingException)
+				return Double.POSITIVE_INFINITY;
+			throw e;
+		}
 	}
 
 	@Override
 	public String implementationName() {
 		return srcInfo.implementationName();
-	}
-
-	@Override
-	public StructInstance<?> createOpInstance(List<?> dependencies) {
-		throw new UnsupportedOperationException(
-			"Cannot create an instance without knowing the Simplifier/Focuser Functions needed to mutate the arugments!");
 	}
 
 	@Override
@@ -78,7 +159,7 @@ public class SimplifiedOpInfo implements OpInfo {
 
 	@Override
 	public ValidityException getValidityException() {
-		return srcInfo.getValidityException();
+		return validityException;
 	}
 
 	@Override
@@ -94,12 +175,9 @@ public class SimplifiedOpInfo implements OpInfo {
 	 * focus the simplified inputs into types suitable for the original Op.
 	 * 
 	 * @param dependencies - this Op's dependencies
-	 * @param metadata - data required to correctly write the simplified Op
-	 * @see #createOpInstance(List) - used when there are no associated
-	 *      {@code refSimplifier}s.
 	 */
-	public StructInstance<?> createOpInstance(List<?> dependencies,
-		SimplificationMetadata metadata)
+	@Override
+	public StructInstance<?> createOpInstance(List<?> dependencies)
 	{
 		final Object op = srcInfo.createOpInstance(dependencies).object();
 		try {

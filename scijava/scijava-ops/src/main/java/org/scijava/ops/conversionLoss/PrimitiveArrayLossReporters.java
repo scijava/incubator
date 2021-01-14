@@ -16,6 +16,10 @@ public class PrimitiveArrayLossReporters {
 	@OpField(names = "lossReporter")
 	public final LossReporter<Byte[], Integer[]> bArrIArr = (from, to) -> 0.;
 	
+	@Unsimplifiable
+	@OpField(names = "lossReporter")
+	public final LossReporter<Double[], Integer[]> dArrIArr = (from, to) -> 0.;
+
 }
 
 //@Plugin(type = Op.class, name = "lossReporter")

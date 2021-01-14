@@ -24,7 +24,7 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Byte[]> byteArrFocuser = o -> o
-		.stream().map(b -> b.byteValue()).toArray(Byte[]::new);
+		.stream().map(b -> b == null ? null : b.byteValue()).toArray(Byte[]::new);
 
 	@Unsimplifiable
 	@OpField(names = "simplify")
@@ -34,7 +34,7 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Integer[]> intArrFocuser = o -> o
-		.stream().map(i -> i.intValue()).toArray(Integer[]::new);
+		.stream().map(i -> i == null ? null : i.intValue()).toArray(Integer[]::new);
 
 	@Unsimplifiable
 	@OpField(names = "simplify")
@@ -44,7 +44,7 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Short[]> shortArrFocuser = o -> o
-		.stream().map(s -> s.shortValue()).toArray(Short[]::new);
+		.stream().map(s -> s == null ? null : s.shortValue()).toArray(Short[]::new);
 
 	@Unsimplifiable
 	@OpField(names = "simplify")
@@ -54,7 +54,7 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Long[]> longArrFocuser = o -> o
-		.stream().map(l -> l.longValue()).toArray(Long[]::new);
+		.stream().map(l -> l == null ? null : l.longValue()).toArray(Long[]::new);
 
 	@Unsimplifiable
 	@OpField(names = "simplify")
@@ -64,7 +64,7 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Float[]> floatArrFocuser = o -> o
-		.stream().map(f -> f.floatValue()).toArray(Float[]::new);
+		.stream().map(f -> f == null ? null : f.floatValue()).toArray(Float[]::new);
 
 	@Unsimplifiable
 	@OpField(names = "simplify")
@@ -74,5 +74,5 @@ public class PrimitiveArraySimplifiers {
 	@Unsimplifiable
 	@OpField(names = "focus")
 	public final Function<ObjectArray<Number>, Double[]> doubleArrFocuser = o -> o
-		.stream().map(d -> d.doubleValue()).toArray(Double[]::new);
+		.stream().map(d -> d == null ? null : d.doubleValue()).toArray(Double[]::new);
 }

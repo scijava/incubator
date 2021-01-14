@@ -1,8 +1,6 @@
 package org.scijava.ops.matcher;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Function;
@@ -23,15 +21,15 @@ import org.scijava.struct.StructInstance;
  */
 public class OpAdaptationInfo implements OpInfo {
 
-	private OpCandidate srcCandidate;
+	private OpInfo srcInfo;
 	private Type type;
 	private Function<Object, Object> adaptor;
 
 	private Struct struct;
 	private ValidityException validityException;
 
-	public OpAdaptationInfo(OpCandidate srcCandidate, Type type, Function<Object, Object> adaptor) {
-		this.srcCandidate = srcCandidate;
+	public OpAdaptationInfo(OpInfo srcInfo, Type type, Function<Object, Object> adaptor) {
+		this.srcInfo = srcInfo;
 		this.type = type;
 		this.adaptor = adaptor;
 
@@ -47,7 +45,7 @@ public class OpAdaptationInfo implements OpInfo {
 	
 	@Override
 	public List<OpDependencyMember<?>> dependencies() {
-		return srcCandidate.opInfo().dependencies();
+		return srcInfo.dependencies();
 	}
 
 	@Override
@@ -63,12 +61,12 @@ public class OpAdaptationInfo implements OpInfo {
 	// we want the original op to have priority over this one.
 	@Override
 	public double priority() {
-		return srcCandidate.priority() - 1;
+		return srcInfo.priority() - 1;
 	}
 
 	@Override
 	public String implementationName() {
-		return srcCandidate.opInfo().implementationName() + " adapted to " + type
+		return srcInfo.implementationName() + " adapted to " + type
 			.toString();
 	}
 
@@ -77,7 +75,7 @@ public class OpAdaptationInfo implements OpInfo {
 	 */
 	@Override
 	public StructInstance<?> createOpInstance(List<?> dependencies) {
-		final Object op = srcCandidate.createOpInstance(dependencies).object();
+		final Object op = srcInfo.createOpInstance(dependencies).object();
 		final Object adaptedOp = adaptor.apply(op);
 		return struct().createInstance(adaptedOp);
 	}

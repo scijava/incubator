@@ -25,7 +25,7 @@ import org.scijava.util.Types;
  */
 public class SimplificationMetadata {
 
-	private final SimplifiedOpInfo info;
+	private final OpInfo info;
 	private final Class<?> opType;
 	private final MutatorChain[] argChains;
 	private final MutatorChain outChain;
@@ -43,7 +43,7 @@ public class SimplificationMetadata {
 
 	private final int numInputs;
 
-	public SimplificationMetadata(SimplifiedOpRef ref, SimplifiedOpInfo info, TypePair[] argPairs, TypePair outPair, Map<TypePair, MutatorChain> mutators,
+	public SimplificationMetadata(SimplifiedOpRef ref, OpInfo info, TypePair[] argPairs, TypePair outPair, Map<TypePair, MutatorChain> mutators,
 		OpEnvironment env)
 	{
 		this.info = info;
@@ -243,7 +243,7 @@ public class SimplificationMetadata {
 		return ioArgIndex() == -1;
 	}
 
-	public SimplifiedOpInfo info() {
+	public OpInfo info() {
 		return info;
 	}
 

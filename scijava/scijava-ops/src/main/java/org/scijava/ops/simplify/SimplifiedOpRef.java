@@ -47,45 +47,6 @@ public class SimplifiedOpRef extends OpRef {
 		this.copyOp = Optional.of(copyOp);
 	}
 
-	public boolean matchExists(SimplifiedOpInfo info) {
-
-		if (srcRef.getArgs().length != info.inputs().size())
-			throw new IllegalArgumentException(
-				"ref and info must have the same number of arguments!");
-		int numInputs = srcRef.getArgs().length;
-
-		Type[] originalArgs = srcRef.getArgs();
-		Type[] originalParams = info.srcInfo().inputs().stream().map(m -> m.getType())
-			.toArray(Type[]::new);
-		TypePair[] pairings = Streams.zip(Arrays.stream(originalArgs), Arrays
-			.stream(originalParams), (from, to) -> new TypePair(from, to)).toArray(
-				TypePair[]::new);
-
-		Map<TypePair, ChainCluster> pathways = new HashMap<>();
-
-		List<List<OpInfo>> infoFocusers = info.getFocusers(); 
-		for (int i = 0; i < numInputs; i++) {
-			TypePair pairing = pairings[i];
-			if (pathways.keySet().contains(pairing)) continue;
-			List<OpInfo> simplifiers = simplifierSets.get(i);
-			List<OpInfo> focusers = infoFocusers.get(i);
-			ChainCluster cluster = ChainCluster.generateCluster(pairing, simplifiers, focusers);
-			if (cluster.getChains().size() == 0) return false;
-			pathways.put(pairing, cluster);
-		}
-
-		TypePair outPairing = new TypePair(info.srcInfo().output().getType(), srcRef.getOutType());
-		if(!pathways.keySet().contains(outPairing)) {
-			List<OpInfo> simplifiers = info.getOutputSimplifiers();
-			List<OpInfo> focusers = outputFocusers;
-			ChainCluster cluster = ChainCluster.generateCluster(outPairing, simplifiers, focusers);
-			if (cluster.getChains().size() == 0) return false;
-			pathways.put(outPairing, cluster);
-		}
-
-		return true;
-	}
-
 	public OpRef srcRef() {
 		return srcRef;
 	}
