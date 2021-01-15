@@ -432,17 +432,36 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	private Class<?> getWrapperClass(Object op, OpInfo info) {
-			Class<?>[] suitableWrappers = wrappers.keySet().stream().filter(wrapper -> wrapper.isInstance(op))
-					.toArray(Class[]::new);
-			if (suitableWrappers.length == 0)
-				throw new IllegalArgumentException(info.implementationName() + ": matched op Type " + info.opType().getClass()
-						+ " does not match a wrappable Op type.");
-			if (suitableWrappers.length > 1)
-				throw new IllegalArgumentException(
-						"Matched op Type " + info.opType().getClass() + " matches multiple Op types: " + wrappers.toString());
-			if (!Types.isAssignable(Types.raw(info.opType()), suitableWrappers[0]))
-				throw new IllegalArgumentException(Types.raw(info.opType()) + "cannot be wrapped as a " + suitableWrappers[0].getClass());
-			return suitableWrappers[0];
+		List<Class<?>> suitableWrappers = wrappers.keySet().parallelStream().filter(
+			wrapper -> wrapper.isInstance(op)).collect(Collectors.toList());
+		List<Class<?>> filteredWrappers = filterWrapperSuperclasses(
+			suitableWrappers);
+		if (filteredWrappers.size() == 0) throw new IllegalArgumentException(info
+			.implementationName() + ": matched op Type " + info.opType().getClass() +
+			" does not match a wrappable Op type.");
+		if (filteredWrappers.size() > 1) throw new IllegalArgumentException(
+			"Matched op Type " + info.opType().getClass() +
+				" matches multiple Op types: " + filteredWrappers.toString());
+		if (!Types.isAssignable(Types.raw(info.opType()), filteredWrappers.get(0)))
+			throw new IllegalArgumentException(Types.raw(info.opType()) +
+				"cannot be wrapped as a " + filteredWrappers.get(0).getClass());
+		return filteredWrappers.get(0);
+	}
+
+	private List<Class<?>> filterWrapperSuperclasses(
+		List<Class<?>> suitableWrappers)
+	{
+		if (suitableWrappers.size() < 2) return suitableWrappers;
+		List<Class<?>> list = new ArrayList<>();
+		for (Class<?> c : suitableWrappers) {
+			boolean isSuperclass = false;
+			for (Class<?> other : suitableWrappers) {
+				if (c.equals(other)) continue;
+				if (c.isAssignableFrom(other)) isSuperclass = true;
+			}
+			if (!isSuperclass) list.add(c);
+		}
+		return list;
 	}
 
 	private List<Object> resolveOpDependencies(OpCandidate candidate) throws OpMatchingException {
