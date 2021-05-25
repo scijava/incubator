@@ -31,7 +31,9 @@ package org.scijava.ops.matcher;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,7 @@ import org.scijava.Priority;
 import org.scijava.ops.OpField;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
@@ -184,5 +187,20 @@ public class OpFieldInfo implements OpInfo {
 	@Override
 	public boolean isSimplifiable() {
 		return simplifiable;
+	}
+
+	/**
+	 * NB annotations are not allowed on Field Ops written as lambdas. Since this
+	 * is really the only way Ops are written as Fields, we are going to blanket
+	 * cover all Field Ops.
+	 */
+	@Override
+	public boolean hasOptionalParameters() {
+		return false;
+	}
+
+	@Override
+	public Parameter[] optionalParameters() {
+		return new Parameter[] {};
 	}
 }

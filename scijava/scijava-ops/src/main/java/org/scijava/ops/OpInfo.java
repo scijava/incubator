@@ -2,6 +2,7 @@
 package org.scijava.ops;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
@@ -66,6 +67,10 @@ public interface OpInfo extends Comparable<OpInfo> {
 	ValidityException getValidityException();
 	
 	AnnotatedElement getAnnotationBearer();
+
+	boolean hasOptionalParameters();
+
+	Parameter[] optionalParameters();
 
 	@Override
 	default int compareTo(final OpInfo that) {

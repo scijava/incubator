@@ -38,6 +38,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -50,6 +51,7 @@ import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.util.Adapt;
+import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
@@ -358,5 +360,17 @@ public class OpMethodInfo implements OpInfo {
 	@Override
 	public boolean isSimplifiable() {
 		return simplifiable;
+	}
+
+	@Override
+	public boolean hasOptionalParameters() {
+		return optionalParameters().length > 0;
+	}
+
+	@Override
+	public Parameter[] optionalParameters() {
+		return Arrays.stream(method.getParameters()) //
+				.filter(p -> p.isAnnotationPresent(Optional.class)) //
+				.toArray(Parameter[]::new);
 	}
 }

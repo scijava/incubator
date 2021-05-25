@@ -29,17 +29,25 @@
 
 package org.scijava.ops.matcher;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.scijava.Priority;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
+import org.scijava.ops.util.AnnotationUtils;
+import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.plugin.Plugin;
@@ -192,5 +200,35 @@ public class OpClassInfo implements OpInfo {
 	@Override
 	public boolean isSimplifiable() {
 		return simplifiable;
+	}
+
+	@Override
+	public boolean hasOptionalParameters() {
+		return optionalParameters().length > 0;
+
+	}
+
+	@Override
+	public Parameter[] optionalParameters() {
+		Method fMethod;
+		try {
+			fMethod = opClass.getMethod(SimplificationUtils.findFMethod(opClass)
+				.getName(), inputRawTypes());
+		}
+		catch (NoSuchMethodException exc) {
+			throw new IllegalArgumentException("No Op Method on class " + opClass);
+		}
+		return Arrays.stream(fMethod.getParameters()) //
+				.filter(p -> p.isAnnotationPresent(Optional.class)) //
+				.toArray(Parameter[]::new);
+	}
+
+	private Class<?>[] inputRawTypes() {
+		Type[] params = OpUtils.inputTypes(struct);
+		Class<?>[] rawParams = new Class<?>[params.length];
+		for(int i = 0; i < params.length; i++) {
+			rawParams[i] = Types.raw(params[i]);
+		}
+		return rawParams;
 	}
 }
