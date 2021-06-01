@@ -36,7 +36,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.scijava.Priority;
 import org.scijava.ops.OpField;
@@ -198,10 +200,11 @@ public class OpFieldInfo implements OpInfo {
 		if (m.isOutput()) return false;
 		int inputIndex = OpUtils.inputs(struct).indexOf(m);
 		// TODO: call this method once?
-		return parameters()[inputIndex].isAnnotationPresent(Optional.class);
+		return parameters().anyMatch(arr -> arr[inputIndex].isAnnotationPresent(Optional.class));
 	}
 
-	private Parameter[] parameters() {
+
+	private Stream<Parameter[]> parameters() {
 		Class<?> fieldClass;
 		try {
 			fieldClass = field.get(instance).getClass();
@@ -210,21 +213,11 @@ public class OpFieldInfo implements OpInfo {
 			// TODO Auto-generated catch block
 			throw new IllegalArgumentException(exc1);
 		}
-		Method fMethod = findFunctionalMethod(fieldClass);
-		return fMethod.getParameters();
+		Method superFMethod = SimplificationUtils.findFMethod(fieldClass);
+		return Arrays.stream(fieldClass.getMethods()) //
+				.filter(m -> m.getName().equals(superFMethod.getName())) //
+				.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
+				.map(m -> m.getParameters());
 	}
 
-	private Method findFunctionalMethod(Class<?> fieldClass) {
-		Method fMethod = SimplificationUtils.findFMethod(fieldClass);
-		Class<?>[] inputTypes = fMethod.getParameterTypes();
-		if (!fieldClass.isSynthetic()) {
-			inputTypes = OpUtils.inputRawTypes(struct);
-		}
-		try {
-			return fieldClass.getMethod(fMethod.getName(), inputTypes);
-		}
-		catch (NoSuchMethodException exc) {
-			throw new IllegalArgumentException("No Op Method on class " + fieldClass);
-		}
-	}
 }

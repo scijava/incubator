@@ -30,6 +30,8 @@
 
 package org.scijava.ops.matcher;
 
+import com.google.common.collect.Streams;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
@@ -38,9 +40,11 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.scijava.Priority;
 import org.scijava.ops.OpDependency;
@@ -48,6 +52,7 @@ import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.util.Adapt;
 import org.scijava.param.Optional;
@@ -374,10 +379,16 @@ public class OpMethodInfo implements OpInfo {
 		if (m instanceof OpDependencyMember) return false;
 		int inputIndex = OpUtils.inputs(struct).indexOf(m);
 		// TODO: call this method once?
-		return parameters()[inputIndex].isAnnotationPresent(Optional.class);
+		return parameters().anyMatch(arr -> arr[inputIndex].isAnnotationPresent(Optional.class));
 	}
 
-	private Parameter[] parameters() {
-		return method.getParameters();
+	private Stream<Parameter[]> parameters() {
+		Method superFMethod = SimplificationUtils.findFMethod(Types.raw(opType));
+		List<Method> methods = new ArrayList<>(Arrays.asList(opType.getClass().getMethods()));
+		methods.add(method);
+		return methods.parallelStream() //
+				.filter(m -> m.getName().equals(superFMethod.getName())) //
+				.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
+				.map(m -> m.getParameters());
 	}
 }

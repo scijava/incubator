@@ -238,7 +238,7 @@ public class OpClassInfo implements OpInfo {
 		Method superFMethod = SimplificationUtils.findFMethod(opClass);
 		return Arrays.stream(opClass.getMethods()) //
 				.filter(m -> m.getName().equals(superFMethod.getName())) //
-				.filter(m -> m.getDeclaringClass() != ParameterStructs.findFunctionalInterface(opClass)) //
+				.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
 				.map(m -> m.getParameters());
 	}
 }
