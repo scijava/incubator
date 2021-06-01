@@ -110,4 +110,8 @@ public class ReducedOpInfo implements OpInfo {
 		return srcInfo;
 	}
 
+	public int paramsReduced() {
+		return paramsReduced;
+	}
+
 }

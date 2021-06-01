@@ -191,13 +191,25 @@ public class ReductionUtils {
 		sb.append("op." + m.getName() + "(");
 		int i;
 		List<Member<?>> totalArguments = OpUtils.inputs(info.srcInfo().struct());
+		int totalArgs = OpUtils.inputs(info.srcInfo().struct()).size();
+		long totalOptionals = OpUtils.inputs(info.srcInfo().struct())
+			.parallelStream().filter(member -> info.srcInfo().isOptional(member))
+			.count();
+		long neededOptionals = totalOptionals - info.paramsReduced();
 		int reducedArg = 0;
-		for (i = 0; i < totalArguments.size(); i++) {
-			if (info.srcInfo().isOptional(totalArguments.get(i))) {
-				sb.append(" null");
+		int optionals = 0;
+		for (i = 0; i < totalArgs; i++) {
+			// NB due to our optionality paradigm (if there are n optional parameters,
+			// they must be the last n), we just need to pass null for the last n
+			// arguments
+			if (!info.srcInfo().isOptional(totalArguments.get(i))) {
+				sb.append(" in" + reducedArg++);
+			} else if (optionals < neededOptionals) {
+				sb.append(" in" + reducedArg++);
+				optionals++;
 			}
 			else {
-				sb.append(" in" + reducedArg++);
+				sb.append(" null");
 			}
 			if (i + 1 < totalArguments.size()) sb.append(",");
 		}
