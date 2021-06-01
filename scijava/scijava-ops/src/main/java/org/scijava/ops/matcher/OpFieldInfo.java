@@ -44,9 +44,11 @@ import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
+import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
+import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 
@@ -189,18 +191,40 @@ public class OpFieldInfo implements OpInfo {
 		return simplifiable;
 	}
 
-	/**
-	 * NB annotations are not allowed on Field Ops written as lambdas. Since this
-	 * is really the only way Ops are written as Fields, we are going to blanket
-	 * cover all Field Ops.
-	 */
 	@Override
-	public boolean hasOptionalParameters() {
-		return false;
+	public boolean isOptional(Member<?> m) {
+		if (!struct.members().contains(m)) throw new IllegalArgumentException(
+			"Member " + m + " is not a Memeber of OpInfo " + this);
+		if (m.isOutput()) return false;
+		int inputIndex = OpUtils.inputs(struct).indexOf(m);
+		// TODO: call this method once?
+		return parameters()[inputIndex].isAnnotationPresent(Optional.class);
 	}
 
-	@Override
-	public Parameter[] optionalParameters() {
-		return new Parameter[] {};
+	private Parameter[] parameters() {
+		Class<?> fieldClass;
+		try {
+			fieldClass = field.get(instance).getClass();
+		}
+		catch (IllegalArgumentException | IllegalAccessException exc1) {
+			// TODO Auto-generated catch block
+			throw new IllegalArgumentException(exc1);
+		}
+		Method fMethod = findFunctionalMethod(fieldClass);
+		return fMethod.getParameters();
+	}
+
+	private Method findFunctionalMethod(Class<?> fieldClass) {
+		Method fMethod = SimplificationUtils.findFMethod(fieldClass);
+		Class<?>[] inputTypes = fMethod.getParameterTypes();
+		if (!fieldClass.isSynthetic()) {
+			inputTypes = OpUtils.inputRawTypes(struct);
+		}
+		try {
+			return fieldClass.getMethod(fMethod.getName(), inputTypes);
+		}
+		catch (NoSuchMethodException exc) {
+			throw new IllegalArgumentException("No Op Method on class " + fieldClass);
+		}
 	}
 }

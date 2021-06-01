@@ -1,7 +1,6 @@
 package org.scijava.ops.matcher;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Function;
@@ -12,6 +11,7 @@ import org.scijava.ops.OpUtils;
 import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
+import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 
@@ -107,19 +107,16 @@ public class OpAdaptationInfo implements OpInfo {
 		return false;
 	}
 
-	@Override
-	public boolean hasOptionalParameters() {
-		return false;
-	}
-
 	/**
 	 * NB for {@link Optional} annotations to be on the Op, they would have to be
 	 * declared within the adapter. Since this is unlikely (and is probably bad
 	 * practice), we will assume that they do not exist.
 	 */
 	@Override
-	public Parameter[] optionalParameters() {
-		return new Parameter[] {};
+	public boolean isOptional(Member<?> m) {
+		if (!struct.members().contains(m)) throw new IllegalArgumentException(
+			"Member " + m + " is not a Memeber of OpInfo " + this);
+		return false;
 	}
 
 }

@@ -38,7 +38,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -362,15 +361,23 @@ public class OpMethodInfo implements OpInfo {
 		return simplifiable;
 	}
 
+	/**
+	 * TODO: this implementation seems hacky. We are assuming that the Struct's
+	 * Members and their corresponding {@link Parameter}s on the functional Method
+	 * have the same ordering. There is no real guarantee that this is the case.
+	 */
 	@Override
-	public boolean hasOptionalParameters() {
-		return optionalParameters().length > 0;
+	public boolean isOptional(Member<?> m) {
+		if (!struct.members().contains(m)) throw new IllegalArgumentException(
+			"Member " + m + " is not a Memeber of OpInfo " + this);
+		if (m.isOutput()) return false;
+		if (m instanceof OpDependencyMember) return false;
+		int inputIndex = OpUtils.inputs(struct).indexOf(m);
+		// TODO: call this method once?
+		return parameters()[inputIndex].isAnnotationPresent(Optional.class);
 	}
 
-	@Override
-	public Parameter[] optionalParameters() {
-		return Arrays.stream(method.getParameters()) //
-				.filter(p -> p.isAnnotationPresent(Optional.class)) //
-				.toArray(Parameter[]::new);
+	private Parameter[] parameters() {
+		return method.getParameters();
 	}
 }

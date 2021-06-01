@@ -1,13 +1,16 @@
-package org.scijava.ops.matcher;
+package org.scijava.ops.reduce;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
 import org.scijava.ops.OpInfo;
+import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
+import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 
@@ -16,14 +19,15 @@ public class ReducedOpInfo implements OpInfo {
 
 	private final OpInfo srcInfo;
 	private final Type reducedOpType;
-	private final double priority;
+	private final int paramsReduced;
 
 	private Struct struct;
 	private ValidityException validityException;
 
-	public ReducedOpInfo(OpInfo src, Type reducedOpType) {
+	public ReducedOpInfo(OpInfo src, Type reducedOpType, int paramsReduced) {
 		this.srcInfo = src;
 		this.reducedOpType = reducedOpType;
+		this.paramsReduced = paramsReduced;
 
 		try {
 			this.struct = ParameterStructs.structOf(srcInfo, reducedOpType);
@@ -31,7 +35,6 @@ public class ReducedOpInfo implements OpInfo {
 		catch (ValidityException e) {
 			validityException = e;
 		}
-
 	}
 
 	@Override
@@ -57,13 +60,26 @@ public class ReducedOpInfo implements OpInfo {
 	@Override
 	public String implementationName() {
 		// TODO: improve this name
-		return srcInfo.implementationName() + " as " + reducedOpType.toString();
+		return srcInfo.implementationName() + "Reduction" + paramsReduced; 
 	}
 
 	@Override
 	public StructInstance<?> createOpInstance(List<?> dependencies) {
-		// TODO Auto-generated method stub
-		return null;
+		final Object op = srcInfo.createOpInstance(dependencies).object();
+		if (!Modifier.isPublic(srcInfo.opType().getClass().getModifiers())) {
+			throw new IllegalArgumentException("Op " + srcInfo.opType() +
+				" is not public; only Ops backed by public classes can be reduced!");
+		}
+		try {
+			Object reducedOp = ReductionUtils.javassistOp(op, this);
+			return struct().createInstance(reducedOp);
+		}
+		catch (Throwable ex) {
+			throw new IllegalArgumentException(
+				"Failed to invoke reduction of Op: \n" + srcInfo +
+					"\nProvided Op dependencies were: " + Objects.toString(dependencies),
+				ex);
+		}
 	}
 
 	@Override
@@ -86,17 +102,12 @@ public class ReducedOpInfo implements OpInfo {
 	 * remaining {@link Optional} parameters
 	 */
 	@Override
-	public boolean hasOptionalParameters() {
+	public boolean isOptional(Member<?> m) {
 		return false;
 	}
 
-	/**
-	 * NB since this {@link OpInfo} has already been reduced, we ignore any
-	 * remaining {@link Optional} parameters
-	 */
-	@Override
-	public Parameter[] optionalParameters() {
-		return new Parameter[0];
+	public OpInfo srcInfo() {
+		return srcInfo;
 	}
 
 }

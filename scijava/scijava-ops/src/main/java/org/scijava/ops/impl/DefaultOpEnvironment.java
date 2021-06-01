@@ -40,11 +40,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -72,6 +75,7 @@ import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpCandidate.StatusCode;
+import org.scijava.ops.reduce.InfoReducer;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
 import org.scijava.ops.matcher.OpMatcher;
@@ -89,6 +93,7 @@ import org.scijava.param.ParameterStructs;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.PluginInfo;
 import org.scijava.plugin.PluginService;
+import org.scijava.plugin.SciJavaPlugin;
 import org.scijava.struct.ItemIO;
 import org.scijava.types.Nil;
 import org.scijava.types.TypeService;
@@ -135,6 +140,11 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * is retrieved by providing the {@link Class} that it is able to wrap.
 	 */
 	private Map<Class<?>, OpWrapper<?>> wrappers;
+
+	/**
+	 * Data structure storing all discoverable {@link InfoReducer}s.
+	 */
+	private List<? extends InfoReducer> infoReducers;
 
 	public DefaultOpEnvironment(final Context context) {
 		context.inject(this);
@@ -475,6 +485,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 
+	private void initInfoReducers() {
+		infoReducers = pluginService.createInstancesOfType(InfoReducer.class);
+	}
+
 	/**
 	 * Attempts to inject {@link OpDependency} annotated fields of the specified
 	 * object by looking for Ops matching the field type and the name specified in
@@ -664,6 +678,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 
 	private void initOpDirectory() {
 		opDirectory = new HashMap<>();
+		initInfoReducers();
 
 		// Add regular Ops
 		for (final PluginInfo<Op> pluginInfo : pluginService.getPluginsOfType(Op.class)) {
@@ -671,6 +686,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				final Class<?> opClass = pluginInfo.loadClass();
 				OpInfo opInfo = new OpClassInfo(opClass);
 				addToOpIndex(opInfo, pluginInfo.getName());
+				boolean hasOptional = opInfo.struct().members().parallelStream() //
+						.filter(m -> opInfo.isOptional(m)) //
+						.findAny() //
+						.isPresent();
+				if (hasOptional) {
+					reduceInfo.accept(opInfo, pluginInfo.getName());
+				}
 			} catch (InstantiableException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
@@ -687,18 +709,63 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 						instance = field.getDeclaringClass().newInstance();
 					}
 					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field);
-					addToOpIndex(opInfo, field.getAnnotation(OpField.class).names());
+					String names = field.getAnnotation(OpField.class).names();
+					addToOpIndex(opInfo, names);
+					boolean hasOptional = opInfo.struct().members().parallelStream() //
+							.filter(m -> opInfo.isOptional(m)) //
+							.findAny() //
+							.isPresent();
+					if (hasOptional) {
+						reduceInfo.accept(opInfo, names);
+					}
 				}
 				final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
 				for (final Method method: methods) {
 					OpInfo opInfo = new OpMethodInfo(method);
-					addToOpIndex(opInfo, method.getAnnotation(OpMethod.class).names());
+					String names = method.getAnnotation(OpMethod.class).names();
+					addToOpIndex(opInfo, names);
+					boolean hasOptional = opInfo.struct().members().parallelStream() //
+							.filter(m -> opInfo.isOptional(m)) //
+							.findAny() //
+							.isPresent();
+					if (hasOptional) {
+						reduceInfo.accept(opInfo, names);
+					}
 				}
 			} catch (InstantiableException | InstantiationException | IllegalAccessException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
 		}
+
+		// TODO: can we 
+//		// Find all Ops able to be reduced
+//		initInfoReducers();
+//		Set<OpInfo> reducableInfos = StreamSupport.stream(infos().spliterator(), true) //
+//				.filter(info -> info.hasOptionalParameters()) //
+//				.collect(Collectors.toSet());
+//		reducableInfos.parallelStream() //
+//			.forEach(reduceInfo);
 	}
+
+	private final BiConsumer<OpInfo, String> reduceInfo = (info, names) -> {
+		// find a InfoReducer capable of reducing info
+		Optional<? extends InfoReducer> suitableReducer = infoReducers
+			.parallelStream().filter(reducer -> reducer.canReduce(info)).findAny();
+		if (suitableReducer.isEmpty()) {
+			log.warn("Cannot reduce " + info + ": No suitable InfoReducer!");
+			return;
+		}
+
+		InfoReducer reducer = suitableReducer.get();
+		long numReductions = info.struct().members().parallelStream() //
+			.filter(m -> info.isOptional(m)) //
+			.count(); //
+		// add a ReducedOpInfo for all possible reductions
+		// TODO: how to find the names?
+		for (int i = 1; i <= numReductions; i++) {
+			addToOpIndex(reducer.reduce(info, i), names);
+		}
+	};
 
 	private void addToOpIndex(final OpInfo opInfo, final String opNames) {
 		String[] parsedOpNames = OpUtils.parseOpNames(opNames);

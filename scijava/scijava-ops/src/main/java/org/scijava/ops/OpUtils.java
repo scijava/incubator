@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.scijava.ops.matcher.MatchingResult;
@@ -136,6 +137,15 @@ public final class OpUtils {
 		return getTypes(inputs(struct));
 	}
 
+	public static Class<?>[] inputRawTypes(Struct struct) {
+		Type[] inputTypes = getTypes(inputs(struct));
+		Class<?>[] inputRawTypes = new Class<?>[inputTypes.length];
+		for (int i = 0; i < inputTypes.length; i++) {
+			inputRawTypes[i] = Types.raw(inputTypes[i]);
+		}
+		return inputRawTypes;
+	}
+
 	public static Member<?> output(OpCandidate candidate) {
 		return candidate.opInfo().output();
 	}
@@ -148,6 +158,10 @@ public final class OpUtils {
 		return struct.members().stream() //
 				.filter(member -> member.isOutput()) //
 				.collect(Collectors.toList());
+	}
+
+	public static Type outputType(final Struct candidate) {
+		return outputs(candidate).get(0).getType();
 	}
 
 	public static List<MemberInstance<?>> outputs(StructInstance<?> op) {
@@ -434,5 +448,22 @@ public final class OpUtils {
 			return functionalInterface;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the index of the argument that is both the input and the output. <b>If there is no such argument (i.e. the Op produces a pure output), -1 is returned</b>
+	 * 
+	 * @return the index of the mutable argument.
+	 */
+	public static int ioArgIndex(final OpInfo info) {
+		List<Member<?>> inputs = OpUtils.inputs(info.struct());
+		Optional<Member<?>> ioArg = inputs.stream().filter(m -> m.isInput() && m.isOutput()).findFirst();
+		if(ioArg.isEmpty()) return -1;
+		Member<?> ioMember = ioArg.get();
+		return inputs.indexOf(ioMember);
+	}
+
+	public static boolean hasPureOutput(final OpInfo info) {
+		return ioArgIndex(info) == -1;
 	}
 }

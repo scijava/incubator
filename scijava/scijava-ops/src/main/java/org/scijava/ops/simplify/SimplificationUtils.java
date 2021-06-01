@@ -20,6 +20,7 @@ import java.util.stream.StreamSupport;
 
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpUtils;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpRef;
@@ -479,7 +480,7 @@ public class SimplificationUtils {
 		Method m = ParameterStructs.singularAbstractMethod(metadata.opType());
 		// determine the name of the output:
 		String opOutput = "";
-		int ioIndex = metadata.ioArgIndex();
+		int ioIndex = OpUtils.ioArgIndex(metadata.info());
 		if(ioIndex == -1) {
 			opOutput = "originalOut";
 		}
@@ -497,7 +498,7 @@ public class SimplificationUtils {
 		sb.append(fMethodPreprocessing(metadata));
 
 		// processing
-		if (metadata.pureOutput()) {
+		if (OpUtils.hasPureOutput(metadata.info())) {
 			sb.append(metadata.originalOutput().getTypeName() + " " + opOutput + " = ");
 		}
 		sb.append("op." + m.getName() + "(");
@@ -511,7 +512,7 @@ public class SimplificationUtils {
 		sb.append(fMethodPostprocessing(metadata, opOutput));
 
 		// if pure output, return it
-		if (metadata.pureOutput()) {
+		if (OpUtils.hasPureOutput(metadata.info())) {
 			sb.append("return out;");
 		}
 		sb.append("}");
@@ -556,7 +557,7 @@ public class SimplificationUtils {
 
 		// call copy op iff it exists
 		if(metadata.hasCopyOp()) {
-			int ioIndex = metadata.ioArgIndex();
+			int ioIndex = OpUtils.ioArgIndex(metadata.info());
 			Type ioType = metadata.originalInputs()[ioIndex];
 			String originalIOArg = "in" + ioIndex;
 			sb.append("copyOp.compute((" + focused.getTypeName() + ") out, (" + ioType.getTypeName() + ") " + originalIOArg + ");");

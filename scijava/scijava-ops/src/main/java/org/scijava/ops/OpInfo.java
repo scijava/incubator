@@ -68,9 +68,7 @@ public interface OpInfo extends Comparable<OpInfo> {
 	
 	AnnotatedElement getAnnotationBearer();
 
-	boolean hasOptionalParameters();
-
-	Parameter[] optionalParameters();
+	boolean isOptional(Member<?> m);
 
 	@Override
 	default int compareTo(final OpInfo that) {
