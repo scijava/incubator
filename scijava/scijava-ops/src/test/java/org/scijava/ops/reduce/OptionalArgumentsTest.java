@@ -1,13 +1,15 @@
-package org.scijava.ops;
+package org.scijava.ops.reduce;
 
 import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.OpField;
+import org.scijava.ops.OpMethod;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Functions;
-import org.scijava.param.Container;
 import org.scijava.param.Optional;
 import org.scijava.plugin.Plugin;
 

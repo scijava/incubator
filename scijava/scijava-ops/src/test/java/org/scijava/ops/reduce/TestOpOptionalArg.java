@@ -1,5 +1,5 @@
 
-package org.scijava.ops;
+package org.scijava.ops.reduce;
 
 import org.scijava.ops.core.Op;
 import org.scijava.param.Optional;
