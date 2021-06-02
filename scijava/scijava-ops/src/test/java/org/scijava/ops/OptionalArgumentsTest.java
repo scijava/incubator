@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
+import org.scijava.ops.function.Functions;
 import org.scijava.param.Container;
 import org.scijava.param.Optional;
 import org.scijava.plugin.Plugin;
@@ -85,6 +86,34 @@ public class OptionalArgumentsTest extends AbstractTestEnvironment{
 		ops.env().op("test.optionalMultiply").input(d1).output(o).compute();
 		Double expected = 2.0;
 		Assert.assertEquals(expected, o[0]);
+	}
+
+	@OpMethod(names = "test.optionalConcatenate", type = Functions.Arity3.class)
+	public static String optionalMethod(String in1, @Optional String in2, @Optional String in3) {
+		if (in2 == null) in2 = "";
+		if (in3 == null) in3 = "";
+		return in1.concat(in2).concat(in3);
+	}
+
+	@Test
+	public void testMethodWithTwoOptionals() {
+		String out = ops.env().op("test.optionalConcatenate").input("a", "b", "c").outType(String.class).apply();
+		String expected = "abc";
+		Assert.assertEquals(expected, out);
+	}
+
+	@Test
+	public void testMethodWithOneOptional() {
+		String out = ops.env().op("test.optionalConcatenate").input("a", "b").outType(String.class).apply();
+		String expected = "ab";
+		Assert.assertEquals(expected, out);
+	}
+
+	@Test
+	public void testMethodWithoutOptionals() {
+		String out = ops.env().op("test.optionalConcatenate").input("a").outType(String.class).apply();
+		String expected = "a";
+		Assert.assertEquals(expected, out);
 	}
 
 }

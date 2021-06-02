@@ -64,28 +64,64 @@ public class ReductionUtils {
 			.newInstance(originalOp);
 	}
 
-	// TODO: consider correctness
+	/**
+	 * A valid class name must be unique.
+	 * @param reducedInfo
+	 * @return the class name
+	 */
 	private static String formClassName(ReducedOpInfo reducedInfo) {
-		// package name - required to be this package for the Lookup to work
-		String packageName = ReductionUtils.class.getPackageName();
+		// -- package name --
+		// NB required to be this package for the Lookup to work
+		String packageName = getPackageName();
 		StringBuilder sb = new StringBuilder(packageName + ".");
 
-		// class name
-		String implementationName = reducedInfo.implementationName();
-		String originalName = implementationName.substring(implementationName
-			.lastIndexOf('.') + 1); // we only want the class name
+		// -- class name -- 
+		// Start with the class of the implementation
+		String originalName = className(reducedInfo);
+		// Add the input members for uniqueness
+		String simplifiedParameters = memberNames(reducedInfo);
+
+		// -- ensure the name is valid --
+		String className = originalName.concat(simplifiedParameters);
+		if(className.chars().anyMatch(c -> !Character.isJavaIdentifierPart(c)))
+			throw new IllegalArgumentException(className + " is not a valid class name!");
+
+		// -- full name is package + class --
+		sb.append(className);
+		return sb.toString();
+	}
+
+	private static String getPackageName() {
+		return ReductionUtils.class.getPackageName();
+	}
+
+	private static String className(ReducedOpInfo reducedInfo) {
+		String implName = reducedInfo.implementationName();
+		int parenIndex = implName.indexOf('(');
+		int classStart;
+		// no paren - structure is package.class
+		if (parenIndex == -1) {
+			classStart = implName.lastIndexOf('.') + 1;
+		}
+		// paren - structure is packge.class.method(params)
+		else {
+			int methodStart = implName.substring(0, parenIndex).lastIndexOf('.');
+			classStart = implName.substring(0, methodStart).lastIndexOf('.') + 1;
+		}
+
+		String originalName = implName.substring(classStart); // we only want the class name
+		// replace non-valid identifiers with underscore (the underscore is arbitrary)
+		return originalName.replaceAll("[^A-Z^a-z0-9$_]", "_");
+	}
+
+	private static String memberNames(ReducedOpInfo reducedInfo) {
 		Stream<String> memberNames = //
 			Streams.concat(Arrays.stream(OpUtils.inputTypes(reducedInfo.struct())), //
 				Stream.of(OpUtils.outputType(reducedInfo.struct()))) //
 				.map(type -> getClassName(Types.raw(type)));
 		Iterable<String> iterableNames = (Iterable<String>) memberNames::iterator;
 		String simplifiedParameters = String.join("_", iterableNames);
-		String className = originalName.concat(simplifiedParameters);
-		if(className.chars().anyMatch(c -> !Character.isJavaIdentifierPart(c)))
-			throw new IllegalArgumentException(className + " is not a valid class name!");
-
-		sb.append(className);
-		return sb.toString();
+		return simplifiedParameters;
 	}
 
 	/**

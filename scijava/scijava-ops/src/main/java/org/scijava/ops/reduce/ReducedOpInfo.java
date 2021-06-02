@@ -66,10 +66,10 @@ public class ReducedOpInfo implements OpInfo {
 	@Override
 	public StructInstance<?> createOpInstance(List<?> dependencies) {
 		final Object op = srcInfo.createOpInstance(dependencies).object();
-		if (!Modifier.isPublic(srcInfo.opType().getClass().getModifiers())) {
-			throw new IllegalArgumentException("Op " + srcInfo.opType() +
-				" is not public; only Ops backed by public classes can be reduced!");
-		}
+//		if (!Modifier.isPublic(srcInfo.opType().getClass().getModifiers())) {
+//			throw new IllegalArgumentException("Op " + srcInfo.opType() +
+//				" is not public; only Ops backed by public classes can be reduced!");
+//		}
 		try {
 			Object reducedOp = ReductionUtils.javassistOp(op, this);
 			return struct().createInstance(reducedOp);

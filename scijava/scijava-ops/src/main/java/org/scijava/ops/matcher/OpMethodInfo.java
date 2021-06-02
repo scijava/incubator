@@ -377,9 +377,12 @@ public class OpMethodInfo implements OpInfo {
 			"Member " + m + " is not a Memeber of OpInfo " + this);
 		if (m.isOutput()) return false;
 		if (m instanceof OpDependencyMember) return false;
+		// TODO: this likely will break down if OpDependencies
 		int inputIndex = OpUtils.inputs(struct).indexOf(m);
 		// TODO: call this method once?
-		return parameters().anyMatch(arr -> arr[inputIndex].isAnnotationPresent(Optional.class));
+		boolean optionalOnMethod = method.getParameters()[inputIndex].isAnnotationPresent(Optional.class);
+		boolean optionalOnIFace = parameters().anyMatch(arr -> arr[inputIndex].isAnnotationPresent(Optional.class));
+		return optionalOnMethod || optionalOnIFace;
 	}
 
 	private Stream<Parameter[]> parameters() {
