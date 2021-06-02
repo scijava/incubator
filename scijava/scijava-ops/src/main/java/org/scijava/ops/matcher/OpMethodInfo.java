@@ -388,7 +388,7 @@ public class OpMethodInfo implements OpInfo {
 	private Stream<Parameter[]> parameters() {
 		Method superFMethod = SimplificationUtils.findFMethod(Types.raw(opType));
 		List<Method> methods = new ArrayList<>(Arrays.asList(opType.getClass().getMethods()));
-		methods.add(method);
+		methods.add(superFMethod);
 		return methods.parallelStream() //
 				.filter(m -> m.getName().equals(superFMethod.getName())) //
 				.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
