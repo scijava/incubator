@@ -30,8 +30,6 @@
 
 package org.scijava.ops.matcher;
 
-import com.google.common.collect.Streams;
-
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
@@ -82,6 +80,7 @@ public class OpMethodInfo implements OpInfo {
 	private final Method method;
 	private Type opType;
 	private Struct struct;
+	private final boolean[] paramOptionality;
 	private final ValidityException validityException;
 
 	private final boolean simplifiable;
@@ -117,6 +116,8 @@ public class OpMethodInfo implements OpInfo {
 		catch (final ValidityException e) {
 			problems.addAll(e.problems());
 		}
+
+		paramOptionality = getParameterOptionality(this.method, Types.raw(opType));
 		validityException = problems.isEmpty() ? null : new ValidityException(
 			problems);
 	}
@@ -379,19 +380,60 @@ public class OpMethodInfo implements OpInfo {
 		if (m instanceof OpDependencyMember) return false;
 		// TODO: this likely will break down if OpDependencies
 		int inputIndex = OpUtils.inputs(struct).indexOf(m);
-		// TODO: call this method once?
-		boolean optionalOnMethod = method.getParameters()[inputIndex].isAnnotationPresent(Optional.class);
-		boolean optionalOnIFace = parameters().anyMatch(arr -> arr[inputIndex].isAnnotationPresent(Optional.class));
-		return optionalOnMethod || optionalOnIFace;
+		return paramOptionality[inputIndex];
 	}
 
-	private Stream<Parameter[]> parameters() {
+	private static boolean[] getParameterOptionality(Method m, Class<?> opType) {
+		int[] paramIndex = mapFunctionalParamsToIndices(m.getParameters());
+		boolean[] arr = new boolean[m.getParameterCount()];
+		// check parameters on m
+		boolean[] mOptionals = hasOptionalAnnotation(m.getParameters());
+		// check parameters on methods from opType
+		boolean[][] optionalOnIFace = parameters(opType);
+		
+		for (boolean[] a : optionalOnIFace) {
+			for(int i = 0; i < arr.length; i++) {
+				int index = paramIndex[i];
+				if (index == -1) continue;
+				arr[i] |= a[index];
+			}
+		}
+		for(int i = 0; i < arr.length; i++) {
+			arr[i] |= mOptionals[i];
+		}
+		return arr;
+	}
+
+	private static int[] mapFunctionalParamsToIndices(Parameter[] parameters) {
+		int[] paramNo = new int[parameters.length];
+		int paramIndex = 0;
+		for(int i = 0; i < parameters.length; i++) {
+			if (parameters[i].isAnnotationPresent(OpDependency.class)) {
+				paramNo[i] = -1;
+			}
+			else {
+				paramNo[i] = paramIndex++;
+			}
+		}
+		return paramNo;
+	}
+
+	private static boolean[][] parameters(Class<?> opType) {
 		Method superFMethod = SimplificationUtils.findFMethod(Types.raw(opType));
 		List<Method> methods = new ArrayList<>(Arrays.asList(opType.getClass().getMethods()));
 		methods.add(superFMethod);
 		return methods.parallelStream() //
 				.filter(m -> m.getName().equals(superFMethod.getName())) //
 				.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
-				.map(m -> m.getParameters());
+				.map(m -> hasOptionalAnnotation(m.getParameters())) //
+				.toArray(boolean[][]::new);
+	}
+
+	private static boolean[] hasOptionalAnnotation(Parameter[] params) {
+		boolean[] b = new boolean[params.length];
+		for(int i = 0; i < params.length; i++) {
+			b[i] = params[i].isAnnotationPresent(Optional.class);
+		}
+		return b;
 	}
 }
