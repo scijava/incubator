@@ -686,10 +686,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				final Class<?> opClass = pluginInfo.loadClass();
 				OpInfo opInfo = new OpClassInfo(opClass);
 				addToOpIndex(opInfo, pluginInfo.getName());
-				boolean hasOptional = opInfo.struct().members().parallelStream() //
-						.filter(m -> opInfo.isOptional(m)) //
-						.findAny() //
-						.isPresent();
+				boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
+						.anyMatch(m -> opInfo.isOptional(m)); //
 				if (hasOptional) {
 					reduceInfo.accept(opInfo, pluginInfo.getName());
 				}
@@ -711,10 +709,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field);
 					String names = field.getAnnotation(OpField.class).names();
 					addToOpIndex(opInfo, names);
-					boolean hasOptional = opInfo.struct().members().parallelStream() //
-							.filter(m -> opInfo.isOptional(m)) //
-							.findAny() //
-							.isPresent();
+					boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
+							.anyMatch(m -> opInfo.isOptional(m)); //
 					if (hasOptional) {
 						reduceInfo.accept(opInfo, names);
 					}
@@ -724,10 +720,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					OpInfo opInfo = new OpMethodInfo(method);
 					String names = method.getAnnotation(OpMethod.class).names();
 					addToOpIndex(opInfo, names);
-					boolean hasOptional = opInfo.struct().members().parallelStream() //
-							.filter(m -> opInfo.isOptional(m)) //
-							.findAny() //
-							.isPresent();
+					boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
+							.anyMatch(m -> opInfo.isOptional(m)); //
 					if (hasOptional) {
 						reduceInfo.accept(opInfo, names);
 					}
@@ -736,15 +730,6 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
 		}
-
-		// TODO: can we 
-//		// Find all Ops able to be reduced
-//		initInfoReducers();
-//		Set<OpInfo> reducableInfos = StreamSupport.stream(infos().spliterator(), true) //
-//				.filter(info -> info.hasOptionalParameters()) //
-//				.collect(Collectors.toSet());
-//		reducableInfos.parallelStream() //
-//			.forEach(reduceInfo);
 	}
 
 	private final BiConsumer<OpInfo, String> reduceInfo = (info, names) -> {
