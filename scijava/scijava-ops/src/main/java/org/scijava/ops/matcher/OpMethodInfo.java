@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.scijava.Priority;
 import org.scijava.ops.OpDependency;
@@ -80,7 +80,7 @@ public class OpMethodInfo implements OpInfo {
 	private final Method method;
 	private Type opType;
 	private Struct struct;
-	private final boolean[] paramOptionality;
+	private Boolean[] paramOptionality;
 	private final ValidityException validityException;
 
 	private final boolean simplifiable;
@@ -117,7 +117,10 @@ public class OpMethodInfo implements OpInfo {
 			problems.addAll(e.problems());
 		}
 
-		paramOptionality = getParameterOptionality(this.method, Types.raw(opType));
+		// determine parameter optionality
+		paramOptionality = getParameterOptionality(this.method, Types.raw(opType),
+			struct, problems);
+
 		validityException = problems.isEmpty() ? null : new ValidityException(
 			problems);
 	}
@@ -383,27 +386,64 @@ public class OpMethodInfo implements OpInfo {
 		return paramOptionality[inputIndex];
 	}
 
-	private static boolean[] getParameterOptionality(Method m, Class<?> opType) {
-		int[] paramIndex = mapFunctionalParamsToIndices(m.getParameters());
-		boolean[] arr = new boolean[m.getParameterCount()];
-		// check parameters on m
-		boolean[] mOptionals = hasOptionalAnnotation(m.getParameters());
-		// check parameters on methods from opType
-		boolean[][] optionalOnIFace = parameters(opType);
-		
-		for (boolean[] a : optionalOnIFace) {
-			for(int i = 0; i < arr.length; i++) {
-				int index = paramIndex[i];
-				if (index == -1) continue;
-				arr[i] |= a[index];
-			}
+	private static Boolean[] getParameterOptionality(Method m, Class<?> opType,
+		Struct struct, List<ValidityProblem> problems)
+	{
+		boolean opMethodHasOptionals = hasOptionalAnntotations.apply(m);
+		List<Method> fMethodsWithOptionals = fMethodsWithOptional(opType);
+		// the number of parameters we need to determine
+		int opParams = OpUtils.inputs(struct).size();
+
+		// Ensure only the Op method OR ONE of its op type's functional methods have
+		// Optionals
+		if (opMethodHasOptionals && !fMethodsWithOptionals.isEmpty()) {
+			problems.add(new ValidityProblem(
+				"Both the OpMethod and its op type have optional parameters!"));
+			return generateAllRequiredArray.apply(opParams);
 		}
+		if (fMethodsWithOptionals.size() > 1) {
+			problems.add(new ValidityProblem(
+				"Multiple methods from the op type have optional parameters!"));
+			return generateAllRequiredArray.apply(opParams);
+		}
+
+		// return the optionality of each parameter of the Op
+		if (opMethodHasOptionals) return getOpMethodOptionals(m, opParams);
+		if (fMethodsWithOptionals.size() > 0) return findParameterOptionality.apply(
+			fMethodsWithOptionals.get(0));
+		return generateAllRequiredArray.apply(opParams);
+	}
+
+	private static Function<Integer, Boolean[]> generateAllRequiredArray =
+		num -> {
+			Boolean[] arr = new Boolean[num];
+			Arrays.fill(arr, false);
+			return arr;
+		};
+
+	private static Boolean[] getOpMethodOptionals(Method m, int opParams) {
+		int[] paramIndex = mapFunctionalParamsToIndices(m.getParameters());
+		Boolean[] arr = generateAllRequiredArray.apply(opParams);
+		// check parameters on m
+		Boolean[] mOptionals = findParameterOptionality.apply(m);
 		for(int i = 0; i < arr.length; i++) {
-			arr[i] |= mOptionals[i];
+			int index = paramIndex[i];
+			if (index == -1) continue;
+			arr[i] |= mOptionals[index];
 		}
 		return arr;
 	}
 
+	/**
+	 * Since {@link OpMethod}s can have an {@link OpDependency} (or multiple) as
+	 * parameters, we need to determine which parameter indices correspond to the
+	 * inputs of the Op.
+	 * 
+	 * @param parameters the list of {@link Parameter}s of the {@link OpMethod}
+	 * @return an array of ints where the value at index {@code i} denotes the
+	 *         position of the parameter in the Op's signature. Values of
+	 *         {@code -1} designate an {@link OpDependency} at that position.
+	 */
 	private static int[] mapFunctionalParamsToIndices(Parameter[] parameters) {
 		int[] paramNo = new int[parameters.length];
 		int paramIndex = 0;
@@ -418,22 +458,22 @@ public class OpMethodInfo implements OpInfo {
 		return paramNo;
 	}
 
-	private static boolean[][] parameters(Class<?> opType) {
+	private static List<Method> fMethodsWithOptional(Class<?> opType) {
 		Method superFMethod = SimplificationUtils.findFMethod(Types.raw(opType));
 		List<Method> methods = new ArrayList<>(Arrays.asList(opType.getClass().getMethods()));
 		methods.add(superFMethod);
 		return methods.parallelStream() //
-				.filter(m -> m.getName().equals(superFMethod.getName())) //
-				.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
-				.map(m -> hasOptionalAnnotation(m.getParameters())) //
-				.toArray(boolean[][]::new);
+			.filter(m -> m.getName().equals(superFMethod.getName())) //
+			.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
+			.filter(m -> hasOptionalAnntotations.apply(m)) //
+			.collect(Collectors.toList());
 	}
 
-	private static boolean[] hasOptionalAnnotation(Parameter[] params) {
-		boolean[] b = new boolean[params.length];
-		for(int i = 0; i < params.length; i++) {
-			b[i] = params[i].isAnnotationPresent(Optional.class);
-		}
-		return b;
-	}
+	private static Function<? super Method, Boolean[]> findParameterOptionality =
+		m -> Arrays.stream(m.getParameters()).map(p -> p.isAnnotationPresent(
+			Optional.class)).toArray(Boolean[]::new);
+
+	private static Function<? super Method, Boolean> hasOptionalAnntotations =
+		m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(
+			Optional.class));
 }
