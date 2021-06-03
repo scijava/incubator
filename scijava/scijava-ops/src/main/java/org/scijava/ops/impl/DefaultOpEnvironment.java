@@ -40,7 +40,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,13 +74,13 @@ import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpCandidate.StatusCode;
-import org.scijava.ops.reduce.InfoReducer;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
 import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
 import org.scijava.ops.matcher.OpRef;
+import org.scijava.ops.reduce.InfoReducer;
 import org.scijava.ops.simplify.InfoSimplificationGenerator;
 import org.scijava.ops.simplify.SimplificationUtils;
 import org.scijava.ops.simplify.SimplifiedOpInfo;
@@ -93,7 +92,6 @@ import org.scijava.param.ParameterStructs;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.PluginInfo;
 import org.scijava.plugin.PluginService;
-import org.scijava.plugin.SciJavaPlugin;
 import org.scijava.struct.ItemIO;
 import org.scijava.types.Nil;
 import org.scijava.types.TypeService;
@@ -676,51 +674,28 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return new OpRef(name, type, mappedOutputs[0], mappedInputs);
 	}
 
+	/**
+	 * Initializes the Op Directory. There are two phases:
+	 * <ol>
+	 * <li> Ops written as Classes are discovered
+	 * <li> Ops written as Fields and Methods are discovered via {@link OpCollection} annotations
+	 * </ol>
+	 *
+	 * TODO: can this be done in parallel?
+	 */
 	private void initOpDirectory() {
 		opDirectory = new HashMap<>();
 		initInfoReducers();
 
 		// Add regular Ops
-		for (final PluginInfo<Op> pluginInfo : pluginService.getPluginsOfType(Op.class)) {
-			try {
-				final Class<?> opClass = pluginInfo.loadClass();
-				OpInfo opInfo = new OpClassInfo(opClass, pluginInfo.getName());
-				addToOpIndex(opInfo);
-				reduceInfo.accept(opInfo, pluginInfo.getName());
-			} catch (InstantiableException exc) {
-				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
-			}
-		}
+		pluginService.getPluginsOfType(Op.class) //
+			.stream().forEach(parseOpClass);
 		// Add Ops contained in an OpCollection
-		for (final PluginInfo<OpCollection> pluginInfo : pluginService.getPluginsOfType(OpCollection.class)) {
-			try {
-				final Class<? extends OpCollection> c = pluginInfo.loadClass();
-				final List<Field> fields = ClassUtils.getAnnotatedFields(c, OpField.class);
-				Object instance = null;
-				for (Field field : fields) {
-					final boolean isStatic = Modifier.isStatic(field.getModifiers());
-					if (!isStatic && instance == null) {
-						instance = field.getDeclaringClass().newInstance();
-					}
-					String names = field.getAnnotation(OpField.class).names();
-					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field, names);
-					addToOpIndex(opInfo);
-					reduceInfo.accept(opInfo, names);
-				}
-				final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
-				for (final Method method: methods) {
-					String names = method.getAnnotation(OpMethod.class).names();
-					OpInfo opInfo = new OpMethodInfo(method, names);
-					addToOpIndex(opInfo);
-					reduceInfo.accept(opInfo, names);
-				}
-			} catch (InstantiableException | InstantiationException | IllegalAccessException exc) {
-				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
-			}
-		}
+		pluginService.getPluginsOfType(OpCollection.class) //
+			.stream().forEach(parseOpCollection);
 	}
 
-	private final BiConsumer<OpInfo, String> reduceInfo = (info, names) -> {
+	private final Consumer<OpInfo> reduceInfo = (info) -> {
 		// if there is nothing to reduce, end quickly
 		boolean hasOptional = OpUtils.inputs(info.struct()).parallelStream() //
 			.anyMatch(m -> info.isOptional(m)); //
@@ -742,6 +717,44 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		// TODO: how to find the names?
 		for (int i = 1; i <= numReductions; i++) {
 			addToOpIndex(reducer.reduce(info, i));
+		}
+	};
+
+	private final Consumer<PluginInfo<Op>> parseOpClass = (pluginInfo) -> {
+		try {
+			final Class<?> opClass = pluginInfo.loadClass();
+			OpInfo opInfo = new OpClassInfo(opClass, pluginInfo.getName());
+			addToOpIndex(opInfo);
+			reduceInfo.accept(opInfo);
+		} catch (InstantiableException exc) {
+			log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
+		}
+	};
+
+	private final Consumer<PluginInfo<OpCollection>> parseOpCollection = pluginInfo -> {
+		try {
+			final Class<? extends OpCollection> c = pluginInfo.loadClass();
+			final List<Field> fields = ClassUtils.getAnnotatedFields(c, OpField.class);
+			Object instance = null;
+			for (Field field : fields) {
+				final boolean isStatic = Modifier.isStatic(field.getModifiers());
+				if (!isStatic && instance == null) {
+					instance = field.getDeclaringClass().newInstance();
+				}
+				String names = field.getAnnotation(OpField.class).names();
+				OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field, names);
+				addToOpIndex(opInfo);
+				reduceInfo.accept(opInfo);
+			}
+			final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
+			for (final Method method: methods) {
+				String names = method.getAnnotation(OpMethod.class).names();
+				OpInfo opInfo = new OpMethodInfo(method, names);
+				addToOpIndex(opInfo);
+				reduceInfo.accept(opInfo);
+			}
+		} catch (InstantiableException | InstantiationException | IllegalAccessException exc) {
+			log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 		}
 	};
 
