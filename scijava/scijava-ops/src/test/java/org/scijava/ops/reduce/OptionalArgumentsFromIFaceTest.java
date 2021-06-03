@@ -3,6 +3,7 @@ package org.scijava.ops.reduce;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.OpField;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.core.OpCollection;
 import org.scijava.plugin.Plugin;
@@ -27,6 +28,32 @@ public class OptionalArgumentsFromIFaceTest extends AbstractTestEnvironment{
 	public void testMethodWithoutOptionals() {
 		Double o = ops.env().op("test.optionalSubtract").input(2., 5.).outType(Double.class).apply();
 		Double expected = -3.0;
+		Assert.assertEquals(expected, o);
+	}
+
+	@OpField(names = "test.optionalAnd", params = "in1, in2, in3")
+	public final BiFunctionWithOptional<Boolean, Boolean, Boolean, Boolean> bar =
+		(in1, in2, in3) -> {
+			if (in3 == null) in3 = true;
+			return in1 & in2 & in3;
+		};
+
+	@Test
+	public void testFieldWithOptionals() {
+		Boolean in1 = true;
+		Boolean in2 = true;
+		Boolean in3 = false;
+		Boolean o = ops.env().op("test.optionalAnd").input(in1, in2, in3).outType(Boolean.class).apply();
+		Boolean expected = false;
+		Assert.assertEquals(expected, o);
+	}
+
+	@Test
+	public void testFieldWithoutOptionals() {
+		Boolean in1 = true;
+		Boolean in2 = true;
+		Boolean o = ops.env().op("test.optionalAnd").input(in1, in2).outType(Boolean.class).apply();
+		Boolean expected = true;
 		Assert.assertEquals(expected, o);
 	}
 

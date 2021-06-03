@@ -33,12 +33,12 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.scijava.Priority;
 import org.scijava.ops.OpField;
@@ -67,6 +67,7 @@ public class OpFieldInfo implements OpInfo {
 	private Struct struct;
 	private ValidityException validityException;
 
+	private final Boolean[] paramOptionality;
 	private final boolean simplifiable;
 
 	public OpFieldInfo(final Object instance, final Field field) {
@@ -107,6 +108,10 @@ public class OpFieldInfo implements OpInfo {
 
 		// we cannot simplify the Op iff it has the Unsimplifiable annotation.
 		simplifiable = field.getAnnotation(Unsimplifiable.class) == null;
+
+		// determine parameter optionality
+		paramOptionality = getParameterOptionality(instance, field,
+			struct, problems);
 	}
 
 	// -- OpInfo methods --
@@ -200,24 +205,67 @@ public class OpFieldInfo implements OpInfo {
 		if (m.isOutput()) return false;
 		int inputIndex = OpUtils.inputs(struct).indexOf(m);
 		// TODO: call this method once?
-		return parameters().anyMatch(arr -> arr[inputIndex].isAnnotationPresent(Optional.class));
+		return paramOptionality[inputIndex];
 	}
 
+	private static Boolean[] getParameterOptionality(Object instance, Field field,
+		Struct struct, List<ValidityProblem> problems)
+	{
+		// the number of parameters we need to determine
+		int opParams = OpUtils.inputs(struct).size();
 
-	private Stream<Parameter[]> parameters() {
 		Class<?> fieldClass;
 		try {
 			fieldClass = field.get(instance).getClass();
 		}
-		catch (IllegalArgumentException | IllegalAccessException exc1) {
+		catch (IllegalArgumentException | IllegalAccessException exc) {
 			// TODO Auto-generated catch block
-			throw new IllegalArgumentException(exc1);
+			problems.add(new ValidityProblem(exc));
+			return generateAllRequiredArray.apply(opParams);
 		}
-		Method superFMethod = SimplificationUtils.findFMethod(fieldClass);
-		return Arrays.stream(fieldClass.getMethods()) //
-				.filter(m -> m.getName().equals(superFMethod.getName())) //
-				.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
-				.map(m -> m.getParameters());
+		List<Method> fMethodsWithOptionals = fMethodsWithOptional(fieldClass);
+		Class<?> fIface = ParameterStructs.findFunctionalInterface(fieldClass);
+		List<Method> fIfaceMethodsWithOptionals = fMethodsWithOptional(fIface);
+
+		if (fMethodsWithOptionals.isEmpty() && fIfaceMethodsWithOptionals.isEmpty()) {
+			return generateAllRequiredArray.apply(opParams);
+		}
+		if (!fMethodsWithOptionals.isEmpty() && !fIfaceMethodsWithOptionals.isEmpty()) {
+			problems.add(new ValidityProblem(
+				"Multiple methods from the op type have optional parameters!"));
+			return generateAllRequiredArray.apply(opParams);
+		}
+		if (fMethodsWithOptionals.isEmpty()) {
+			return findParameterOptionality.apply(fIfaceMethodsWithOptionals.get(0));
+		}
+		if (fIfaceMethodsWithOptionals.isEmpty()) {
+			return findParameterOptionality.apply(fMethodsWithOptionals.get(0));
+		}
+		return generateAllRequiredArray.apply(opParams);
 	}
+
+	private static Function<Integer, Boolean[]> generateAllRequiredArray =
+		num -> {
+			Boolean[] arr = new Boolean[num];
+			Arrays.fill(arr, false);
+			return arr;
+		};
+
+	private static List<Method> fMethodsWithOptional(Class<?> opClass) {
+		Method superFMethod = SimplificationUtils.findFMethod(opClass);
+		return Arrays.stream(opClass.getMethods()) //
+			.filter(m -> m.getName().equals(superFMethod.getName())) //
+			.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
+			.filter(m -> hasOptionalAnnotations.apply(m)) //
+			.collect(Collectors.toList());
+	}
+
+	private static Function<? super Method, Boolean[]> findParameterOptionality =
+		m -> Arrays.stream(m.getParameters()).map(p -> p.isAnnotationPresent(
+			Optional.class)).toArray(Boolean[]::new);
+
+	private static Function<? super Method, Boolean> hasOptionalAnnotations =
+		m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(
+			Optional.class));
 
 }
