@@ -230,7 +230,7 @@ public class ReductionUtils {
 		if (OpUtils.hasPureOutput(info)) {
 			sb.append(OpUtils.outputType(info.struct()).getTypeName() + " " + opOutput + " = ");
 		}
-		sb.append("op." + m.getName() + "(");
+		sb.append("op." + srcM.getName() + "(");
 		int i;
 		List<Member<?>> totalArguments = OpUtils.inputs(info.srcInfo().struct());
 		int totalArgs = OpUtils.inputs(info.srcInfo().struct()).size();

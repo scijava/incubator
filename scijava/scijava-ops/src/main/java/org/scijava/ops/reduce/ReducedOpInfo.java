@@ -1,12 +1,13 @@
 package org.scijava.ops.reduce;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
 
+import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpUtils;
 import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
@@ -66,6 +67,16 @@ public class ReducedOpInfo implements OpInfo {
 	public String implementationName() {
 		// TODO: improve this name
 		return srcInfo.implementationName() + "Reduction" + paramsReduced; 
+	}
+
+	/**
+	 * Gets the op's dependencies on other ops. NB the reduction wrapper has no
+	 * dependencies, but the Op itself might. So the dependencies are actually
+	 * reflected in {@code srcInfo}
+	 */
+	@Override
+	public List<OpDependencyMember<?>> dependencies() {
+		return OpUtils.dependencies(srcInfo().struct());
 	}
 
 	@Override

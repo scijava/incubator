@@ -438,10 +438,10 @@ public class OpMethodInfo implements OpInfo {
 		Boolean[] arr = ReductionUtils.generateAllRequiredArray(opParams);
 		// check parameters on m
 		Boolean[] mOptionals = ReductionUtils.findParameterOptionality(m);
-		for(int i = 0; i < arr.length; i++) {
+		for(int i = 0; i < mOptionals.length; i++) {
 			int index = paramIndex[i];
 			if (index == -1) continue;
-			arr[i] |= mOptionals[index];
+			arr[index] |= mOptionals[i];
 		}
 		return arr;
 	}
