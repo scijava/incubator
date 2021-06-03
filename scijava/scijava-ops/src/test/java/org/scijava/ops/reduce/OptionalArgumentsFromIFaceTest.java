@@ -30,4 +30,23 @@ public class OptionalArgumentsFromIFaceTest extends AbstractTestEnvironment{
 		Assert.assertEquals(expected, o);
 	}
 
+	@Test
+	public void testClassWithOptionals() {
+		Boolean in1 = true;
+		Boolean in2 = false;
+		Boolean in3 = false;
+		Boolean o = ops.env().op("test.optionalOr").input(in1, in2, in3).outType(Boolean.class).apply();
+		Boolean expected = true;
+		Assert.assertEquals(expected, o);
+	}
+
+	@Test
+	public void testClassWithoutOptionals() {
+		Boolean in1 = true;
+		Boolean in2 = false;
+		Boolean o = ops.env().op("test.optionalOr").input(in1, in2).outType(Boolean.class).apply();
+		Boolean expected = true;
+		Assert.assertEquals(expected, o);
+	}
+
 }
