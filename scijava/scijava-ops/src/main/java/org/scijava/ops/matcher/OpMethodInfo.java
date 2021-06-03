@@ -38,10 +38,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.scijava.Priority;
@@ -50,10 +48,9 @@ import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.simplify.SimplificationUtils;
+import org.scijava.ops.reduce.ReductionUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.util.Adapt;
-import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
@@ -389,8 +386,8 @@ public class OpMethodInfo implements OpInfo {
 	private static Boolean[] getParameterOptionality(Method m, Class<?> opType,
 		Struct struct, List<ValidityProblem> problems)
 	{
-		boolean opMethodHasOptionals = hasOptionalAnntotations.apply(m);
-		List<Method> fMethodsWithOptionals = fMethodsWithOptional(opType);
+		boolean opMethodHasOptionals = ReductionUtils.hasOptionalAnnotations(m);
+		List<Method> fMethodsWithOptionals = ReductionUtils.fMethodsWithOptional(opType);
 		// the number of parameters we need to determine
 		int opParams = OpUtils.inputs(struct).size();
 
@@ -399,33 +396,26 @@ public class OpMethodInfo implements OpInfo {
 		if (opMethodHasOptionals && !fMethodsWithOptionals.isEmpty()) {
 			problems.add(new ValidityProblem(
 				"Both the OpMethod and its op type have optional parameters!"));
-			return generateAllRequiredArray.apply(opParams);
+			return ReductionUtils.generateAllRequiredArray(opParams);
 		}
 		if (fMethodsWithOptionals.size() > 1) {
 			problems.add(new ValidityProblem(
 				"Multiple methods from the op type have optional parameters!"));
-			return generateAllRequiredArray.apply(opParams);
+			return ReductionUtils.generateAllRequiredArray(opParams);
 		}
 
 		// return the optionality of each parameter of the Op
 		if (opMethodHasOptionals) return getOpMethodOptionals(m, opParams);
-		if (fMethodsWithOptionals.size() > 0) return findParameterOptionality.apply(
+		if (fMethodsWithOptionals.size() > 0) return ReductionUtils.findParameterOptionality(
 			fMethodsWithOptionals.get(0));
-		return generateAllRequiredArray.apply(opParams);
+		return ReductionUtils.generateAllRequiredArray(opParams);
 	}
-
-	private static Function<Integer, Boolean[]> generateAllRequiredArray =
-		num -> {
-			Boolean[] arr = new Boolean[num];
-			Arrays.fill(arr, false);
-			return arr;
-		};
 
 	private static Boolean[] getOpMethodOptionals(Method m, int opParams) {
 		int[] paramIndex = mapFunctionalParamsToIndices(m.getParameters());
-		Boolean[] arr = generateAllRequiredArray.apply(opParams);
+		Boolean[] arr = ReductionUtils.generateAllRequiredArray(opParams);
 		// check parameters on m
-		Boolean[] mOptionals = findParameterOptionality.apply(m);
+		Boolean[] mOptionals = ReductionUtils.findParameterOptionality(m);
 		for(int i = 0; i < arr.length; i++) {
 			int index = paramIndex[i];
 			if (index == -1) continue;
@@ -458,22 +448,4 @@ public class OpMethodInfo implements OpInfo {
 		return paramNo;
 	}
 
-	private static List<Method> fMethodsWithOptional(Class<?> opType) {
-		Method superFMethod = SimplificationUtils.findFMethod(Types.raw(opType));
-		List<Method> methods = new ArrayList<>(Arrays.asList(opType.getClass().getMethods()));
-		methods.add(superFMethod);
-		return methods.parallelStream() //
-			.filter(m -> m.getName().equals(superFMethod.getName())) //
-			.filter(m -> m.getParameterCount() == superFMethod.getParameterCount()) //
-			.filter(m -> hasOptionalAnntotations.apply(m)) //
-			.collect(Collectors.toList());
-	}
-
-	private static Function<? super Method, Boolean[]> findParameterOptionality =
-		m -> Arrays.stream(m.getParameters()).map(p -> p.isAnnotationPresent(
-			Optional.class)).toArray(Boolean[]::new);
-
-	private static Function<? super Method, Boolean> hasOptionalAnntotations =
-		m -> Arrays.stream(m.getParameters()).anyMatch(p -> p.isAnnotationPresent(
-			Optional.class));
 }
