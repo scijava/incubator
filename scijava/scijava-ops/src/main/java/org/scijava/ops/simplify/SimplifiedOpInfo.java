@@ -65,6 +65,11 @@ public class SimplifiedOpInfo implements OpInfo {
 	}
 
 	@Override
+	public String names() {
+		return srcInfo.names();
+	}
+
+	@Override
 	public double priority() {
 		return priority;
 	}

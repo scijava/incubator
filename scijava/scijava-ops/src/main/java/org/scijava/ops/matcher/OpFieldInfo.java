@@ -59,6 +59,7 @@ public class OpFieldInfo implements OpInfo {
 
 	private final Object instance;
 	private final Field field;
+	private final String names;
 
 	private Struct struct;
 	private ValidityException validityException;
@@ -66,9 +67,10 @@ public class OpFieldInfo implements OpInfo {
 	private final Boolean[] paramOptionality;
 	private final boolean simplifiable;
 
-	public OpFieldInfo(final Object instance, final Field field) {
+	public OpFieldInfo(final Object instance, final Field field, final String names) {
 		this.instance = instance;
 		this.field = field;
+		this.names = names;
 
 		if (Modifier.isStatic(field.getModifiers())) {
 			// Field is static; instance must be null.
@@ -121,6 +123,11 @@ public class OpFieldInfo implements OpInfo {
 	@Override
 	public Struct struct() {
 		return struct;
+	}
+
+	@Override
+	public String names() {
+		return names;
 	}
 
 	@Override

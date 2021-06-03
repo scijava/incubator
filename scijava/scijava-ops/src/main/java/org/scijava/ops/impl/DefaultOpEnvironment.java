@@ -199,19 +199,19 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	@Override
-	public OpInfo opify(final Class<?> opClass) {
-		return opify(opClass, Priority.NORMAL);
+	public OpInfo opify(final Class<?> opClass, String names) {
+		return opify(opClass, names, Priority.NORMAL);
 	}
 
 	@Override
-	public OpInfo opify(final Class<?> opClass, final double priority) {
-		return new OpClassInfo(opClass, priority, opClass.getAnnotation(Unsimplifiable.class) == null);
+	public OpInfo opify(final Class<?> opClass, final String names, final double priority) {
+		return new OpClassInfo(opClass, names, priority, opClass.getAnnotation(Unsimplifiable.class) == null);
 	}
 
 	@Override
-	public void register(final OpInfo info, final String name) {
+	public void register(final OpInfo info) {
 		if (opDirectory == null) initOpDirectory();
-		addToOpIndex(info, name);
+		addToOpIndex(info);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -684,8 +684,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		for (final PluginInfo<Op> pluginInfo : pluginService.getPluginsOfType(Op.class)) {
 			try {
 				final Class<?> opClass = pluginInfo.loadClass();
-				OpInfo opInfo = new OpClassInfo(opClass);
-				addToOpIndex(opInfo, pluginInfo.getName());
+				OpInfo opInfo = new OpClassInfo(opClass, pluginInfo.getName());
+				addToOpIndex(opInfo);
 				boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
 						.anyMatch(m -> opInfo.isOptional(m)); //
 				if (hasOptional) {
@@ -706,9 +706,9 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					if (!isStatic && instance == null) {
 						instance = field.getDeclaringClass().newInstance();
 					}
-					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field);
 					String names = field.getAnnotation(OpField.class).names();
-					addToOpIndex(opInfo, names);
+					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field, names);
+					addToOpIndex(opInfo);
 					boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
 							.anyMatch(m -> opInfo.isOptional(m)); //
 					if (hasOptional) {
@@ -717,9 +717,9 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				}
 				final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
 				for (final Method method: methods) {
-					OpInfo opInfo = new OpMethodInfo(method);
 					String names = method.getAnnotation(OpMethod.class).names();
-					addToOpIndex(opInfo, names);
+					OpInfo opInfo = new OpMethodInfo(method, names);
+					addToOpIndex(opInfo);
 					boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
 							.anyMatch(m -> opInfo.isOptional(m)); //
 					if (hasOptional) {
@@ -748,12 +748,12 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		// add a ReducedOpInfo for all possible reductions
 		// TODO: how to find the names?
 		for (int i = 1; i <= numReductions; i++) {
-			addToOpIndex(reducer.reduce(info, i), names);
+			addToOpIndex(reducer.reduce(info, i));
 		}
 	};
 
-	private void addToOpIndex(final OpInfo opInfo, final String opNames) {
-		String[] parsedOpNames = OpUtils.parseOpNames(opNames);
+	private void addToOpIndex(final OpInfo opInfo) {
+		String[] parsedOpNames = OpUtils.parseOpNames(opInfo.names());
 		if (parsedOpNames == null || parsedOpNames.length == 0) {
 			log.error("Skipping Op " + opInfo.implementationName() + ":\n" + "Op implementation must provide name.");
 			return;

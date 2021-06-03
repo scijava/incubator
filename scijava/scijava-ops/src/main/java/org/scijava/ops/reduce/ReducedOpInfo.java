@@ -48,6 +48,11 @@ public class ReducedOpInfo implements OpInfo {
 	}
 
 	@Override
+	public String names() {
+		return srcInfo.names();
+	}
+
+	@Override
 	public boolean isSimplifiable() {
 		return true;
 	}

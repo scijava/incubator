@@ -60,6 +60,11 @@ public class OpAdaptationInfo implements OpInfo {
 		return struct;
 	}
 
+	@Override
+	public String names() {
+		return srcInfo.names();
+	}
+
 	// we want the original op to have priority over this one.
 	@Override
 	public double priority() {

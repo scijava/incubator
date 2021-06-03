@@ -30,7 +30,10 @@ public interface OpInfo extends Comparable<OpInfo> {
 
 	/** Gets the associated {@link Struct} metadata. */
 	Struct struct();
-	
+
+	/** Gets the comma-delimited set of names used to identify the Op */
+	String names();
+
 	/** Describes whether this Op can be simplified. */
 	boolean isSimplifiable();
 

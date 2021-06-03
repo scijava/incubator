@@ -64,23 +64,25 @@ public class OpClassInfo implements OpInfo {
 
 	private final Class<?> opClass;
 	private Struct struct;
+	private final String names;
 	private ValidityException validityException;
 	private final double priority;
 
 	private final Boolean[] paramOptionality;
 	private final boolean simplifiable;
 
-	public OpClassInfo(final Class<?> opClass) {
-		this(opClass, priorityFromAnnotation(opClass), simplifiableFromAnnotation(
+	public OpClassInfo(final Class<?> opClass, final String names) {
+		this(opClass, names, priorityFromAnnotation(opClass), simplifiableFromAnnotation(
 			opClass));
 	}
 
-	public OpClassInfo(final Class<?> opClass, final double priority,
+	public OpClassInfo(final Class<?> opClass, final String names, final double priority,
 		final boolean simplifiable)
 	{
 		final List<ValidityProblem> problems = new ArrayList<>();
 
 		this.opClass = opClass;
+		this.names = names;
 		try {
 			struct = ParameterStructs.structOf(opClass);
 			OpUtils.checkHasSingleOutput(struct);
@@ -112,6 +114,11 @@ public class OpClassInfo implements OpInfo {
 	@Override
 	public Struct struct() {
 		return struct;
+	}
+
+	@Override
+	public String names() {
+		return names;
 	}
 
 	@Override

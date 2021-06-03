@@ -120,23 +120,24 @@ public interface OpEnvironment {
 	 * Creates an {@link OpInfo} from an {@link Class}.
 	 *
 	 * @param opClass
+	 * @param names the comma-delimited set of names under which this Op is known
 	 * @return an {@link OpInfo} which can make instances of {@code opClass}
 	 */
-	OpInfo opify(Class<?> opClass);
+	OpInfo opify(Class<?> opClass, String names);
 
 	/**
 	 * Creates an {@link OpInfo} from an {@link Class} with the given priority.
 	 *
 	 * @param opClass
+	 * @param names the comma-delimited set of names under which this Op is known
 	 * @param priority - the assigned priority of the Op.
 	 * @return an {@link OpInfo} which can make instances of {@code opClass}
 	 */
-	OpInfo opify(Class<?> opClass, double priority);
+	OpInfo opify(Class<?> opClass, String names, double priority);
 
 	/**
-	 * Makes the {@link OpInfo} {@code info} known to this {@link OpEnvironment} under the name {@code name}
+	 * Makes the {@link OpInfo} {@code info} known to this {@link OpEnvironment}
 	 * @param info
-	 * @param name
 	 */
-	void register(OpInfo info, String name);
+	void register(OpInfo info);
 }

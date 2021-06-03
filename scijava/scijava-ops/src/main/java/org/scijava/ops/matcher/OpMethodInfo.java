@@ -77,12 +77,13 @@ public class OpMethodInfo implements OpInfo {
 	private final Method method;
 	private Type opType;
 	private Struct struct;
+	private final String names;
 	private Boolean[] paramOptionality;
 	private final ValidityException validityException;
 
 	private final boolean simplifiable;
 
-	public OpMethodInfo(final Method method) {
+	public OpMethodInfo(final Method method, final String names) {
 		final List<ValidityProblem> problems = new ArrayList<>();
 		// Reject all non public methods
 		if (!Modifier.isPublic(method.getModifiers())) {
@@ -97,6 +98,7 @@ public class OpMethodInfo implements OpInfo {
 				" must be static."));
 		}
 		this.method = method;
+		this.names = names;
 		// we cannot simplify this op iff it has the Unsimplifiable annotation.
 		simplifiable = method.getAnnotation(Unsimplifiable.class) == null; 
 		try {
@@ -132,6 +134,11 @@ public class OpMethodInfo implements OpInfo {
 	@Override
 	public Struct struct() {
 		return struct;
+	}
+
+	@Override
+	public String names() {
+		return names;
 	}
 
 	@Override
