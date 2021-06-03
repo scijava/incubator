@@ -686,11 +686,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				final Class<?> opClass = pluginInfo.loadClass();
 				OpInfo opInfo = new OpClassInfo(opClass, pluginInfo.getName());
 				addToOpIndex(opInfo);
-				boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
-						.anyMatch(m -> opInfo.isOptional(m)); //
-				if (hasOptional) {
-					reduceInfo.accept(opInfo, pluginInfo.getName());
-				}
+				reduceInfo.accept(opInfo, pluginInfo.getName());
 			} catch (InstantiableException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
 			}
@@ -709,22 +705,14 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					String names = field.getAnnotation(OpField.class).names();
 					OpInfo opInfo = new OpFieldInfo(isStatic ? null : instance, field, names);
 					addToOpIndex(opInfo);
-					boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
-							.anyMatch(m -> opInfo.isOptional(m)); //
-					if (hasOptional) {
-						reduceInfo.accept(opInfo, names);
-					}
+					reduceInfo.accept(opInfo, names);
 				}
 				final List<Method> methods = ClassUtils.getAnnotatedMethods(c, OpMethod.class);
 				for (final Method method: methods) {
 					String names = method.getAnnotation(OpMethod.class).names();
 					OpInfo opInfo = new OpMethodInfo(method, names);
 					addToOpIndex(opInfo);
-					boolean hasOptional = OpUtils.inputs(opInfo.struct()).parallelStream() //
-							.anyMatch(m -> opInfo.isOptional(m)); //
-					if (hasOptional) {
-						reduceInfo.accept(opInfo, names);
-					}
+					reduceInfo.accept(opInfo, names);
 				}
 			} catch (InstantiableException | InstantiationException | IllegalAccessException exc) {
 				log.error("Can't load class from plugin info: " + pluginInfo.toString(), exc);
@@ -733,6 +721,11 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	private final BiConsumer<OpInfo, String> reduceInfo = (info, names) -> {
+		// if there is nothing to reduce, end quickly
+		boolean hasOptional = OpUtils.inputs(info.struct()).parallelStream() //
+			.anyMatch(m -> info.isOptional(m)); //
+		if (!hasOptional) return;
+
 		// find a InfoReducer capable of reducing info
 		Optional<? extends InfoReducer> suitableReducer = infoReducers
 			.parallelStream().filter(reducer -> reducer.canReduce(info)).findAny();
