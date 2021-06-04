@@ -33,10 +33,15 @@
  */
 package org.scijava.concurrent;
 
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.test.RandomImgs;
-import net.imglib2.type.numeric.integer.IntType;
-import net.imglib2.view.Views;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -49,15 +54,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 /**
  * Demonstrates how to use {@link Parallelization} to execute a algorithm
@@ -72,40 +68,62 @@ import java.util.stream.LongStream;
 public class ParallelizationBenchmark
 {
 
-	private final RandomAccessibleInterval< IntType > image = RandomImgs.seed( 42 ).nextImage( new IntType(), 100, 500, 500 );
+	private final int[][][] image = generateRandomImage(42, 100, 500, 500);
 
 	/**
 	 * If the image is one dimensional: run simple calculate sum.
 	 * If the image is at least 2D: cut the image into slices.
-	 * Use {@link Parallelization#forEach} to call
+	 * Use {@link TaskExecutor#forEach } to call
 	 * {@link #calculateSum} for each slice, and sum up the results.
 	 */
-	private static long calculateSum( RandomAccessibleInterval< IntType > image )
+	private static long calculateSum( int[][][] image )
 	{
-		if ( image.numDimensions() <= 1 )
-			return simpleCalculateSum( image );
-		List< RandomAccessibleInterval< IntType > > slices = slices( image );
+		List<int[][]> slices = Arrays.asList( image );
 		AtomicLong result = new AtomicLong();
 		Parallelization.getTaskExecutor().forEach( slices, slice -> result.addAndGet( calculateSum( slice ) ) );
 		return result.get();
 	}
 
-	private static long simpleCalculateSum( RandomAccessibleInterval< IntType > image )
+	private static long calculateSum(int[][] slice) {
+		List<int[]> rows = Arrays.asList(slice );
+		AtomicLong result = new AtomicLong();
+		Parallelization.getTaskExecutor().forEach( rows, row -> result.addAndGet( simpleCalculateSum( row ) ) );
+		return result.get();
+	}
+
+	private static int[][][] generateRandomImage(long seed, int x, int y, int z) {
+		Random r = new Random(seed);
+		int[][][] arr = new int[x][y][z];
+		for(int i = 0; i < arr.length; i++) {
+			for (int j = 0; i < arr[i].length; j++) {
+				for (int k = 0; k < arr[i][j].length; k++) {
+					arr[i][j][k] = r.nextInt();
+				}
+			}
+		}
+		return arr;
+	}
+
+	private static long simpleCalculateSum( int[][][] image )
 	{
 		long result = 0;
-		for ( IntType pixel : Views.iterable( image ) )
-			result += pixel.getInteger();
+		for (int[][] slice : image)
+			result += simpleCalculateSum(slice);
 		return result;
 	}
 
-	private static List< RandomAccessibleInterval< IntType > > slices( RandomAccessibleInterval< IntType > image )
-	{
-		int lastDim = image.numDimensions() - 1;
-		final long min = image.min( lastDim );
-		final long max = image.max( lastDim );
-		return LongStream.rangeClosed( min, max )
-				.mapToObj( position -> Views.hyperSlice( image, lastDim, position ) )
-				.collect( Collectors.toList() );
+	private static long simpleCalculateSum(int[][] slice) {
+		long result = 0;
+		for (int[] row : slice)
+			result += simpleCalculateSum(row);
+		return result;
+	}
+
+	private static long simpleCalculateSum(int[] row) {
+		long result = 0;
+		for (int pixel : row)
+			result += pixel;
+		return result;
 	}
 
 	@Benchmark
