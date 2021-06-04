@@ -213,7 +213,10 @@ public class ReductionUtils {
 		StringBuilder sb = new StringBuilder();
 
 		// determine the name of the functional method
-		Method m = ParameterStructs.singularAbstractMethod(Types.raw(info.opType()));
+		Class<?> fIface = ParameterStructs.findFunctionalInterface(Types.raw(info.opType()));
+		Method m = ParameterStructs.singularAbstractMethod(fIface);
+		Class<?> srcFIface = ParameterStructs.findFunctionalInterface(Types.raw(info.srcInfo().opType()));
+		Method srcM = ParameterStructs.singularAbstractMethod(srcFIface);
 		// determine the name of the output:
 		String opOutput = "out";
 
