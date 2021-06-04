@@ -205,8 +205,29 @@ public class OpMethodInfo implements OpInfo {
 
 		// Create wrapper class
 		String className = formClassName(m);
-		CtClass cc = pool.makeClass(className);
+		Class<?> c;
+		try {
+			// use javassist to create the class
+			CtClass cc = constructOpMethodWrapper(pool, className, m);
+			c = cc.toClass(MethodHandles.lookup());
+		}
+		catch (RuntimeException e) {
+			// the OpMethod has already been created - find it
+			c= Class.forName(className);
+		}
 
+		// Return Op instance
+		List<OpDependencyMember<?>> depMembers = OpUtils.dependencies(struct());
+		Class<?>[] depClasses = depMembers.stream().map(dep -> dep.getRawType())
+			.toArray(Class[]::new);
+		return c.getDeclaredConstructor(depClasses).newInstance(dependencies
+			.toArray());
+	}
+
+	private CtClass constructOpMethodWrapper(ClassPool pool, String className,
+		Method m) throws Throwable
+	{
+		CtClass cc =  pool.makeClass(className);
 		// Add implemented interface
 		CtClass jasOpType = pool.get(Types.raw(opType).getName());
 		cc.addInterface(jasOpType);
@@ -226,13 +247,7 @@ public class OpMethodInfo implements OpInfo {
 		// add functional interface method
 		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(m), cc);
 		cc.addMethod(functionalMethod);
-
-		// Return Op instance
-		Class<?>[] depClasses = depMembers.stream().map(dep -> dep.getRawType())
-			.toArray(Class[]::new);
-		Class<?> c = cc.toClass(MethodHandles.lookup());
-		return c.getDeclaredConstructor(depClasses).newInstance(dependencies
-			.toArray());
+		return cc;
 	}
 
 	private String formClassName(Method m) {
