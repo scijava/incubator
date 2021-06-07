@@ -27,35 +27,55 @@
  * #L%
  */
 
-package net.imagej.ops2.help;
+package org.scijava.ops.help;
 
-import java.util.function.BiFunction;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.scijava.Priority;
 import org.scijava.ops.OpInfo;
-import org.scijava.ops.OpService;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
-import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
+import org.scijava.ops.OpUtils;
+import org.scijava.ops.matcher.OpCandidate;
 
 /**
- * Gets documentation for the given name.
+ * Base class for help operations.
  *
- * @author Mark Hiner
+ * @author Curtis Rueden
  */
-@Plugin(type = Op.class, name = "help", priority = Priority.HIGH,
-	description = "Gets documentation for all Ops with the given name")
-@Parameter(key = "name")
-@Parameter(key = "opService")
-@Parameter(key = "opInfo")
-public class HelpForName extends AbstractHelp implements BiFunction<String, OpService, String> {
+public abstract class AbstractHelp {
 
-	@Override
-	public String apply(String name, OpService ops) {
-		final Iterable<OpInfo> allOps = ops.env().infos(name);
-		help(allOps);
-		return help;
+	protected String help;
+
+	protected void help(final List<OpCandidate> candidates) {
+		final ArrayList<OpInfo> infos = new ArrayList<>();
+		for (final OpCandidate candidate : candidates) {
+			infos.add(candidate.opInfo());
+		}
+		help(infos);
+	}
+
+	protected void help(final Iterable<? extends OpInfo> infos) {
+		Iterator<? extends OpInfo> itr = infos.iterator();
+		if (!itr.hasNext()){
+			help = "No such operation.";
+			return;
+		}
+
+		final StringBuilder sb = new StringBuilder("Available operations:");
+		for (final OpInfo info : infos) {
+			sb.append("\n\t" + OpUtils.opString(info));
+		}
+
+		// TODO: ops cannot (yet) have descriptions.
+//		if (infos.size() == 1) {
+//			final OpInfo info = infos.iterator().next();
+//			final String description = info.cInfo().getDescription();
+//			if (description != null && !description.isEmpty()) {
+//				sb.append("\n\n" + description);
+//			}
+//		}
+
+		help = sb.toString();
 	}
 
 }
