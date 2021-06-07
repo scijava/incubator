@@ -30,9 +30,9 @@
 package org.scijava.ops;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpRef;
 import org.scijava.types.Nil;
 
@@ -139,4 +139,20 @@ public interface OpEnvironment {
 	 * @param name
 	 */
 	void register(OpInfo info, String name);
+
+	/**
+	 * Returns the descriptions for all Ops contained within this
+	 * {@link OpEnvironment}
+	 *
+	 * @return a {@link List} of descriptions
+	 */
+	Iterable<String> descriptions();
+
+	/**
+	 * Returns the descriptions for all Ops identifiable by a given name within
+	 * this {@link OpEnvironment}
+	 *
+	 * @return a {@link List} of descriptions
+	 */
+	Iterable<String> descriptions(String name);
 }
