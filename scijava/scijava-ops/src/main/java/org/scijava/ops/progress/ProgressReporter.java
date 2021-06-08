@@ -12,8 +12,6 @@ public interface ProgressReporter {
 	void reportPixel();
 	
 	void reportPixels(long numPixels);
-	
-	void reportChunk();
 
 	void reportStart();
 

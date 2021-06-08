@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.scijava.ops.progress.ProgressReporter;
 
 
-public class SingleThreadedReporter implements ProgressReporter {
+public class DefaultProgressReporter implements ProgressReporter {
 
 	/** The Object in control of reporting the progress */
 	private final Object o;
@@ -18,7 +18,7 @@ public class SingleThreadedReporter implements ProgressReporter {
 	private boolean started;
 	private boolean completed;
 
-	public SingleThreadedReporter(final Object o, final long numPieces) {
+	public DefaultProgressReporter(final Object o, final long numPieces) {
 		this.o = o;
 		this.numPieces = numPieces;
 		this.piecesPerChunk = numPieces;
@@ -50,11 +50,6 @@ public class SingleThreadedReporter implements ProgressReporter {
 		if (newValue > numPieces) {
 			throw new IllegalStateException("More pixels have been completed than exist!");
 		}
-	}
-
-	@Override
-	public void reportChunk() {
-		reportPixels(piecesPerChunk);
 	}
 
 	@Override

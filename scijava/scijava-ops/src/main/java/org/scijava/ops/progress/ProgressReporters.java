@@ -35,8 +35,16 @@ public class ProgressReporters {
 	public static final Map<Object, ProgressReporter> reporters =
 		new ConcurrentHashMap<>();
 
-	public static ProgressReporter getReporter(Object o) {
+	public static ProgressReporter get(Object o) {
 		return reporters.get(o);
+	}
+
+	public static ProgressReporter getAndStart(Object o) {
+		ProgressReporter p = get(o);
+		if (p == null) throw new IllegalArgumentException("Object " + o + " has not been given a ProgressReporter!");
+		if (p.hasStarted()) throw new IllegalArgumentException("The ProgressReporter for Object " + o + " has already been started!");
+		p.reportStart();
+		return p;
 	}
 
 	public static ProgressReporter setReporter(Object o, ProgressReporter p) {
