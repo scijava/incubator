@@ -2,7 +2,7 @@ package org.scijava.ops.progress;
 
 /**
  * A basic interface for Objects reporting the progress of certain tasks.
- * @author G
+ * @author Gabriel Selzer
  *
  */
 public interface ProgressReporter {
