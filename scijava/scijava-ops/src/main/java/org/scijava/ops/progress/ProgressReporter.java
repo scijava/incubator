@@ -7,9 +7,11 @@ package org.scijava.ops.progress;
  */
 public interface ProgressReporter {
 
+	Object progressOf();
+
 	void reportPixel();
 	
-	void reportPixels();
+	void reportPixels(long numPixels);
 	
 	void reportChunk();
 
