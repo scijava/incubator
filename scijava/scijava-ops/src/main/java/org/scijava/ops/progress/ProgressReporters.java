@@ -32,11 +32,15 @@ public class ProgressReporters {
 	 * A quasi-static repository for obtaining a {@link ProgressReporter} used to
 	 * report the progress of its {@link Object} key
 	 */
-	public static final Map<Object, ProgressReporter> reporters =
+	private static final Map<Object, ProgressReporter> reporters =
 		new ConcurrentHashMap<>();
 
 	public static ProgressReporter get(Object o) {
 		return reporters.get(o);
+	}
+
+	public static double getProgress(Object o) {
+		return reporters.get(o).getProgress();
 	}
 
 	public static ProgressReporter getAndStart(Object o) {
@@ -49,6 +53,14 @@ public class ProgressReporters {
 
 	public static ProgressReporter setReporter(Object o, ProgressReporter p) {
 		return reporters.put(o, p);
+	}
+
+	public static void pixelCompleted(Object o) {
+		reporters.get(o).reportPixel();
+	}
+
+	public static void pixelsCompleted(Object o, int numPixels) {
+		reporters.get(o).reportPixels(numPixels);
 	}
 
 }
