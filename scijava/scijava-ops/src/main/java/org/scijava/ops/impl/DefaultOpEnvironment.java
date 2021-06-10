@@ -73,6 +73,7 @@ import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpCandidate.StatusCode;
+import org.scijava.ops.provenance.OpHistory;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
 import org.scijava.ops.matcher.OpMatcher;
@@ -143,6 +144,8 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	public DefaultOpEnvironment(final Context context) {
 		context.inject(this);
 		matcher = new DefaultOpMatcher(log);
+		// HACK
+		OpHistory.resetHistory();
 	}
 
 	@Override
@@ -419,7 +422,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			// wrap the Op
 			@SuppressWarnings("unchecked")
 			final OpWrapper<T> opWrapper = (OpWrapper<T>) wrappers.get(Types.raw(reifiedSuperType));
-			return opWrapper.wrap(op, reifiedSuperType);
+			return opWrapper.wrap(op, opInfo, reifiedSuperType);
 		} catch (IllegalArgumentException | SecurityException exc) {
 			log.error(exc.getMessage() != null ? exc.getMessage() : "Cannot wrap " + op.getClass());
 			return op;
