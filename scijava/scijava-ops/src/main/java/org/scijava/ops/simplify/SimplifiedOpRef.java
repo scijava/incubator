@@ -15,6 +15,7 @@ import org.scijava.ops.OpInfo;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers.Arity1;
 import org.scijava.ops.hints.Hints;
+import org.scijava.ops.hints.impl.DefaultHints;
 import org.scijava.ops.hints.BaseOpHints.Adaptation;
 import org.scijava.ops.hints.BaseOpHints.Simplification;
 import org.scijava.ops.matcher.OpMatchingException;
@@ -107,7 +108,7 @@ public class SimplifiedOpRef extends OpRef {
 	 * @throws OpMatchingException
 	 */
 	private static Computers.Arity1<?, ?> simplifierCopyOp(OpEnvironment env, Type copyType, Hints hints) throws OpMatchingException{
-			Hints hintsCopy = hints.getCopy();
+			Hints hintsCopy = new DefaultHints(hints.getHints());
 			hintsCopy.setHint(Adaptation.FORBIDDEN);
 			hintsCopy.setHint(Simplification.FORBIDDEN);
 

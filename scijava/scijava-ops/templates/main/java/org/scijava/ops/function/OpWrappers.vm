@@ -6,6 +6,7 @@
 package org.scijava.ops.function;
 
 import java.lang.reflect.Type;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -25,7 +26,7 @@ public class OpWrappers {
 	public static class ProducerOpWrapper<T> implements OpWrapper<Producer<T>> {
 
 		@Override
-		public Producer<T> wrap(final Producer<T> op, final OpInfo info, final Type reifiedType) {
+		public Producer<T> wrap(final Producer<T> op, final OpInfo info, final UUID executionID, final Type reifiedType) {
 			class GenericTypedProducer implements Producer<T>, GenericTyped {
 
 				@Override
@@ -35,7 +36,7 @@ public class OpWrappers {
 					T out = op.create();
 
 					// Log a new execution
-					OpExecutionSummary e = new OpExecutionSummary(info, op, out);
+					OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, out);
 					OpHistory.addExecution(e);
 					return out;
 				}
@@ -63,6 +64,7 @@ public class OpWrappers {
 		public $fg wrap( //
 			final $fg op, //
 			final OpInfo info, //
+			final UUID executionID, //
 			final Type reifiedType)
 		{
 			class GenericTypedFunction${arity} implements //
@@ -77,7 +79,7 @@ public class OpWrappers {
 					O out = op.apply($applyArgs.call($arity));
 
 					// Log a new execution
-					OpExecutionSummary e = new OpExecutionSummary(info, op, out);
+					OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, out);
 					OpHistory.addExecution(e);
 					return out;
 				}
@@ -106,6 +108,7 @@ public class OpWrappers {
 		public $cg wrap( //
 			final $cg op, //
 			final OpInfo info, //
+			final UUID executionID, //
 			final Type reifiedType)
 		{
 			class GenericTypedComputer${arity} implements //
@@ -120,7 +123,7 @@ public class OpWrappers {
 					op.compute($computeArgs.call($arity));
 
 					// Log a new execution
-					OpExecutionSummary e = new OpExecutionSummary(info, op, out);
+					OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, out);
 					OpHistory.addExecution(e);
 				}
 
@@ -149,6 +152,7 @@ public class OpWrappers {
 		public $ig wrap( //
 			final $ig op, //
 			final OpInfo info, //
+			final UUID executionID, //
 			final Type reifiedType)
 		{
 			class GenericTypedInplace${inplaceSuffix.call($arity, $a)} //
@@ -163,7 +167,7 @@ public class OpWrappers {
 					op.mutate($mutateArgs.call($arity, $a));
 
 					// Log a new execution
-					OpExecutionSummary e = new OpExecutionSummary(info, op, ioType);
+					OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, ioType);
 					OpHistory.addExecution(e);
 				}
 

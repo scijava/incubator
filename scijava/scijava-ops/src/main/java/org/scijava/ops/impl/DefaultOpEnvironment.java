@@ -61,9 +61,9 @@ import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.core.Op;
 import org.scijava.ops.core.OpCollection;
-import org.scijava.ops.hints.Hints;
 import org.scijava.ops.hints.BaseOpHints.Adaptation;
 import org.scijava.ops.hints.BaseOpHints.Simplification;
+import org.scijava.ops.hints.Hints;
 import org.scijava.ops.hints.impl.AdaptationHints;
 import org.scijava.ops.hints.impl.DefaultHints;
 import org.scijava.ops.hints.impl.SimplificationHints;
@@ -73,13 +73,13 @@ import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpCandidate.StatusCode;
-import org.scijava.ops.provenance.OpHistory;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
 import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
 import org.scijava.ops.matcher.OpRef;
+import org.scijava.ops.provenance.OpHistory;
 import org.scijava.ops.simplify.SimplifiedOpInfo;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
@@ -208,7 +208,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	@Override
 	public <T> T op(final String opName, final Nil<T> specialType, final Nil<?>[] inTypes, final Nil<?> outType, Hints hints) {
 		try {
-			return findOpInstance(opName, specialType, inTypes, outType, hints);
+			return findOpInstance(opName, specialType, inTypes, outType, hints.getCopy(true));
 		} catch (OpMatchingException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -220,7 +220,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		try {
 			Type[] types = Arrays.stream(inTypes).map(nil -> nil.getType()).toArray(Type[]::new);
 			OpRef ref = OpRef.fromTypes(specialType.getType(), outType.getType(), types);
-			return (T) findOpInstance(ref, info, hints);
+			return (T) findOpInstance(ref, info, hints.getCopy(true));
 		} catch (OpMatchingException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -288,7 +288,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		Object op = instantiateOp(candidate, hints);
 
 		// wrap Op
-		Object wrappedOp = wrapOp(op, candidate.opInfo(), candidate
+		Object wrappedOp = wrapOp(op, candidate.opInfo(), hints, candidate
 			.typeVarAssigns());
 
 		MatchingConditions conditions = new MatchingConditions(ref, hints);
@@ -324,7 +324,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		Object op = instantiateOp(candidate, hints);
 		
 		// wrap Op
-		Object wrappedOp = wrapOp(op, candidate.opInfo(), candidate.typeVarAssigns());
+		Object wrappedOp = wrapOp(op, candidate.opInfo(), hints, candidate.typeVarAssigns());
 
 		// cache instance
 		cacheOp(conditions, wrappedOp);
@@ -381,7 +381,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	private OpCandidate findSimplifiedOp(OpRef ref, Hints hints) throws OpMatchingException {
-		Hints simplificationHints = SimplificationHints.generateHints(hints);
+		Hints simplificationHints = SimplificationHints.generateHints(hints, false);
 		return matcher.findSingleMatch(this, ref, simplificationHints);
 	}
 
@@ -408,7 +408,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 *            
 	 * @return an {@link Op} wrapping of op.
 	 */
-	private <T> T wrapOp(T op, OpInfo opInfo, Map<TypeVariable<?>, Type> typeVarAssigns) {
+	private <T> T wrapOp(T op, OpInfo opInfo, Hints hints, Map<TypeVariable<?>, Type> typeVarAssigns) {
 		if (wrappers == null)
 			initWrappers();
 
@@ -422,7 +422,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			// wrap the Op
 			@SuppressWarnings("unchecked")
 			final OpWrapper<T> opWrapper = (OpWrapper<T>) wrappers.get(Types.raw(reifiedSuperType));
-			return opWrapper.wrap(op, opInfo, reifiedSuperType);
+			return opWrapper.wrap(op, opInfo, hints.executionChainID(), reifiedSuperType);
 		} catch (IllegalArgumentException | SecurityException exc) {
 			log.error(exc.getMessage() != null ? exc.getMessage() : "Cannot wrap " + op.getClass());
 			return op;
@@ -497,7 +497,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		for (final OpDependencyMember<?> dependency : dependencies) {
 			final OpRef dependencyRef = inferOpRef(dependency, typeVarAssigns);
 			try {
-				Hints hintCopy = hints.getCopy();
+				Hints hintCopy = hints.getCopy(false);
 				hintCopy.setHint(Simplification.FORBIDDEN);
 				if(!dependency.isAdaptable()) {
 					hintCopy.setHint(Adaptation.FORBIDDEN);
@@ -601,7 +601,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	private OpCandidate findAdaptationCandidate(final OpRef srcOpRef, final Hints hints)
 		throws OpMatchingException
 	{
-		Hints adaptationHints = AdaptationHints.generateHints(hints);
+		Hints adaptationHints = AdaptationHints.generateHints(hints, false);
 		final OpCandidate srcCandidate = findOpCandidate(srcOpRef, adaptationHints);
 		return srcCandidate;
 	}
@@ -764,7 +764,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 */
 	@Override
 	public void setHints(Hints hints) {
-		this.environmentHints = hints.getCopy();
+		this.environmentHints = hints.getCopy(false);
 	}
 
 	/**
@@ -777,7 +777,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * @return a {@link Hints}
 	 */
 	private Hints getHints() {
-		if(this.environmentHints != null) return this.environmentHints;
+		if(this.environmentHints != null) return this.environmentHints.getCopy(true);
 		return new DefaultHints();
 	}
 
