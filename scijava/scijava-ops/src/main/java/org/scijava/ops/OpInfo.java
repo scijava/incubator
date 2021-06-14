@@ -2,6 +2,7 @@
 package org.scijava.ops;
 
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
@@ -29,7 +30,10 @@ public interface OpInfo extends Comparable<OpInfo> {
 
 	/** Gets the associated {@link Struct} metadata. */
 	Struct struct();
-	
+
+	/** Gets the comma-delimited set of names used to identify the Op */
+	String names();
+
 	/** Describes whether this Op can be simplified. */
 	boolean isSimplifiable();
 
@@ -66,6 +70,8 @@ public interface OpInfo extends Comparable<OpInfo> {
 	ValidityException getValidityException();
 	
 	AnnotatedElement getAnnotationBearer();
+
+	boolean isOptional(Member<?> m);
 
 	@Override
 	default int compareTo(final OpInfo that) {

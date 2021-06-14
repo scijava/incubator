@@ -8,8 +8,10 @@ import java.util.function.Function;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
+import org.scijava.param.Optional;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
+import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 
@@ -58,6 +60,11 @@ public class OpAdaptationInfo implements OpInfo {
 		return struct;
 	}
 
+	@Override
+	public String names() {
+		return srcInfo.names();
+	}
+
 	// we want the original op to have priority over this one.
 	@Override
 	public double priority() {
@@ -102,6 +109,18 @@ public class OpAdaptationInfo implements OpInfo {
 	 */
 	@Override
 	public boolean isSimplifiable() {
+		return false;
+	}
+
+	/**
+	 * NB for {@link Optional} annotations to be on the Op, they would have to be
+	 * declared within the adapter. Since this is unlikely (and is probably bad
+	 * practice), we will assume that they do not exist.
+	 */
+	@Override
+	public boolean isOptional(Member<?> m) {
+		if (!struct.members().contains(m)) throw new IllegalArgumentException(
+			"Member " + m + " is not a Memeber of OpInfo " + this);
 		return false;
 	}
 

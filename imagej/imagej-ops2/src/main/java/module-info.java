@@ -1,6 +1,7 @@
 module net.imagej.ops2 {
 	
 	// -- Open plugins to scijava-common
+	opens net.imagej.ops2;
 	opens net.imagej.ops2.coloc to org.scijava, org.scijava.ops;
 	opens net.imagej.ops2.coloc.icq to org.scijava, org.scijava.ops;
 	opens net.imagej.ops2.coloc.kendallTau to org.scijava, org.scijava.ops;

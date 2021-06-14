@@ -31,6 +31,7 @@ package org.scijava.ops.matcher;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -40,10 +41,12 @@ import org.scijava.Priority;
 import org.scijava.ops.OpField;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.reduce.ReductionUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
+import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 
@@ -56,15 +59,18 @@ public class OpFieldInfo implements OpInfo {
 
 	private final Object instance;
 	private final Field field;
+	private final String names;
 
 	private Struct struct;
 	private ValidityException validityException;
 
+	private final Boolean[] paramOptionality;
 	private final boolean simplifiable;
 
-	public OpFieldInfo(final Object instance, final Field field) {
+	public OpFieldInfo(final Object instance, final Field field, final String names) {
 		this.instance = instance;
 		this.field = field;
+		this.names = names;
 
 		if (Modifier.isStatic(field.getModifiers())) {
 			// Field is static; instance must be null.
@@ -100,6 +106,10 @@ public class OpFieldInfo implements OpInfo {
 
 		// we cannot simplify the Op iff it has the Unsimplifiable annotation.
 		simplifiable = field.getAnnotation(Unsimplifiable.class) == null;
+
+		// determine parameter optionality
+		paramOptionality = getParameterOptionality(instance, field,
+			struct, problems);
 	}
 
 	// -- OpInfo methods --
@@ -113,6 +123,11 @@ public class OpFieldInfo implements OpInfo {
 	@Override
 	public Struct struct() {
 		return struct;
+	}
+
+	@Override
+	public String names() {
+		return names;
 	}
 
 	@Override
@@ -185,4 +200,51 @@ public class OpFieldInfo implements OpInfo {
 	public boolean isSimplifiable() {
 		return simplifiable;
 	}
+
+	@Override
+	public boolean isOptional(Member<?> m) {
+		if (!struct.members().contains(m)) throw new IllegalArgumentException(
+			"Member " + m + " is not a Memeber of OpInfo " + this);
+		if (m.isOutput()) return false;
+		int inputIndex = OpUtils.inputs(struct).indexOf(m);
+		// TODO: call this method once?
+		return paramOptionality[inputIndex];
+	}
+
+	private static Boolean[] getParameterOptionality(Object instance, Field field,
+		Struct struct, List<ValidityProblem> problems)
+	{
+		// the number of parameters we need to determine
+		int opParams = OpUtils.inputs(struct).size();
+
+		Class<?> fieldClass;
+		try {
+			fieldClass = field.get(instance).getClass();
+		}
+		catch (IllegalArgumentException | IllegalAccessException exc) {
+			// TODO Auto-generated catch block
+			problems.add(new ValidityProblem(exc));
+			return ReductionUtils.generateAllRequiredArray(opParams);
+		}
+		List<Method> fMethodsWithOptionals = ReductionUtils.fMethodsWithOptional(fieldClass);
+		Class<?> fIface = ParameterStructs.findFunctionalInterface(fieldClass);
+		List<Method> fIfaceMethodsWithOptionals = ReductionUtils.fMethodsWithOptional(fIface);
+
+		if (fMethodsWithOptionals.isEmpty() && fIfaceMethodsWithOptionals.isEmpty()) {
+			return ReductionUtils.generateAllRequiredArray(opParams);
+		}
+		if (!fMethodsWithOptionals.isEmpty() && !fIfaceMethodsWithOptionals.isEmpty()) {
+			problems.add(new ValidityProblem(
+				"Multiple methods from the op type have optional parameters!"));
+			return ReductionUtils.generateAllRequiredArray(opParams);
+		}
+		if (fMethodsWithOptionals.isEmpty()) {
+			return ReductionUtils.findParameterOptionality(fIfaceMethodsWithOptionals.get(0));
+		}
+		if (fIfaceMethodsWithOptionals.isEmpty()) {
+			return ReductionUtils.findParameterOptionality(fMethodsWithOptionals.get(0));
+		}
+		return ReductionUtils.generateAllRequiredArray(opParams);
+	}
+
 }

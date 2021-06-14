@@ -7,9 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.Priority;
 import org.scijava.ops.function.Producer;
-import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.param.Parameter;
-import org.scijava.struct.ItemIO;
 import org.scijava.types.GenericTyped;
 import org.scijava.types.Nil;
 
@@ -42,7 +40,7 @@ public class OpEnvironmentTest extends AbstractTestEnvironment{
 
 	@Test
 	public void testClassOpification() {
-		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class);
+		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class, "foo");
 		Assert.assertEquals(OpifyOp.class.getName(), opifyOpInfo.implementationName());
 		// assert default priority
 		Assert.assertEquals(Priority.NORMAL, opifyOpInfo.priority(), 0.);
@@ -50,7 +48,7 @@ public class OpEnvironmentTest extends AbstractTestEnvironment{
 
 	@Test
 	public void testClassOpificationWithPriority() {
-		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class, Priority.HIGH);
+		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class, "foo", Priority.HIGH);
 		Assert.assertEquals(OpifyOp.class.getName(), opifyOpInfo.implementationName());
 		// assert default priority
 		Assert.assertEquals(Priority.HIGH, opifyOpInfo.priority(), 0.);
@@ -59,8 +57,8 @@ public class OpEnvironmentTest extends AbstractTestEnvironment{
 	@Test
 	public void testRegister() {
 		String opName = "test.opifyOp";
-		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class, Priority.HIGH);
-		ops.env().register(opifyOpInfo, opName);
+		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class, opName, Priority.HIGH);
+		ops.env().register(opifyOpInfo);
 
 		String actual = ops.op(opName).input().outType(String.class).create();
 

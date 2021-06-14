@@ -48,6 +48,7 @@ import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.reduce.ReductionUtils;
 import org.scijava.ops.simplify.Unsimplifiable;
 import org.scijava.ops.util.Adapt;
 import org.scijava.param.ParameterStructs;
@@ -76,11 +77,13 @@ public class OpMethodInfo implements OpInfo {
 	private final Method method;
 	private Type opType;
 	private Struct struct;
+	private final String names;
+	private Boolean[] paramOptionality;
 	private final ValidityException validityException;
 
 	private final boolean simplifiable;
 
-	public OpMethodInfo(final Method method) {
+	public OpMethodInfo(final Method method, final String names) {
 		final List<ValidityProblem> problems = new ArrayList<>();
 		// Reject all non public methods
 		if (!Modifier.isPublic(method.getModifiers())) {
@@ -95,6 +98,7 @@ public class OpMethodInfo implements OpInfo {
 				" must be static."));
 		}
 		this.method = method;
+		this.names = names;
 		// we cannot simplify this op iff it has the Unsimplifiable annotation.
 		simplifiable = method.getAnnotation(Unsimplifiable.class) == null; 
 		try {
@@ -111,6 +115,11 @@ public class OpMethodInfo implements OpInfo {
 		catch (final ValidityException e) {
 			problems.addAll(e.problems());
 		}
+
+		// determine parameter optionality
+		paramOptionality = getParameterOptionality(this.method, Types.raw(opType),
+			struct, problems);
+
 		validityException = problems.isEmpty() ? null : new ValidityException(
 			problems);
 	}
@@ -125,6 +134,11 @@ public class OpMethodInfo implements OpInfo {
 	@Override
 	public Struct struct() {
 		return struct;
+	}
+
+	@Override
+	public String names() {
+		return names;
 	}
 
 	@Override
@@ -191,8 +205,29 @@ public class OpMethodInfo implements OpInfo {
 
 		// Create wrapper class
 		String className = formClassName(m);
-		CtClass cc = pool.makeClass(className);
+		Class<?> c;
+		try {
+			// use javassist to create the class
+			CtClass cc = constructOpMethodWrapper(pool, className, m);
+			c = cc.toClass(MethodHandles.lookup());
+		}
+		catch (RuntimeException e) {
+			// the OpMethod has already been created - find it
+			c= Class.forName(className);
+		}
 
+		// Return Op instance
+		List<OpDependencyMember<?>> depMembers = OpUtils.dependencies(struct());
+		Class<?>[] depClasses = depMembers.stream().map(dep -> dep.getRawType())
+			.toArray(Class[]::new);
+		return c.getDeclaredConstructor(depClasses).newInstance(dependencies
+			.toArray());
+	}
+
+	private CtClass constructOpMethodWrapper(ClassPool pool, String className,
+		Method m) throws Throwable
+	{
+		CtClass cc =  pool.makeClass(className);
 		// Add implemented interface
 		CtClass jasOpType = pool.get(Types.raw(opType).getName());
 		cc.addInterface(jasOpType);
@@ -212,13 +247,7 @@ public class OpMethodInfo implements OpInfo {
 		// add functional interface method
 		CtMethod functionalMethod = CtNewMethod.make(createFunctionalMethod(m), cc);
 		cc.addMethod(functionalMethod);
-
-		// Return Op instance
-		Class<?>[] depClasses = depMembers.stream().map(dep -> dep.getRawType())
-			.toArray(Class[]::new);
-		Class<?> c = cc.toClass(MethodHandles.lookup());
-		return c.getDeclaredConstructor(depClasses).newInstance(dependencies
-			.toArray());
+		return cc;
 	}
 
 	private String formClassName(Method m) {
@@ -359,4 +388,86 @@ public class OpMethodInfo implements OpInfo {
 	public boolean isSimplifiable() {
 		return simplifiable;
 	}
+
+	/**
+	 * TODO: this implementation seems hacky. We are assuming that the Struct's
+	 * Members and their corresponding {@link Parameter}s on the functional Method
+	 * have the same ordering. There is no real guarantee that this is the case.
+	 */
+	@Override
+	public boolean isOptional(Member<?> m) {
+		if (!struct.members().contains(m)) throw new IllegalArgumentException(
+			"Member " + m + " is not a Memeber of OpInfo " + this);
+		if (m.isOutput()) return false;
+		if (m instanceof OpDependencyMember) return false;
+		// TODO: this likely will break down if OpDependencies
+		int inputIndex = OpUtils.inputs(struct).indexOf(m);
+		return paramOptionality[inputIndex];
+	}
+
+	private static Boolean[] getParameterOptionality(Method m, Class<?> opType,
+		Struct struct, List<ValidityProblem> problems)
+	{
+		boolean opMethodHasOptionals = ReductionUtils.hasOptionalAnnotations(m);
+		List<Method> fMethodsWithOptionals = ReductionUtils.fMethodsWithOptional(opType);
+		// the number of parameters we need to determine
+		int opParams = OpUtils.inputs(struct).size();
+
+		// Ensure only the Op method OR ONE of its op type's functional methods have
+		// Optionals
+		if (opMethodHasOptionals && !fMethodsWithOptionals.isEmpty()) {
+			problems.add(new ValidityProblem(
+				"Both the OpMethod and its op type have optional parameters!"));
+			return ReductionUtils.generateAllRequiredArray(opParams);
+		}
+		if (fMethodsWithOptionals.size() > 1) {
+			problems.add(new ValidityProblem(
+				"Multiple methods from the op type have optional parameters!"));
+			return ReductionUtils.generateAllRequiredArray(opParams);
+		}
+
+		// return the optionality of each parameter of the Op
+		if (opMethodHasOptionals) return getOpMethodOptionals(m, opParams);
+		if (fMethodsWithOptionals.size() > 0) return ReductionUtils.findParameterOptionality(
+			fMethodsWithOptionals.get(0));
+		return ReductionUtils.generateAllRequiredArray(opParams);
+	}
+
+	private static Boolean[] getOpMethodOptionals(Method m, int opParams) {
+		int[] paramIndex = mapFunctionalParamsToIndices(m.getParameters());
+		Boolean[] arr = ReductionUtils.generateAllRequiredArray(opParams);
+		// check parameters on m
+		Boolean[] mOptionals = ReductionUtils.findParameterOptionality(m);
+		for(int i = 0; i < mOptionals.length; i++) {
+			int index = paramIndex[i];
+			if (index == -1) continue;
+			arr[index] |= mOptionals[i];
+		}
+		return arr;
+	}
+
+	/**
+	 * Since {@link OpMethod}s can have an {@link OpDependency} (or multiple) as
+	 * parameters, we need to determine which parameter indices correspond to the
+	 * inputs of the Op.
+	 * 
+	 * @param parameters the list of {@link Parameter}s of the {@link OpMethod}
+	 * @return an array of ints where the value at index {@code i} denotes the
+	 *         position of the parameter in the Op's signature. Values of
+	 *         {@code -1} designate an {@link OpDependency} at that position.
+	 */
+	private static int[] mapFunctionalParamsToIndices(Parameter[] parameters) {
+		int[] paramNo = new int[parameters.length];
+		int paramIndex = 0;
+		for(int i = 0; i < parameters.length; i++) {
+			if (parameters[i].isAnnotationPresent(OpDependency.class)) {
+				paramNo[i] = -1;
+			}
+			else {
+				paramNo[i] = paramIndex++;
+			}
+		}
+		return paramNo;
+	}
+
 }
