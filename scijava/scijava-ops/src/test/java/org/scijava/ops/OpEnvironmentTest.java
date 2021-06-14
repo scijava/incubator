@@ -2,14 +2,13 @@ package org.scijava.ops;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
+import java.util.stream.StreamSupport;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.Priority;
 import org.scijava.ops.function.Producer;
-import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.param.Parameter;
-import org.scijava.struct.ItemIO;
 import org.scijava.types.GenericTyped;
 import org.scijava.types.Nil;
 
@@ -66,6 +65,42 @@ public class OpEnvironmentTest extends AbstractTestEnvironment{
 
 		String expected = new OpifyOp().getString();
 		Assert.assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testDescription() {
+		String opName = "test.opForDescriptions";
+		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class, Priority.HIGH);
+		ops.env().register(opifyOpInfo, opName);
+
+		Iterable<String> descriptions = ops.env().descriptions(opName);
+		String expected = "org.scijava.ops.OpifyOp(\n\t" + " Inputs:\n\t" +
+			" Outputs:\n\t\t" + "java.lang.String output1\n" + ")\n";
+		boolean hasExpected = StreamSupport.stream(descriptions.spliterator(), true)
+			.anyMatch(expected::equals);
+		Assert.assertTrue(hasExpected);
+	}
+
+	@Test
+	public void testNumDescriptions() {
+		// test with name
+		String opName = "test.opForCheckingAllDescriptions";
+		OpInfo opifyOpInfo = ops.env().opify(OpifyOp.class, Priority.HIGH);
+		ops.env().register(opifyOpInfo, opName);
+
+		Iterable<String> descriptions = ops.env().descriptions(opName);
+		long numDescriptions = StreamSupport.stream(descriptions.spliterator(),
+			true).count();
+		Assert.assertEquals(1, numDescriptions);
+
+		// test without name
+		Iterable<OpInfo> allInfos = ops.env().infos();
+		long numInfos = StreamSupport.stream(allInfos.spliterator(), false).count();
+		Iterable<String> allDescriptions = ops.env().descriptions();
+		numDescriptions = StreamSupport.stream(allDescriptions.spliterator(), true)
+			.count();
+		Assert.assertEquals(numInfos, numDescriptions);
+
 	}
 
 }

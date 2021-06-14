@@ -743,4 +743,33 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return Collections.unmodifiableSet(ops);
 	}
 
+	@Override
+	public Iterable<String> descriptions() {
+		return descriptions(infos());
+	}
+
+	@Override
+	public Iterable<String> descriptions(String name) {
+		return descriptions(infos(name));
+	}
+
+	/**
+	 * Helper method to get the descriptions for each {@link OpInfo} in
+	 * {@code infos}
+	 * <p>
+	 * NB we return a {@link List} here to preserve multiple instances of the same
+	 * {@link OpInfo}. This is consistent with {@link DefaultOpEnvironment#infos}
+	 * returning multiple instances of the same {@link OpInfo}. The duplicate
+	 * {@link OpInfo}s are created when Ops have multiple names.
+	 *
+	 * @param infos
+	 * @return a set of {@link String}s, one describing each {@link OpInfo} in
+	 *         {@code infos}.
+	 */
+	private List<String> descriptions(Iterable<OpInfo> infos) {
+		return StreamSupport.stream(infos.spliterator(), true) //
+			.map(info -> OpUtils.opString(info)) //
+			.collect(Collectors.toList());
+	}
+
 }
