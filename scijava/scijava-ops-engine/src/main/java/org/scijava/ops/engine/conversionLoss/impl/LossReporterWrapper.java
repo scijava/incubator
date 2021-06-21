@@ -4,12 +4,12 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 
 import org.scijava.ops.api.Hints;
-import org.scijava.ops.api.OpExecutionSummary;
 import org.scijava.ops.api.OpHistory;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpWrapper;
 import org.scijava.ops.engine.BaseOpHints.DependencyMatching;
 import org.scijava.ops.engine.conversionLoss.LossReporter;
+import org.scijava.ops.engine.impl.DefaultOpExecution;
 import org.scijava.plugin.Plugin;
 import org.scijava.types.GenericTyped;
 import org.scijava.types.Nil;
@@ -46,14 +46,20 @@ public class LossReporterWrapper<I, O> //
 			@Override
 			public Double apply(Nil<I> from, Nil<O> to) //
 			{
+				// Log a new execution
+				DefaultOpExecution e = null;
+				if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+					e = new DefaultOpExecution(executionID, info, op, this);
+					history.addExecution(e);
+				}
+
 				// Call the op
 				Double output = op.apply(from, to);
 
 				// Log a new execution
-					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, output);
-						history.addExecution(e);
-					}
+				if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+					e.complete(output);
+				}
 				return output;
 			}
 

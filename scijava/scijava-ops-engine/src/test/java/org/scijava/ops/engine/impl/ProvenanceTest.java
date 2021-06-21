@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.scijava.Priority;
 import org.scijava.function.Producer;
 import org.scijava.ops.api.Hints;
-import org.scijava.ops.api.OpExecutionSummary;
+import org.scijava.ops.api.OpExecution;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.engine.AbstractTestEnvironment;
 import org.scijava.ops.engine.OpHistoryService;
@@ -33,7 +33,7 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 	@Test
 	public void testProvenance() {
 		String s = ops.op("test.provenance").input().outType(String.class).create();
-		List<OpExecutionSummary> l = context.getService(OpHistoryService.class).getHistory().executionsUpon(s);
+		List<OpExecution> l = context.getService(OpHistoryService.class).getHistory().executionsUpon(s);
 		Assert.assertEquals(1, l.size());
 		Assert.assertEquals(l.get(0).executor(), foo);
 	}
@@ -65,8 +65,8 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		Double out2 = ops.op("test.provenance").input(l2).outType(Double.class).apply();
 
 		Assert.assertEquals(out1, out2);
-		List<OpExecutionSummary> history1 = context.getService(OpHistoryService.class).getHistory().executionsUpon(out1);
-		List<OpExecutionSummary> history2 = context.getService(OpHistoryService.class).getHistory().executionsUpon(out2);
+		List<OpExecution> history1 = context.getService(OpHistoryService.class).getHistory().executionsUpon(out1);
+		List<OpExecution> history2 = context.getService(OpHistoryService.class).getHistory().executionsUpon(out2);
 		Assert.assertEquals(1, history1.size());
 		Assert.assertEquals(baz, history1.get(0).executor());
 		Assert.assertEquals(1, history2.size());
@@ -104,7 +104,7 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		Thing out = ops.op("test.provenanceMapper").input(array).outType(Thing.class).apply();
 
 		// Assert only one execution upon this Object
-		List<OpExecutionSummary> history = context.getService(OpHistoryService.class).getHistory().executionsUpon(out);
+		List<OpExecution> history = context.getService(OpHistoryService.class).getHistory().executionsUpon(out);
 		Assert.assertEquals(1, history.size());
 	}
 
@@ -148,7 +148,7 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		Thing out = ops.op("test.provenanceMapper").input(array).outType(Thing.class).apply(hints);
 
 		// Assert only one run of the Base Op
-		List<OpExecutionSummary> history = context.getService(OpHistoryService.class).getHistory().executionsUpon(out);
+		List<OpExecution> history = context.getService(OpHistoryService.class).getHistory().executionsUpon(out);
 		Assert.assertEquals(1, history.size());
 
 		// Run the mapped Op, assert still one run on the mapper

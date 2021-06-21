@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
-import org.scijava.ops.api.OpExecutionSummary;
+import org.scijava.ops.api.OpExecution;
 import org.scijava.ops.api.OpHistory;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.spi.OpDependency;
@@ -49,7 +49,7 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 	 * {@link Map} responsible for recording the execution of an Op returned by a
 	 * <b>matching call</b>
 	 */
-	private final Map<UUID, ConcurrentLinkedDeque<OpExecutionSummary>> history =
+	private final Map<UUID, ConcurrentLinkedDeque<OpExecution>> history =
 		new ConcurrentHashMap<>();
 
 	/**
@@ -82,7 +82,7 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 	 * @return a {@link List} of all executions upon {@code o}
 	 */
 	@Override
-	public List<OpExecutionSummary> executionsUpon(Object o) {
+	public List<OpExecution> executionsUpon(Object o) {
 		if (o.getClass().isPrimitive()) throw new IllegalArgumentException(
 			"Cannot determine the executions upon a primitive as they are passed by reference!");
 		return history.values().stream() //
@@ -130,13 +130,13 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 	// -- HISTORY MAINTENANCE API -- //
 
 	/**
-	 * Logs a {@link OpExecutionSummary} in the history
+	 * Logs a {@link OpExecution} in the history
 	 * 
-	 * @param e the {@link OpExecutionSummary}
+	 * @param e the {@link OpExecution}
 	 * @return true iff {@code e} was successfully logged
 	 */
 	@Override
-	public boolean addExecution(OpExecutionSummary e) {
+	public boolean addExecution(OpExecution e) {
 		if (!history.containsKey(e.executionTreeHash())) generateDeque(e
 			.executionTreeHash());
 		history.get(e.executionTreeHash()).addLast(e);
@@ -215,7 +215,7 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 
 	private synchronized void generateDeque(UUID executionTreeHash) {
 		history.putIfAbsent(executionTreeHash,
-			new ConcurrentLinkedDeque<OpExecutionSummary>());
+			new ConcurrentLinkedDeque<OpExecution>());
 	}
 
 	private <T, V> T keyForV(Map<T, V> map, V value) {

@@ -36,7 +36,7 @@ public interface OpHistory {
 	 * @param o the {@link Object} of interest
 	 * @return a {@link List} of all executions upon {@code o}
 	 */
-	public List<OpExecutionSummary> executionsUpon(Object o);
+	public List<OpExecution> executionsUpon(Object o);
 
 	/**
 	 * Returns the {@link Graph} of {@link OpInfo}s describing the dependency
@@ -61,12 +61,12 @@ public interface OpHistory {
 	// -- HISTORY MAINTENANCE API -- //
 
 	/**
-	 * Logs a {@link OpExecutionSummary} in the history
+	 * Logs a {@link OpExecution} in the history
 	 * 
-	 * @param e the {@link OpExecutionSummary}
+	 * @param e the {@link OpExecution}
 	 * @return true iff {@code e} was successfully logged
 	 */
-	public boolean addExecution(OpExecutionSummary e);
+	public boolean addExecution(OpExecution e);
 
 	/**
 	 * Logs the {@link List} of {@link OpInfo} dependencies under the
