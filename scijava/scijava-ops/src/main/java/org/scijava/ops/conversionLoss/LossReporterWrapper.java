@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.hints.BaseOpHints.DependencyMatching;
 import org.scijava.ops.hints.Hints;
-import org.scijava.ops.provenance.OpExecutionSummary;
+import org.scijava.ops.provenance.DefaultOpExecution;
 import org.scijava.ops.provenance.OpHistory;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.plugin.Plugin;
@@ -44,14 +44,20 @@ public class LossReporterWrapper<I, O> //
 			@Override
 			public Double apply(Nil<I> from, Nil<O> to) //
 			{
+				// Log a new execution
+				DefaultOpExecution e = null;
+				if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+					e = new DefaultOpExecution(executionID, info, op, this);
+					OpHistory.addExecution(e);
+				}
+
 				// Call the op
 				Double output = op.apply(from, to);
 
 				// Log a new execution
-					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, output);
-						OpHistory.addExecution(e);
-					}
+				if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+					e.complete(output);
+				}
 				return output;
 			}
 

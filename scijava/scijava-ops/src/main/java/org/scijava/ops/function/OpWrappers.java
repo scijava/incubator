@@ -14,7 +14,8 @@ import org.scijava.param.Container;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.hints.BaseOpHints.DependencyMatching;
 import org.scijava.ops.hints.Hints;
-import org.scijava.ops.provenance.OpExecutionSummary;
+import org.scijava.ops.provenance.DefaultOpExecution;
+import org.scijava.ops.provenance.OpExecution;
 import org.scijava.ops.provenance.OpHistory;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.plugin.Plugin;
@@ -33,14 +34,19 @@ public class OpWrappers {
 
 				@Override
 				public T create() {
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
 
 					// Call the op
 					T out = op.create();
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -78,13 +84,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I in) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -120,13 +132,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -162,13 +180,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -204,13 +228,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -246,13 +276,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -288,13 +324,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -330,13 +372,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -372,13 +420,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -414,13 +468,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -456,13 +516,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -498,13 +564,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -540,13 +612,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -582,13 +660,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -624,13 +708,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13, I14 in14) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -666,13 +756,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13, I14 in14, I15 in15) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -708,13 +804,19 @@ public class OpWrappers {
 				@Override
 				public O apply(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13, I14 in14, I15 in15, I16 in16) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, in16);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -752,13 +854,19 @@ public class OpWrappers {
 				@Override
 				public void compute(@Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -793,13 +901,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I in, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -834,13 +948,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -875,13 +995,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -916,13 +1042,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -957,13 +1089,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -998,13 +1136,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1039,13 +1183,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1080,13 +1230,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1121,13 +1277,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1162,13 +1324,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1203,13 +1371,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1244,13 +1418,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1285,13 +1465,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1326,13 +1512,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13, I14 in14, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1367,13 +1559,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13, I14 in14, I15 in15, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1408,13 +1606,19 @@ public class OpWrappers {
 				@Override
 				public void compute(I1 in1, I2 in2, I3 in3, I4 in4, I5 in5, I6 in6, I7 in7, I8 in8, I9 in9, I10 in10, I11 in11, I12 in12, I13 in13, I14 in14, I15 in15, I16 in16, @Container O out) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, in16, out);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -1451,13 +1655,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1492,13 +1702,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1533,13 +1749,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1574,13 +1796,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1615,13 +1843,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1656,13 +1890,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1697,13 +1937,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1738,13 +1984,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1779,13 +2031,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1820,13 +2078,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1861,13 +2125,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1902,13 +2172,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1943,13 +2219,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -1984,13 +2266,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2025,13 +2313,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2066,13 +2360,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2107,13 +2407,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2148,13 +2454,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2189,13 +2501,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2230,13 +2548,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2271,13 +2595,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2312,13 +2642,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2353,13 +2689,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2394,13 +2736,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2435,13 +2783,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2476,13 +2830,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2517,13 +2877,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2558,13 +2924,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2599,13 +2971,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2640,13 +3018,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2681,13 +3065,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2722,13 +3112,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2763,13 +3159,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2804,13 +3206,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2845,13 +3253,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2886,13 +3300,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2927,13 +3347,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -2968,13 +3394,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3009,13 +3441,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3050,13 +3488,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3091,13 +3535,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3132,13 +3582,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3173,13 +3629,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3214,13 +3676,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3255,13 +3723,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3296,13 +3770,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3337,13 +3817,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3378,13 +3864,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3419,13 +3911,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3460,13 +3958,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3501,13 +4005,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3542,13 +4052,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3583,13 +4099,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3624,13 +4146,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType, I10 in10Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3665,13 +4193,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3706,13 +4240,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3747,13 +4287,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3788,13 +4334,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3829,13 +4381,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3870,13 +4428,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3911,13 +4475,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3952,13 +4522,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -3993,13 +4569,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4034,13 +4616,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType, I10 in10Type, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4075,13 +4663,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, IO ioType, I11 in11Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4116,13 +4710,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4157,13 +4757,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4198,13 +4804,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4239,13 +4851,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4280,13 +4898,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4321,13 +4945,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4362,13 +4992,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4403,13 +5039,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4444,13 +5086,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4485,13 +5133,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType, I10 in10Type, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4526,13 +5180,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, IO ioType, I11 in11Type, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4567,13 +5227,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, IO ioType, I12 in12Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4608,13 +5274,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4649,13 +5321,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4690,13 +5368,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4731,13 +5415,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4772,13 +5462,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4813,13 +5509,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4854,13 +5556,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4895,13 +5603,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4936,13 +5650,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -4977,13 +5697,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5018,13 +5744,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, IO ioType, I11 in11Type, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5059,13 +5791,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, IO ioType, I12 in12Type, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5100,13 +5838,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, IO ioType, I13 in13Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5141,13 +5885,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5182,13 +5932,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5223,13 +5979,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5264,13 +6026,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5305,13 +6073,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5346,13 +6120,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5387,13 +6167,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5428,13 +6214,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5469,13 +6261,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5510,13 +6308,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5551,13 +6355,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, IO ioType, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5592,13 +6402,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, IO ioType, I12 in12Type, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5633,13 +6449,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, IO ioType, I13 in13Type, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5674,13 +6496,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, IO ioType, I14 in14Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5715,13 +6543,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5756,13 +6590,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5797,13 +6637,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5838,13 +6684,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5879,13 +6731,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5920,13 +6778,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -5961,13 +6825,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6002,13 +6872,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6043,13 +6919,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6084,13 +6966,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6125,13 +7013,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, IO ioType, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6166,13 +7060,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, IO ioType, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6207,13 +7107,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, IO ioType, I13 in13Type, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6248,13 +7154,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, IO ioType, I14 in14Type, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6289,13 +7201,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, IO ioType, I15 in15Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType, in15Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6330,13 +7248,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6371,13 +7295,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(IO ioType, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6412,13 +7342,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, IO ioType, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6453,13 +7389,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, IO ioType, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6494,13 +7436,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, IO ioType, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6535,13 +7483,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, IO ioType, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6576,13 +7530,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, IO ioType, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6617,13 +7577,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, IO ioType, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6658,13 +7624,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, IO ioType, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6699,13 +7671,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, IO ioType, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6740,13 +7718,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, IO ioType, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6781,13 +7765,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, IO ioType, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6822,13 +7812,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, IO ioType, I13 in13Type, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6863,13 +7859,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, IO ioType, I14 in14Type, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6904,13 +7906,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, IO ioType, I15 in15Type, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType, in15Type, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6945,13 +7953,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, IO ioType, I16 in16Type) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, ioType, in16Type);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 
@@ -6986,13 +8000,19 @@ public class OpWrappers {
 				@Override
 				public void mutate(I1 in1Type, I2 in2Type, I3 in3Type, I4 in4Type, I5 in5Type, I6 in6Type, I7 in7Type, I8 in8Type, I9 in9Type, I10 in10Type, I11 in11Type, I12 in12Type, I13 in13Type, I14 in14Type, I15 in15Type, IO ioType) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, ioType);
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 

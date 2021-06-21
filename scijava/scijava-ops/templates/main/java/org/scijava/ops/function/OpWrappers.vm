@@ -14,7 +14,8 @@ import org.scijava.param.Container;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.hints.BaseOpHints.DependencyMatching;
 import org.scijava.ops.hints.Hints;
-import org.scijava.ops.provenance.OpExecutionSummary;
+import org.scijava.ops.provenance.DefaultOpExecution;
+import org.scijava.ops.provenance.OpExecution;
 import org.scijava.ops.provenance.OpHistory;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.plugin.Plugin;
@@ -33,14 +34,19 @@ public class OpWrappers {
 
 				@Override
 				public T create() {
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
 
 					// Call the op
 					T out = op.create();
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -80,13 +86,19 @@ public class OpWrappers {
 				@Override
 				public O apply($applyParams.call($arity)) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					O out = op.apply($applyArgs.call($arity));
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 					return out;
 				}
@@ -127,13 +139,19 @@ public class OpWrappers {
 				@Override
 				public void compute($computeParams.call($arity)) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.compute($computeArgs.call($arity));
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, out);
-						OpHistory.addExecution(e);
+						e.complete(out);
 					}
 				}
 
@@ -174,13 +192,19 @@ public class OpWrappers {
 				@Override
 				public void mutate($mutateParams.call($arity, $a)) //
 				{
+					// Log a new execution
+					DefaultOpExecution e = null;
+					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
+						e = new DefaultOpExecution(executionID, info, op, this);
+						OpHistory.addExecution(e);
+					}
+
 					// Call the op
 					op.mutate($mutateArgs.call($arity, $a));
 
-					// Log a new execution
+					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						OpExecutionSummary e = new OpExecutionSummary(executionID, info, op, this, ioType);
-						OpHistory.addExecution(e);
+						e.complete(ioType);
 					}
 				}
 

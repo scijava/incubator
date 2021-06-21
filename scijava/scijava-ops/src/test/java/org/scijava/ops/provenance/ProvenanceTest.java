@@ -31,7 +31,7 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 	@Test
 	public void testProvenance() {
 		String s = ops.op("test.provenance").input().outType(String.class).create();
-		List<OpExecutionSummary> l = OpHistory.executionsUpon(s);
+		List<OpExecution> l = OpHistory.executionsUpon(s);
 		Assert.assertEquals(1, l.size());
 		Assert.assertEquals(l.get(0).executor(), foo);
 	}
@@ -63,8 +63,8 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		Double out2 = ops.op("test.provenance").input(l2).outType(Double.class).apply();
 
 		Assert.assertEquals(out1, out2);
-		List<OpExecutionSummary> history1 = OpHistory.executionsUpon(out1);
-		List<OpExecutionSummary> history2 = OpHistory.executionsUpon(out2);
+		List<OpExecution> history1 = OpHistory.executionsUpon(out1);
+		List<OpExecution> history2 = OpHistory.executionsUpon(out2);
 		Assert.assertEquals(1, history1.size());
 		Assert.assertEquals(baz, history1.get(0).executor());
 		Assert.assertEquals(1, history2.size());
@@ -102,7 +102,7 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		Thing out = ops.op("test.provenanceMapper").input(array).outType(Thing.class).apply();
 
 		// Assert only one execution upon this Object
-		List<OpExecutionSummary> history = OpHistory.executionsUpon(out);
+		List<OpExecution> history = OpHistory.executionsUpon(out);
 		Assert.assertEquals(1, history.size());
 	}
 
@@ -146,7 +146,7 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		Thing out = ops.op("test.provenanceMapper").input(array).outType(Thing.class).apply(hints);
 
 		// Assert only one run of the Base Op
-		List<OpExecutionSummary> history = OpHistory.executionsUpon(out);
+		List<OpExecution> history = OpHistory.executionsUpon(out);
 		Assert.assertEquals(1, history.size());
 
 		// Run the mapped Op, assert still one run on the mapper

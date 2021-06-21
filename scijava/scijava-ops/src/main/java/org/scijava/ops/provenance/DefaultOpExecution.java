@@ -2,6 +2,9 @@
 package org.scijava.ops.provenance;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.impl.DefaultOpEnvironment;
@@ -11,7 +14,7 @@ import org.scijava.ops.impl.DefaultOpEnvironment;
  *
  * @author Gabe Selzer
  */
-public class OpExecutionSummary {
+public class DefaultOpExecution implements OpExecution {
 
 	/** The identifier identifying the matching call */
 	private final UUID executionHash;
@@ -29,26 +32,24 @@ public class OpExecutionSummary {
 	 * The {@link Object} produced by this execution of {@code wrappedInstance}
 	 * (or {@code instance}, if {@code wrappedInstance} is {@code null}.
 	 */
-	private final Object output;
+	private final CompletableFuture<Object> output;
 
-	public OpExecutionSummary(UUID executionHash, OpInfo info, Object instance,
-		Object wrappedOp, Object output)
+	public DefaultOpExecution(UUID executionHash, OpInfo info, Object instance,
+		Object wrappedOp)
 	{
 		this.executionHash = executionHash;
 		this.info = info;
 		this.instance = instance;
 		this.wrappedInstance = wrappedOp;
-		this.output = output;
+		this.output = new CompletableFuture<>();
 	}
 
-	public OpExecutionSummary(UUID executionHash, OpInfo info, Object instance,
-		Object output)
-	{
+	public DefaultOpExecution(UUID executionHash, OpInfo info, Object instance) {
 		this.executionHash = executionHash;
 		this.info = info;
 		this.instance = instance;
 		this.wrappedInstance = null;
-		this.output = output;
+		this.output = new CompletableFuture<>();
 	}
 
 	/**
@@ -56,7 +57,8 @@ public class OpExecutionSummary {
 	 *
 	 * @return the output of the execution
 	 */
-	public Object output() {
+	@Override
+	public Future<Object> output() {
 		return output;
 	}
 
@@ -66,48 +68,75 @@ public class OpExecutionSummary {
 	 *
 	 * @return the executor
 	 */
+	@Override
 	public Object executor() {
 		return instance;
 	}
 
 	/**
-	 * Returns the wrapping of {@link OpExecutionSummary#instance}, if it exists
+	 * Returns the wrapping of {@link DefaultOpExecution#instance}, if it exists
 	 *
-	 * @return the wrapping of {@link OpExecutionSummary#instance}
+	 * @return the wrapping of {@link DefaultOpExecution#instance}
 	 */
+	@Override
 	public Object wrappedExecutor() {
 		return wrappedInstance;
 	}
 
 	/**
 	 * Describes whether {@code o} is the output of this
-	 * {@link OpExecutionSummary}
+	 * {@link DefaultOpExecution}
 	 *
-	 * @param o the {@link Object} that might be {@link OpExecutionSummary#output}
+	 * @param o the {@link Object} that might be {@link DefaultOpExecution#output}
 	 * @return true iff {@code o == output}
 	 */
+	@Override
 	public boolean isOutput(Object o) {
-		return output == o;
+		if (!output.isDone()) {
+			return false;
+		}
+		try {
+			return output.getNow(this) == o;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	/**
 	 * Returns the {@link OpInfo} responsible for creating this
-	 * {@link OpExecutionSummary#instance}
+	 * {@link DefaultOpExecution#instance}
 	 *
 	 * @return the {@link OpInfo}
 	 */
+	@Override
 	public OpInfo info() {
 		return info;
 	}
 
 	/**
 	 * Returns the {@link UUID} identifying the Op chain responsible for creating
-	 * this {@link OpExecutionSummary#instance}
+	 * this {@link DefaultOpExecution#instance}
 	 *
 	 * @return the identifying {@link UUID}
 	 */
+	@Override
 	public UUID executionTreeHash() {
 		return executionHash;
+	}
+
+	@Override
+	public boolean hasCompleted() {
+		return output.isDone();
+	}
+
+	@Override
+	public double getProgress() {
+		return hasCompleted() ? 1. : 0.;
+	}
+
+	@Override
+	public boolean complete(Object o) {
+		return output.complete(o);
 	}
 
 }

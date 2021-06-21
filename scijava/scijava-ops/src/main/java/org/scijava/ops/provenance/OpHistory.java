@@ -43,7 +43,7 @@ public class OpHistory {
 	 * {@link Map} responsible for recording the execution of an Op returned by a
 	 * <b>matching call</b>
 	 */
-	private static final Map<UUID, ConcurrentLinkedDeque<OpExecutionSummary>> history =
+	private static final Map<UUID, ConcurrentLinkedDeque<OpExecution>> history =
 		new ConcurrentHashMap<>();
 
 	/**
@@ -75,7 +75,7 @@ public class OpHistory {
 	 * @param o the {@link Object} of interest
 	 * @return a {@link List} of all executions upon {@code o}
 	 */
-	public static List<OpExecutionSummary> executionsUpon(Object o) {
+	public static List<OpExecution> executionsUpon(Object o) {
 		if (o.getClass().isPrimitive()) throw new IllegalArgumentException(
 			"Cannot determine the executions upon a primitive as they are passed by reference!");
 		return history.values().stream() //
@@ -121,12 +121,12 @@ public class OpHistory {
 	// -- HISTORY MAINTENANCE API -- //
 
 	/**
-	 * Logs a {@link OpExecutionSummary} in the history
+	 * Logs a {@link OpExecution} in the history
 	 * 
-	 * @param e the {@link OpExecutionSummary}
+	 * @param e the {@link OpExecution}
 	 * @return true iff {@code e} was successfully logged
 	 */
-	public static boolean addExecution(OpExecutionSummary e) {
+	public static boolean addExecution(OpExecution e) {
 		if (!history.containsKey(e.executionTreeHash())) generateDeque(e
 			.executionTreeHash());
 		history.get(e.executionTreeHash()).addLast(e);
@@ -202,7 +202,7 @@ public class OpHistory {
 
 	private static synchronized void generateDeque(UUID executionTreeHash) {
 		history.putIfAbsent(executionTreeHash,
-			new ConcurrentLinkedDeque<OpExecutionSummary>());
+			new ConcurrentLinkedDeque<OpExecution>());
 	}
 
 	private static <T, V> T keyForV(Map<T, V> map, V value) {
