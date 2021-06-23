@@ -20,15 +20,15 @@ import java.util.stream.StreamSupport;
 
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpRef;
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.matcher.MatchingUtils;
-import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.ops.util.AnnotationUtils;
 import org.scijava.param.Container;
 import org.scijava.param.Mutable;
 import org.scijava.param.ParameterStructs;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
+import org.scijava.types.inference.TypeInference;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -54,11 +54,11 @@ public class SimplificationUtils {
 	 * </ul>
 	 * 
 	 * @param originalOpType - the {@link Type} declared by the source
-	 *          {@link DefaultOpRef}
+	 *          {@link OpRef}
 	 * @param newArgs - the new argument {@link Type}s requested by the
-	 *          {@link DefaultOpRef}.
+	 *          {@link OpRef}.
 	 * @param newOutType - the new output {@link Type} requested by the
-	 *          {@link DefaultOpRef}.
+	 *          {@link OpRef}.
 	 * @return - a new {@code type} for a {@link SimplifiedOpRef}.
 	 */
 	public static ParameterizedType retypeOpType(Type originalOpType, Type[] newArgs, Type newOutType) {
@@ -72,12 +72,13 @@ public class SimplificationUtils {
 
 			// solve input types
 			Type[] genericParameterTypes = paramTypesFromOpType(opType, fMethod);
-			MatchingUtils.inferTypeVariables(genericParameterTypes, newArgs, typeVarAssigns);
+			TypeInference.inferTypeVariables(genericParameterTypes, newArgs, typeVarAssigns);
 
 			// solve output type
 			Type genericReturnType = returnTypeFromOpType(opType, fMethod);
 			if (genericReturnType != void.class) {
-				MatchingUtils.inferTypeVariables(new Type[] {genericReturnType}, new Type[] {newOutType}, typeVarAssigns);
+				TypeInference.inferTypeVariables(new Type[] { genericReturnType },
+					new Type[] { newOutType }, typeVarAssigns);
 			}
 
 			// build new (read: simplified) Op type
@@ -109,7 +110,7 @@ public class SimplificationUtils {
 		Type genericDeclaringClass = Types.parameterizeRaw(declaringClass);
 		Type genericClass = Types.parameterizeRaw(opType);
 		Type superGenericClass = Types.getExactSuperType(genericClass, declaringClass);
-		MatchingUtils.inferTypeVariables(new Type[] {genericDeclaringClass}, new Type[] {superGenericClass}, map);
+		TypeInference.inferTypeVariables(new Type[] {genericDeclaringClass}, new Type[] {superGenericClass}, map);
 
 		return Types.mapVarToTypes(types, map);
 	}
@@ -162,7 +163,7 @@ public class SimplificationUtils {
 	public static Type resolveMutatorTypeArgs(Type inferFrom, Type mutatorInferFrom, Type unresolvedType) {
 		if(!Types.containsTypeVars(unresolvedType)) return unresolvedType;
 		Map<TypeVariable<?>, Type> map = new HashMap<>();
-		MatchingUtils.inferTypeVariables(new Type[] {mutatorInferFrom}, new Type[] {inferFrom}, map);
+		TypeInference.inferTypeVariables(new Type[] {mutatorInferFrom}, new Type[] {inferFrom}, map);
 		return Types.mapVarToTypes(unresolvedType, map);
 	}
 

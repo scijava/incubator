@@ -36,6 +36,7 @@ import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 import org.scijava.types.Types;
+import org.scijava.types.inference.TypeInference;
 import org.scijava.util.ClassUtils;
 
 /**
@@ -274,9 +275,9 @@ public final class ParameterStructs {
 		// map params of OpMethod to type variables of abstract method of functional
 		// interface (along with return type if applicable)
 		// TODO: not sure how this handles when there are type variables.
-		MatchingUtils.inferTypeVariables(typeMethodParams, getOpParamTypes(opMethodParams), typeVarAssigns);
+		TypeInference.inferTypeVariables(typeMethodParams, getOpParamTypes(opMethodParams), typeVarAssigns);
 		if (abstractMethod.getReturnType() != void.class) {
-			MatchingUtils.inferTypeVariables(new Type[] {abstractMethod.getGenericReturnType()}, new Type[] {opMethod.getGenericReturnType()}, typeVarAssigns);
+			TypeInference.inferTypeVariables(new Type[] {abstractMethod.getGenericReturnType()}, new Type[] {opMethod.getGenericReturnType()}, typeVarAssigns);
 		}
 		
 		// parameterize opClass 
