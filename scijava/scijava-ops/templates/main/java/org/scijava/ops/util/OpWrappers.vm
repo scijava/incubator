@@ -9,6 +9,7 @@ import java.lang.reflect.Type;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.scijava.ops.OpWrapper;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.function.Inplaces;

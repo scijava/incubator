@@ -1,11 +1,11 @@
-package org.scijava.ops.hints.impl;
+package org.scijava.ops.hint;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.scijava.ops.hints.Hints;
-import org.scijava.ops.hints.BaseOpHints.Adaptation;
-import org.scijava.ops.hints.BaseOpHints.Simplification;
+import org.scijava.ops.Hints;
+import org.scijava.ops.hint.BaseOpHints.Adaptation;
+import org.scijava.ops.hint.BaseOpHints.Simplification;
 
 /**
  * Default Implementation of {@link Hints}

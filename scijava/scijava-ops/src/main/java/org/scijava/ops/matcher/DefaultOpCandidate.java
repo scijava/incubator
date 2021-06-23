@@ -35,8 +35,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.scijava.log.Logger;
+import org.scijava.ops.OpCandidate;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpRef;
 import org.scijava.ops.OpUtils;
 import org.scijava.param.ValidityProblem;
 import org.scijava.struct.Member;
@@ -50,19 +52,7 @@ import org.scijava.struct.StructInstance;
  * @author Curtis Rueden
  * @see OpMatcher
  */
-public class OpCandidate {
-
-	public static enum StatusCode {
-		MATCH, //
-		INVALID_STRUCT, //
-		OUTPUT_TYPES_DO_NOT_MATCH, //
-		TOO_MANY_ARGS, //
-		TOO_FEW_ARGS, //
-		ARG_TYPES_DO_NOT_MATCH, //
-		REQUIRED_ARG_IS_NULL, //
-		CANNOT_CONVERT, //
-		DOES_NOT_CONFORM, OTHER //
-	}
+public class DefaultOpCandidate implements OpCandidate {
 
 	private final OpEnvironment env;
 	private final Logger log;
@@ -79,7 +69,7 @@ public class OpCandidate {
 	 * If the op does not, this will be the same as {@link #ref}.getArgs(). */
 	private final Type[] paddedArgs;
 
-	public OpCandidate(final OpEnvironment env, final Logger log, final OpRef ref, final OpInfo info,
+	public DefaultOpCandidate(final OpEnvironment env, final Logger log, final OpRef ref, final OpInfo info,
 		final Map<TypeVariable<?>, Type> typeVarAssigns)
 	{
 		this.env = env;
@@ -92,30 +82,36 @@ public class OpCandidate {
 	}
 
 	/** Gets the op execution environment of the desired match. */
+	@Override
 	public OpEnvironment env() {
 		return env;
 	}
 
 	/** Gets the op reference describing the desired match. */
+	@Override
 	public OpRef getRef() {
 		return ref;
 	}
 
 	/** Gets the {@link OpInfo} metadata describing the op to match against. */
+	@Override
 	public OpInfo opInfo() {
 		return info;
 	}
 	
 	/** Gets the priority of this result */
+	@Override
 	public double priority() {
 		return info.priority();
 	}
 
-	/** Gets the mapping between {@link TypeVariable}s and {@link Type}s that makes the {@link OpCandidate} pair legal. */
+	/** Gets the mapping between {@link TypeVariable}s and {@link Type}s that makes the {@link DefaultOpCandidate} pair legal. */
+	@Override
 	public Map<TypeVariable<?>, Type> typeVarAssigns() {
 		return typeVarAssigns;
 	}
 
+	@Override
 	public Type[] paddedArgs() {
 		return paddedArgs;
 	}
@@ -125,21 +121,25 @@ public class OpCandidate {
 	 *
 	 * @see OpInfo#struct()
 	 */
+	@Override
 	public Struct struct() {
 		return info.struct();
 	}
 
 	/** Sets the status of the matching attempt. */
+	@Override
 	public void setStatus(final StatusCode code) {
 		setStatus(code, null, null);
 	}
 
 	/** Sets the status of the matching attempt. */
+	@Override
 	public void setStatus(final StatusCode code, final String message) {
 		setStatus(code, message, null);
 	}
 
 	/** Sets the status of the matching. */
+	@Override
 	public void setStatus(final StatusCode code, final String message, final Member<?> item) {
 		this.code = code;
 		this.message = message;
@@ -147,6 +147,7 @@ public class OpCandidate {
 	}
 
 	/** Gets the matching status code. */
+	@Override
 	public StatusCode getStatusCode() {
 		return code;
 	}
@@ -155,11 +156,13 @@ public class OpCandidate {
 	 * Gets the status item related to the matching status, if any. Typically,
 	 * if set, this is the parameter for which matching failed.
 	 */
+	@Override
 	public Member<?> getStatusItem() {
 		return statusItem;
 	}
 
 	/** Gets a descriptive status message in human readable form. */
+	@Override
 	public String getStatus() {
 		final StatusCode statusCode = getStatusCode();
 		if (statusCode == null)
@@ -213,7 +216,8 @@ public class OpCandidate {
 		return info.toString();
 	}
 
-	public StructInstance<?> createOpInstance(List<?> dependencies) throws OpMatchingException
+	@Override
+	public StructInstance<?> createOpInstance(List<?> dependencies)
 	{
 		if (!getStatusCode().equals(StatusCode.MATCH)) {
 			throw new OpMatchingException(
@@ -224,8 +228,8 @@ public class OpCandidate {
 		return inst;
 	}
 
+	@Override
 	public Object createOp(List<?> dependencies)
-		throws OpMatchingException
 	{
 		return createOpInstance(dependencies).object();
 	}

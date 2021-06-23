@@ -37,20 +37,26 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.scijava.Priority;
+import org.scijava.log.Logger;
+import org.scijava.ops.Hints;
+import org.scijava.ops.OpCandidate;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
+import org.scijava.ops.OpEnvironment;
+import org.scijava.ops.OpHints;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
+import org.scijava.ops.OpRef;
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.hints.Hints;
-import org.scijava.ops.hints.OpHints;
-import org.scijava.ops.hints.impl.ImmutableHints;
+import org.scijava.ops.hint.ImmutableHints;
 import org.scijava.ops.util.Adapt;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
@@ -365,6 +371,13 @@ public class OpMethodInfo implements OpInfo {
 	@Override
 	public AnnotatedElement getAnnotationBearer() {
 		return method;
+	}
+
+	@Override
+	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpRef ref,
+		Map<TypeVariable<?>, Type> typeVarAssigns)
+	{
+		return new DefaultOpCandidate(env, log, ref, this, typeVarAssigns);
 	}
 
 }

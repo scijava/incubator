@@ -33,16 +33,22 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.scijava.Priority;
+import org.scijava.log.Logger;
+import org.scijava.ops.Hints;
+import org.scijava.ops.OpCandidate;
+import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpField;
+import org.scijava.ops.OpHints;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpRef;
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.hints.Hints;
-import org.scijava.ops.hints.OpHints;
-import org.scijava.ops.hints.impl.ImmutableHints;
+import org.scijava.ops.hint.ImmutableHints;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
@@ -191,6 +197,13 @@ public class OpFieldInfo implements OpInfo {
 	@Override
 	public String toString() {
 		return OpUtils.opString(this);
+	}
+
+	@Override
+	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpRef ref,
+		Map<TypeVariable<?>, Type> typeVarAssigns)
+	{
+		return new DefaultOpCandidate(env, log, ref, this, typeVarAssigns);
 	}
 
 }

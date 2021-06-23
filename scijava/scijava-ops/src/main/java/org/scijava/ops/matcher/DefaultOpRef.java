@@ -41,6 +41,7 @@ import org.scijava.log.Logger;
 import org.scijava.ops.Op;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
+import org.scijava.ops.OpRef;
 import org.scijava.types.Types;
 
 /**

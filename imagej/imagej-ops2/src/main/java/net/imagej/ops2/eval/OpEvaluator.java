@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.scijava.ops.function.Functions;
-import org.scijava.ops.impl.DefaultOpService;
+import org.scijava.ops.OpService;
 import org.scijava.types.Nil;
 import org.scijava.types.TypeService;
 import org.scijava.parsington.Operator;
@@ -53,12 +53,12 @@ import org.scijava.parsington.eval.Evaluator;
  */
 public class OpEvaluator extends AbstractStandardStackEvaluator {
 
-	private final DefaultOpService ops;
+	private final OpService ops;
 
 	/** Map of Parsington {@link Operator}s to Ops operation names. */
 	private final HashMap<Operator, String> opMap;
 
-	public OpEvaluator(final DefaultOpService ops) {
+	public OpEvaluator(final OpService ops) {
 		this.ops = ops;
 		opMap = new HashMap<>();
 

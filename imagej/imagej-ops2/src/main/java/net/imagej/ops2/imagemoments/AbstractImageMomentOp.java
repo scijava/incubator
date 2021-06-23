@@ -33,28 +33,27 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ops.function.Computers;
-import org.scijava.ops.impl.DefaultOpService;
+import org.scijava.ops.OpService;
 
 /**
- * Abstract {@code ImageMomentOp}. Provides {@link DefaultOpService} and create the
+ * Abstract {@code ImageMomentOp}. Provides {@link OpService} and create the
  * output.
  * 
  * @author Daniel Seebacher (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
- * @param <I>
- *            input type
- * @param <O>
- *            output type
+ * @param <I> input type
+ * @param <O> output type
  */
 public interface AbstractImageMomentOp<I extends RealType<I>, O extends RealType<O>>
-		extends Computers.Arity1<RandomAccessibleInterval<I>, O> {
-	
+	extends Computers.Arity1<RandomAccessibleInterval<I>, O>
+{
+
 	public void computeMoment(RandomAccessibleInterval<I> input, O output);
 
 	@Override
 	default void compute(RandomAccessibleInterval<I> input, O output) {
-		if (input.numDimensions() != 2)
-			throw new IllegalArgumentException("Only two-dimensional inputs allowed!");
+		if (input.numDimensions() != 2) throw new IllegalArgumentException(
+			"Only two-dimensional inputs allowed!");
 		computeMoment(input, output);
 	}
 

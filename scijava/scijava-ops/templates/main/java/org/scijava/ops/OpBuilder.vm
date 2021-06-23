@@ -38,11 +38,11 @@ import java.lang.reflect.Type;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.scijava.ops.Hints;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.function.Inplaces;
 import org.scijava.ops.function.Producer;
-import org.scijava.ops.hints.Hints;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
 

@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.scijava.ops.OpEnvironment;
-import org.scijava.ops.hints.Hints;
+import org.scijava.ops.Hints;
 import org.scijava.types.Nil;
 import org.scijava.param.Container;
 import org.scijava.types.Types;

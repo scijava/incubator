@@ -34,10 +34,9 @@ import java.util.function.BiFunction;
 import org.scijava.Priority;
 import org.scijava.ops.Op;
 import org.scijava.ops.OpInfo;
-import org.scijava.ops.impl.DefaultOpService;
+import org.scijava.ops.OpService;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Gets documentation for the given name.
@@ -49,10 +48,10 @@ import org.scijava.struct.ItemIO;
 @Parameter(key = "name")
 @Parameter(key = "opService")
 @Parameter(key = "opInfo")
-public class HelpForName extends AbstractHelp implements BiFunction<String, DefaultOpService, String> {
+public class HelpForName extends AbstractHelp implements BiFunction<String, OpService, String> {
 
 	@Override
-	public String apply(String name, DefaultOpService ops) {
+	public String apply(String name, OpService ops) {
 		final Iterable<OpInfo> allOps = ops.env().infos(name);
 		help(allOps);
 		return help;

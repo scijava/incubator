@@ -2,7 +2,7 @@ package org.scijava.ops.conversionLoss;
 
 import java.lang.reflect.Type;
 
-import org.scijava.ops.util.OpWrapper;
+import org.scijava.ops.OpWrapper;
 import org.scijava.plugin.Plugin;
 import org.scijava.types.GenericTyped;
 import org.scijava.types.Nil;

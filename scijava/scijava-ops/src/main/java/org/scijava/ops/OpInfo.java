@@ -8,15 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.scijava.log.Logger;
-import org.scijava.ops.hints.Hints;
-import org.scijava.ops.hints.OpHints;
-import org.scijava.ops.matcher.OpCandidate;
-import org.scijava.ops.matcher.OpRef;
 import org.scijava.param.ValidityException;
 import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
-import org.scijava.util.MiscUtils;
 
 /**
  * Metadata about an op implementation.
@@ -52,9 +47,7 @@ public interface OpInfo extends Comparable<OpInfo> {
 		return OpUtils.dependencies(struct());
 	}
 	
-	default OpCandidate createCandidate(OpEnvironment env, Logger log, OpRef ref, Map<TypeVariable<?>, Type> typeVarAssigns) {
-		return new OpCandidate(env, log, ref, this, typeVarAssigns);
-	}
+	OpCandidate createCandidate(OpEnvironment env, Logger log, OpRef ref, Map<TypeVariable<?>, Type> typeVarAssigns);
 
 	/** The op's priority. */
 	double priority();
@@ -75,6 +68,8 @@ public interface OpInfo extends Comparable<OpInfo> {
 	default int compareTo(final OpInfo that) {
 		if (this.priority() < that.priority()) return 1;
 		if (this.priority() > that.priority()) return -1;
-		return MiscUtils.compare(this.implementationName(), that.implementationName());
+		if (this.implementationName() == null) return 1;
+		if (that.implementationName() == null) return -1;
+		return this.implementationName().compareTo(that.implementationName());
 	}
 }

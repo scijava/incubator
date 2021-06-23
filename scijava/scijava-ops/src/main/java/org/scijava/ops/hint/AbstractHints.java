@@ -1,10 +1,10 @@
-package org.scijava.ops.hints.impl;
+package org.scijava.ops.hint;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.scijava.ops.hints.Hints;
+import org.scijava.ops.Hints;
 
 /**
  * Abstract class containing behavior common to most {@link Hints}

@@ -1,9 +1,9 @@
 
 package org.scijava.ops.conversionLoss;
 
-import org.scijava.ops.hints.BaseOpHints.Simplification;
 import org.scijava.ops.Op;
-import org.scijava.ops.hints.OpHints;
+import org.scijava.ops.OpHints;
+import org.scijava.ops.hint.BaseOpHints.Simplification;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;

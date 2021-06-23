@@ -52,7 +52,15 @@ import org.scijava.Context;
 import org.scijava.InstantiableException;
 import org.scijava.Priority;
 import org.scijava.log.LogService;
+import org.scijava.ops.Hints;
 import org.scijava.ops.Op;
+import org.scijava.ops.OpCandidate;
+import org.scijava.ops.OpCandidate.StatusCode;
+import org.scijava.ops.hint.AdaptationHints;
+import org.scijava.ops.hint.DefaultHints;
+import org.scijava.ops.hint.SimplificationHints;
+import org.scijava.ops.hint.BaseOpHints.Adaptation;
+import org.scijava.ops.hint.BaseOpHints.Simplification;
 import org.scijava.ops.OpCollection;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
@@ -60,28 +68,20 @@ import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpField;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
+import org.scijava.ops.OpRef;
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.hints.Hints;
-import org.scijava.ops.hints.BaseOpHints.Adaptation;
-import org.scijava.ops.hints.BaseOpHints.Simplification;
-import org.scijava.ops.hints.impl.AdaptationHints;
-import org.scijava.ops.hints.impl.DefaultHints;
-import org.scijava.ops.hints.impl.SimplificationHints;
+import org.scijava.ops.OpWrapper;
 import org.scijava.ops.matcher.DefaultOpMatcher;
 import org.scijava.ops.matcher.DependencyMatchingException;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
-import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
 import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
-import org.scijava.ops.matcher.OpRef;
 import org.scijava.ops.matcher.DefaultOpRef;
-import org.scijava.ops.matcher.OpCandidate.StatusCode;
 import org.scijava.ops.simplify.SimplifiedOpInfo;
-import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
 import org.scijava.param.ParameterStructs;
 import org.scijava.plugin.Parameter;
@@ -279,8 +279,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		if (!ref.typesMatch(info.opType(), typeVarAssigns))
 			throw new OpMatchingException(
 				"The given OpRef and OpInfo are not compatible!");
-		OpCandidate candidate = new OpCandidate(this, this.log, ref, info,
-			typeVarAssigns);
+		OpCandidate candidate = info.createCandidate(this, log, ref, typeVarAssigns);
 		// TODO: can this be replaced by simply setting the status code to match?
 		if (!matcher.typesMatch(candidate)) throw new OpMatchingException(
 			"The given OpRef and OpInfo are not compatible!");
@@ -572,7 +571,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 					.getType(), map);
 				OpAdaptationInfo adaptedInfo = new OpAdaptationInfo(srcCandidate
 					.opInfo(), adapterOpType, adaptorOp);
-				OpCandidate adaptedCandidate = new OpCandidate(this, log, ref, adaptedInfo, map);
+				OpCandidate adaptedCandidate = adaptedInfo.createCandidate(this, log, ref, map);
 				adaptedCandidate.setStatus(StatusCode.MATCH);
 				return adaptedCandidate;
 			}

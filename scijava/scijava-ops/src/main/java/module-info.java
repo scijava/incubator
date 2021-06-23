@@ -4,7 +4,7 @@ module org.scijava.ops {
 	exports org.scijava.ops; //contains OpDependency interface
 	exports org.scijava.ops.function; // contains functional inferfaces
 	exports org.scijava.ops.core; // contains OpCollection, Op interfaces
-	exports org.scijava.ops.hints;
+	exports org.scijava.ops.hint;
 	exports org.scijava.ops.matcher;
 	exports org.scijava.ops.simplify;
 	exports org.scijava.ops.conversionLoss;

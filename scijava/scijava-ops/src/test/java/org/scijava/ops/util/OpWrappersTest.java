@@ -3,7 +3,7 @@
  * corresponding template in templates/ and rerun bin/generate.groovy.
  */
 
-package org.scijava.ops.core.function;
+package org.scijava.ops.util;
 
 import static org.junit.Assert.assertTrue;
 

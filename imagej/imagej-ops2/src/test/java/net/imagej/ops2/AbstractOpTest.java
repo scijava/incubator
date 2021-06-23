@@ -50,9 +50,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.scijava.Context;
 import org.scijava.cache.CacheService;
-import org.scijava.ops.OpService;
-import org.scijava.ops.impl.DefaultOpService;
 import org.scijava.ops.Op;
+import org.scijava.ops.OpService;
 import org.scijava.plugin.PluginService;
 import org.scijava.thread.ThreadService;
 import org.scijava.types.TypeService;
@@ -60,7 +59,7 @@ import org.scijava.types.TypeService;
 /**
  * Base class for {@link Op} unit testing.
  * <p>
- * <i>All</i> {@link Op} unit tests need to have an {@link DefaultOpService} instance.
+ * <i>All</i> {@link Op} unit tests need to have an {@link OpService} instance.
  * Following the DRY principle, we should implement it only once. Here.
  * </p>
  *
@@ -74,9 +73,9 @@ public abstract class AbstractOpTest{
 
 	@BeforeAll
 	public static void setUp() {
-		context = new Context(DefaultOpService.class, CacheService.class,
+		context = new Context(OpService.class, CacheService.class,
 			ThreadService.class, PluginService.class, TypeService.class);
-		ops = context.service(DefaultOpService.class);
+		ops = context.service(OpService.class);
 	}
 
 	@AfterAll

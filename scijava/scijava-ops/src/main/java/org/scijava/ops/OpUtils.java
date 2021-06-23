@@ -36,11 +36,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.scijava.ops.matcher.MatchingResult;
-import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpMatcher;
-import org.scijava.ops.matcher.OpRef;
-import org.scijava.ops.matcher.OpCandidate.StatusCode;
+import org.scijava.ops.OpCandidate.StatusCode;
 import org.scijava.param.ParameterMember;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
@@ -75,16 +72,16 @@ public final class OpUtils {
 	 * </pre>
 	 * 
 	 * E.g. "math.add, math.pow". </br>
-	 * The name delimiter is a comma (,). Furthermore, names without prefixes
-	 * are added. The above example will result in the following output:
+	 * The name delimiter is a comma (,). Furthermore, names without prefixes are
+	 * added. The above example will result in the following output:
 	 * 
 	 * <pre>
 	 *  [math.add, add, math.pow, pow]
 	 * </pre>
 	 * 
-	 * @param names
-	 *            the string containing the names to parse
-	 * @return
+	 * @param names the string containing the {@code n} names to parse
+	 * @return an array of size {@code 2n}, where elements alternate between a
+	 *         name in {@code names} and the prefix-less name (when present)
 	 */
 	public static String[] parseOpNames(String names) {
 		return Arrays.stream(names.split(",")).map(s -> s.trim())
@@ -96,9 +93,9 @@ public final class OpUtils {
 	 * prefixes. Prefixes are assumed to be separated by a comma (,). E.g.
 	 * "math.add" will result in [math.add, add].
 	 * 
-	 * @param name
-	 *            the string containing the name to parse
-	 * @return
+	 * @param name the string containing the name to parse
+	 * @return a two element array, where the first element is {@code name} and
+	 *         the second element is the prefix-less name (when present)
 	 */
 	public static String[] parseOpName(String name) {
 		if (name == null || name.isEmpty()) {
@@ -107,9 +104,8 @@ public final class OpUtils {
 		if (name.contains(".")) {
 			String[] split = name.split("\\.");
 			return new String[] { name, split[split.length - 1] };
-		} else {
-			return new String[]{name};
 		}
+		return new String[]{name};
 	}
 
 	public static List<MemberInstance<?>> inputs(StructInstance<?> op) {
@@ -258,90 +254,23 @@ public final class OpUtils {
 	 * at the moment.
 	 * @see OpMatcher#typesMatch(OpCandidate)
 	 * @param matches
-	 * @return
+	 * @return true iff incomplete type matching occurred
 	 */
-	private static boolean typeCheckingIncomplete(List<OpCandidate> matches) {
+	public static boolean typeCheckingIncomplete(List<OpCandidate> matches) {
 		Type outputType = null;
 		for (OpCandidate match : matches) {
 			Type ts = output(match).getType();
 			if (outputType == null || Objects.equals(outputType, ts)) {
 				outputType = ts;
 				continue;
-			} else {
-				return true;
 			}
+			return true;
 		}
 		return false;
 	}
 
 	public static Type[] getTypes(List<Member<?>> members) {
 		return members.stream().map(m -> m.getType()).toArray(Type[]::new);
-	}
-
-	/**
-	 * Gets a string with an analysis of a particular match request failure.
-	 * <p>
-	 * This method is used to generate informative exception messages when no
-	 * matches, or too many matches, are found.
-	 * </p>
-	 * 
-	 * @param res
-	 *            The result of type matching
-	 * @return A multi-line string describing the situation: 1) the type of
-	 *         match failure; 2) the list of matching ops (if any); 3) the
-	 *         request itself; and 4) the list of candidates including status
-	 *         (i.e., whether it matched, and if not, why not).
-	 */
-	public static String matchInfo(final MatchingResult res) {
-		final StringBuilder sb = new StringBuilder();
-
-		List<OpCandidate> candidates = res.getCandidates();
-		List<OpCandidate> matches = res.getMatches();
-
-		final OpRef ref = res.getOriginalQueries().get(0);
-		if (matches.isEmpty()) {
-			// no matches
-			sb.append("No matching '" + ref.getLabel() + "' op\n");
-		} else {
-			// multiple matches
-			final double priority = getPriority(matches.get(0));
-			sb.append("Multiple '" + ref.getLabel() + "' ops of priority " + priority + ":\n");
-			if (typeCheckingIncomplete(matches)) {
-				sb.append("Incomplete output type checking may have occured!\n");
-			}
-			int count = 0;
-			for (final OpCandidate match : matches) {
-				sb.append(++count + ". ");
-				sb.append(match.toString() + "\n");
-			}
-		}
-
-		// fail, with information about the request and candidates
-		sb.append("\n");
-		sb.append("Request:\n");
-		sb.append("-\t" + ref.toString() + "\n");
-		sb.append("\n");
-		sb.append("Candidates:\n");
-		if (candidates.isEmpty()) {
-			sb.append("-\t No candidates found!");
-		}
-		int count = 0;
-		for (final OpCandidate candidate : candidates) {
-			sb.append(++count + ". ");
-			sb.append("\t" + opString(candidate.opInfo(), candidate.getStatusItem()) + "\n");
-			final String status = candidate.getStatus();
-			if (status != null)
-				sb.append("\t" + status + "\n");
-			if (candidate.getStatusCode() == StatusCode.DOES_NOT_CONFORM) {
-				// TODO: Conformity not yet implemented
-				// // show argument values when a contingent op rejects them
-				// for (final ModuleItem<?> item : inputs(info)) {
-				// final Object value = item.getValue(candidate.getModule());
-				// sb.append("\t\t" + item.getName() + " = " + value + "\n");
-				// }
-			}
-		}
-		return sb.toString();
 	}
 
 	/**
