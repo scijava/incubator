@@ -4,15 +4,12 @@ package org.scijava.ops;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.scijava.log.Logger;
 import org.scijava.ops.hints.Hints;
 import org.scijava.ops.hints.OpHints;
-import org.scijava.ops.hints.impl.ImmutableHints;
 import org.scijava.ops.matcher.OpCandidate;
 import org.scijava.ops.matcher.OpRef;
 import org.scijava.param.ValidityException;
@@ -38,10 +35,7 @@ public interface OpInfo extends Comparable<OpInfo> {
 	/** Gets the hints declared in the {@link OpHints} annotation */
 	Hints declaredHints();
 
-	default Hints formHints(OpHints h) {
-		if (h == null) return new ImmutableHints(new String[0]);
-		return new ImmutableHints(h.hints());
-	}
+	Hints formHints(OpHints h);
 
 	/** Gets the op's input parameters. */
 	default List<Member<?>> inputs() {

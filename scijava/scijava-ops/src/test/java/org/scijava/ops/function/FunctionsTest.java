@@ -27,12 +27,13 @@
  * #L%
  */
 
-package org.scijava.ops;
+package org.scijava.ops.function;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.junit.Test;
+import org.scijava.ops.AbstractTestEnvironment;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
 

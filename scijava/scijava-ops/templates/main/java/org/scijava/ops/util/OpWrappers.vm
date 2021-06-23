@@ -3,15 +3,20 @@
  * corresponding template in templates/ and rerun bin/generate.groovy.
  */
 
-package org.scijava.ops.function;
+package org.scijava.ops.util;
 
 import java.lang.reflect.Type;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.scijava.ops.util.OpWrapper;
+import org.scijava.ops.function.Computers;
+import org.scijava.ops.function.Functions;
+import org.scijava.ops.function.Inplaces;
+import org.scijava.ops.function.Producer;
+import org.scijava.param.Container;
 import org.scijava.plugin.Plugin;
 import org.scijava.types.GenericTyped;
+
 
 public class OpWrappers {
 

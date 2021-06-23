@@ -38,8 +38,8 @@ import net.imglib2.type.BooleanType;
 
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;

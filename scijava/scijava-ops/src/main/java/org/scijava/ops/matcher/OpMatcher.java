@@ -35,32 +35,32 @@ import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.hints.Hints;
 
 /**
- * Finds Ops which match an {@link OpRef}.
+ * Finds Ops which match an {@link DefaultOpRef}.
  *
  * @author Curtis Rueden
  */
 //TODO javadoc
 public interface OpMatcher {
 
-	OpCandidate findSingleMatch(OpEnvironment env, OpRef ref) throws OpMatchingException;
+	OpCandidate findSingleMatch(OpEnvironment env, DefaultOpRef ref) throws OpMatchingException;
 
-	OpCandidate findSingleMatch(OpEnvironment env, OpRef ref, Hints hints) throws OpMatchingException;
+	OpCandidate findSingleMatch(OpEnvironment env, DefaultOpRef ref, Hints hints) throws OpMatchingException;
 
-	MatchingResult findMatch(OpEnvironment env, OpRef ref);
+	MatchingResult findMatch(OpEnvironment env, DefaultOpRef ref);
 
-	MatchingResult findMatch(OpEnvironment env, OpRef ref, Hints hints);
+	MatchingResult findMatch(OpEnvironment env, DefaultOpRef ref, Hints hints);
 
-	MatchingResult findMatch(OpEnvironment env, List<OpRef> refs);
+	MatchingResult findMatch(OpEnvironment env, List<DefaultOpRef> refs);
 
-	MatchingResult findMatch(OpEnvironment env, List<OpRef> refs, Hints hints);
+	MatchingResult findMatch(OpEnvironment env, List<DefaultOpRef> refs, Hints hints);
 
-	List<OpCandidate> findCandidates(OpEnvironment env, OpRef ref);
+	List<OpCandidate> findCandidates(OpEnvironment env, DefaultOpRef ref);
 
-	List<OpCandidate> findCandidates(OpEnvironment env, OpRef ref, Hints hints);
+	List<OpCandidate> findCandidates(OpEnvironment env, DefaultOpRef ref, Hints hints);
 
-	List<OpCandidate> findCandidates(OpEnvironment env, List<OpRef> refs);
+	List<OpCandidate> findCandidates(OpEnvironment env, List<DefaultOpRef> refs);
 
-	List<OpCandidate> findCandidates(OpEnvironment env, List<OpRef> refs, Hints hints);
+	List<OpCandidate> findCandidates(OpEnvironment env, List<DefaultOpRef> refs, Hints hints);
 
 	List<OpCandidate> filterMatches(List<OpCandidate> candidates);
 

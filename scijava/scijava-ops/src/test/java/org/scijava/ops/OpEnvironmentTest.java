@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.Priority;
 import org.scijava.ops.function.Producer;
+import org.scijava.ops.impl.DefaultOpService;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.param.Parameter;
 import org.scijava.struct.ItemIO;
@@ -17,7 +18,7 @@ import org.scijava.types.Nil;
  * Test class for {@link OpEnvironment} methods. NB this class does not test any
  * <em>particular</em> implementation of {@link OpEnvironment}, but instead
  * ensures expected behavior in the {@link OpEnvironment} returned by the
- * {@link OpService} (which will be nearly exclusively the only OpEnvironment
+ * {@link DefaultOpService} (which will be nearly exclusively the only OpEnvironment
  * implementation used)
  * 
  * @author Gabriel Selzer

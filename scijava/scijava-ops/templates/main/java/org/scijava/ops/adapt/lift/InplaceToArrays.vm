@@ -37,7 +37,7 @@ package org.scijava.ops.adapt.lift;
 import java.util.function.Function;
 
 import org.scijava.ops.OpField;
-import org.scijava.ops.core.OpCollection;
+import org.scijava.ops.OpCollection;
 import org.scijava.ops.function.Inplaces;
 import org.scijava.plugin.Plugin;
 

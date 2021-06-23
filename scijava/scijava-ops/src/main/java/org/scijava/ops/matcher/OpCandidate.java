@@ -44,7 +44,7 @@ import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 
 /**
- * Container class for a possible operation match between an {@link OpRef} and
+ * Container class for a possible operation match between an {@link DefaultOpRef} and
  * an {@link OpInfo}, as computed by the {@link OpMatcher}.
  *
  * @author Curtis Rueden

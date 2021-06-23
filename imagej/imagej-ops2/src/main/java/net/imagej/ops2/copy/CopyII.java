@@ -35,8 +35,8 @@ import java.util.function.Function;
 import net.imglib2.Dimensions;
 import net.imglib2.IterableInterval;
 
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.util.Maps;
 import org.scijava.param.Parameter;

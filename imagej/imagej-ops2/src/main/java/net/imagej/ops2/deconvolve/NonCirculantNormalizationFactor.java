@@ -48,8 +48,8 @@ import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
 import org.scijava.Priority;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Inplaces;
 import org.scijava.param.Parameter;

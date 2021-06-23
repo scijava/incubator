@@ -32,13 +32,12 @@
 * corresponding template in templates/ and rerun bin/generate.groovy.
 */
 
-package org.scijava.ops.core.builder;
+package org.scijava.ops;
 
 import java.lang.reflect.Type;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Functions;
 import org.scijava.ops.function.Inplaces;

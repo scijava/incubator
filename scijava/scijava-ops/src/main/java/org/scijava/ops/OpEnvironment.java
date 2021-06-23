@@ -31,9 +31,8 @@ package org.scijava.ops;
 
 import java.lang.reflect.Type;
 
-import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.ops.hints.Hints;
-import org.scijava.ops.matcher.OpRef;
+import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.types.Nil;
 
 /**
@@ -42,7 +41,7 @@ import org.scijava.types.Nil;
  * <ul>
  * <li>The pool of available ops, from which candidates are chosen.</li>
  * <li>Type-safe, built-in method signatures for all op implementations.</li>
- * <li>Selection (a.k.a. "matching") of op implementations from {@link OpRef}
+ * <li>Selection (a.k.a. "matching") of op implementations from {@link DefaultOpRef}
  * descriptors.</li>
  * </ul>
  * <p>

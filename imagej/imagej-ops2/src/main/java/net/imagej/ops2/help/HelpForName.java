@@ -32,9 +32,9 @@ package net.imagej.ops2.help;
 import java.util.function.BiFunction;
 
 import org.scijava.Priority;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpInfo;
-import org.scijava.ops.OpService;
-import org.scijava.ops.core.Op;
+import org.scijava.ops.impl.DefaultOpService;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;
@@ -49,10 +49,10 @@ import org.scijava.struct.ItemIO;
 @Parameter(key = "name")
 @Parameter(key = "opService")
 @Parameter(key = "opInfo")
-public class HelpForName extends AbstractHelp implements BiFunction<String, OpService, String> {
+public class HelpForName extends AbstractHelp implements BiFunction<String, DefaultOpService, String> {
 
 	@Override
-	public String apply(String name, OpService ops) {
+	public String apply(String name, DefaultOpService ops) {
 		final Iterable<OpInfo> allOps = ops.env().infos(name);
 		help(allOps);
 		return help;

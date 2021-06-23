@@ -52,6 +52,8 @@ import org.scijava.Context;
 import org.scijava.InstantiableException;
 import org.scijava.Priority;
 import org.scijava.log.LogService;
+import org.scijava.ops.Op;
+import org.scijava.ops.OpCollection;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpEnvironment;
@@ -59,8 +61,6 @@ import org.scijava.ops.OpField;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpUtils;
-import org.scijava.ops.core.Op;
-import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.hints.Hints;
 import org.scijava.ops.hints.BaseOpHints.Adaptation;
 import org.scijava.ops.hints.BaseOpHints.Simplification;
@@ -72,13 +72,14 @@ import org.scijava.ops.matcher.DependencyMatchingException;
 import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpCandidate;
-import org.scijava.ops.matcher.OpCandidate.StatusCode;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
 import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
 import org.scijava.ops.matcher.OpRef;
+import org.scijava.ops.matcher.DefaultOpRef;
+import org.scijava.ops.matcher.OpCandidate.StatusCode;
 import org.scijava.ops.simplify.SimplifiedOpInfo;
 import org.scijava.ops.util.OpWrapper;
 import org.scijava.param.FunctionalMethodType;
@@ -119,12 +120,12 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	private Map<String, Set<OpInfo>> opDirectory;
 
 	/**
-	 * Map containing pairs of {@link MatchingConditions} (i.e. the {@link OpRef}
+	 * Map containing pairs of {@link MatchingConditions} (i.e. the {@link DefaultOpRef}
 	 * and {@Hints} used to find an Op) and the {@code Op}s that matched those
 	 * requests. Used to quickly return Ops when the matching conditions are
 	 * identical to those of a previous call.
 	 *
-	 * @see OpRef#equals(Object)
+	 * @see DefaultOpRef#equals(Object)
 	 */
 	private Map<MatchingConditions, Object> opCache;
 
@@ -195,7 +196,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	public <T> T op(final OpInfo info, final Nil<T> specialType, final Nil<?>[] inTypes, final Nil<?> outType) {
 		try {
 			Type[] types = Arrays.stream(inTypes).map(nil -> nil.getType()).toArray(Type[]::new);
-			OpRef ref = OpRef.fromTypes(specialType.getType(), outType.getType(), types);
+			OpRef ref = DefaultOpRef.fromTypes(specialType.getType(), outType.getType(), types);
 			return (T) findOpInstance(ref, info, getHints());
 		} catch (OpMatchingException e) {
 			throw new IllegalArgumentException(e);
@@ -216,7 +217,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	public <T> T op(final OpInfo info, final Nil<T> specialType, final Nil<?>[] inTypes, final Nil<?> outType, Hints hints) {
 		try {
 			Type[] types = Arrays.stream(inTypes).map(nil -> nil.getType()).toArray(Type[]::new);
-			OpRef ref = OpRef.fromTypes(specialType.getType(), outType.getType(), types);
+			OpRef ref = DefaultOpRef.fromTypes(specialType.getType(), outType.getType(), types);
 			return (T) findOpInstance(ref, info, hints);
 		} catch (OpMatchingException e) {
 			throw new IllegalArgumentException(e);
@@ -255,7 +256,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	@SuppressWarnings("unchecked")
 	private <T> T findOpInstance(final String opName, final Nil<T> specialType, final Nil<?>[] inTypes,
 			final Nil<?> outType, Hints hints) throws OpMatchingException {
-		final OpRef ref = OpRef.fromTypes(opName, specialType.getType(), outType != null ? outType.getType() : null,
+		final DefaultOpRef ref = DefaultOpRef.fromTypes(opName, specialType.getType(), outType != null ? outType.getType() : null,
 				toTypes(inTypes));
 		return (T) findOpInstance(ref, hints);
 	}
@@ -265,7 +266,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 	
 	/**
-	 * Creates an Op instance from an {@link OpInfo} with the provided {@link OpRef} as a template.
+	 * Creates an Op instance from an {@link OpInfo} with the provided {@link DefaultOpRef} as a template.
 	 * 
 	 * @param ref
 	 * @param info
@@ -297,7 +298,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 	
 	/**
-	 * Finds an Op instance matching the request described by {@link OpRef}
+	 * Finds an Op instance matching the request described by {@link DefaultOpRef}
 	 * {@code ref}. NB the return must be an {@link Object} here (instead of some
 	 * type variable T where T is the Op type} since there is no way to ensure
 	 * that the {@code OpRef} can provide that T (since the OpRef could require
@@ -308,7 +309,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * @return an Op satisfying the request described by {@code ref}.
 	 * @throws OpMatchingException
 	 */
-	private Object findOpInstance(final OpRef ref,
+	private Object findOpInstance(final DefaultOpRef ref,
 		Hints hints) throws OpMatchingException
 	{
 		// see if the ref has been matched already
@@ -344,7 +345,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return null;
 	}
 	
-	private OpCandidate findOpCandidate(OpRef ref, Hints hints) throws OpMatchingException{
+	private OpCandidate findOpCandidate(DefaultOpRef ref, Hints hints) throws OpMatchingException{
 		try {
 			// attempt to find a direct match
 			return matcher.findSingleMatch(this, ref, hints);
@@ -379,7 +380,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 
-	private OpCandidate findSimplifiedOp(OpRef ref, Hints hints) throws OpMatchingException {
+	private OpCandidate findSimplifiedOp(DefaultOpRef ref, Hints hints) throws OpMatchingException {
 		Hints simplificationHints = SimplificationHints.generateHints(hints);
 		return matcher.findSingleMatch(this, ref, simplificationHints);
 	}
@@ -492,7 +493,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		final List<Object> resolvedDependencies = new ArrayList<>(dependencies.size());
 
 		for (final OpDependencyMember<?> dependency : dependencies) {
-			final OpRef dependencyRef = inferOpRef(dependency, typeVarAssigns);
+			final DefaultOpRef dependencyRef = inferOpRef(dependency, typeVarAssigns);
 			try {
 				Hints hintCopy = hints.getCopy();
 				hintCopy.setHint(Simplification.FORBIDDEN);
@@ -564,7 +565,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				// adaptor since we know it is a Function)
 				Type srcOpType = Types.substituteTypeVariables(adaptor.inputs().get(0)
 					.getType(), map);
-				final OpRef srcOpRef = inferOpRef(srcOpType, ref.getName(), map);
+				final DefaultOpRef srcOpRef = inferOpRef(srcOpType, ref.getName(), map);
 				final OpCandidate srcCandidate = findAdaptationCandidate(srcOpRef, hints);
 				map.putAll(srcCandidate.typeVarAssigns());
 				Type adapterOpType = Types.substituteTypeVariables(adaptor.output()
@@ -595,7 +596,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		throw new DependencyMatchingException(sb.toString());
 	}
 
-	private OpCandidate findAdaptationCandidate(final OpRef srcOpRef, final Hints hints)
+	private OpCandidate findAdaptationCandidate(final DefaultOpRef srcOpRef, final Hints hints)
 		throws OpMatchingException
 	{
 		Hints adaptationHints = AdaptationHints.generateHints(hints);
@@ -619,13 +620,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return true;
 	}
 
-	private OpRef inferOpRef(OpDependencyMember<?> dependency,
+	private DefaultOpRef inferOpRef(OpDependencyMember<?> dependency,
 		Map<TypeVariable<?>, Type> typeVarAssigns) throws OpMatchingException
 	{
 		final Type mappedDependencyType = Types.mapVarToTypes(new Type[] {
 			dependency.getType() }, typeVarAssigns)[0];
 		final String dependencyName = dependency.getDependencyName();
-		final OpRef inferredRef = inferOpRef(mappedDependencyType, dependencyName,
+		final DefaultOpRef inferredRef = inferOpRef(mappedDependencyType, dependencyName,
 			typeVarAssigns);
 		if (inferredRef != null) return inferredRef;
 		throw new OpMatchingException("Could not infer functional " +
@@ -634,13 +635,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	/**
-	 * Tries to infer a {@link OpRef} from a functional Op type. E.g. the type:
+	 * Tries to infer a {@link DefaultOpRef} from a functional Op type. E.g. the type:
 	 * 
 	 * <pre>
 	 * Computer&lt;Double[], Double[]&gt
 	 * </pre>
 	 * 
-	 * Will result in the following {@link OpRef}:
+	 * Will result in the following {@link DefaultOpRef}:
 	 * 
 	 * <pre>
 	 * Name: 'specified name'
@@ -657,7 +658,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * @param name
 	 * @return null if the specified type has no functional method
 	 */
-	private OpRef inferOpRef(Type type, String name, Map<TypeVariable<?>, Type> typeVarAssigns)
+	private DefaultOpRef inferOpRef(Type type, String name, Map<TypeVariable<?>, Type> typeVarAssigns)
 			throws OpMatchingException {
 		List<FunctionalMethodType> fmts = ParameterStructs.findFunctionalMethodTypes(type);
 		if (fmts == null)
@@ -684,7 +685,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 			error += ". This is not supported.";
 			throw new OpMatchingException(error);
 		}
-		return new OpRef(name, type, mappedOutputs[0], mappedInputs);
+		return new DefaultOpRef(name, type, mappedOutputs[0], mappedInputs);
 	}
 
 	private void initOpDirectory() {

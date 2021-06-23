@@ -1,4 +1,4 @@
-package org.scijava.ops.hints;
+package org.scijava.ops.hints.impl;
 
 import static org.junit.Assert.assertTrue;
 
@@ -6,11 +6,12 @@ import java.util.function.Function;
 
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.OpCollection;
 import org.scijava.ops.OpField;
-import org.scijava.ops.core.OpCollection;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.hints.BaseOpHints.Adaptation;
-import org.scijava.ops.hints.impl.DefaultHints;
+import org.scijava.ops.hints.Hints;
+import org.scijava.ops.hints.OpHints;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.plugin.Plugin;
 

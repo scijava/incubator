@@ -47,7 +47,7 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.scijava.ops.core.Op;
+import org.scijava.ops.Op;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;

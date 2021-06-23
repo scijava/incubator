@@ -42,6 +42,7 @@ import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.hints.Hints;
 import org.scijava.ops.hints.OpHints;
+import org.scijava.ops.hints.impl.ImmutableHints;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
 import org.scijava.param.ValidityProblem;
@@ -103,6 +104,12 @@ public class OpFieldInfo implements OpInfo {
 	}
 
 	// -- OpInfo methods --
+
+	@Override
+	public Hints formHints(OpHints h) {
+		if (h == null) return new ImmutableHints(new String[0]);
+		return new ImmutableHints(h.hints());
+	}
 
 	@Override
 	public Type opType() {

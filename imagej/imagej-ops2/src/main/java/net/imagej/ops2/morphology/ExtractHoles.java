@@ -37,8 +37,8 @@ import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.loops.LoopBuilder;
 import net.imglib2.type.BooleanType;
 
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Computers;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;

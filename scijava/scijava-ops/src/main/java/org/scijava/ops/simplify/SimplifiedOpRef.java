@@ -19,10 +19,11 @@ import org.scijava.ops.hints.BaseOpHints.Adaptation;
 import org.scijava.ops.hints.BaseOpHints.Simplification;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpRef;
+import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
 
-public class SimplifiedOpRef extends OpRef {
+public class SimplifiedOpRef extends DefaultOpRef {
 
 	private final OpRef srcRef;
 	private final List<List<OpInfo>> simplifierSets;

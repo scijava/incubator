@@ -22,7 +22,7 @@ import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.matcher.MatchingUtils;
-import org.scijava.ops.matcher.OpRef;
+import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.ops.util.AnnotationUtils;
 import org.scijava.param.Container;
 import org.scijava.param.Mutable;
@@ -54,11 +54,11 @@ public class SimplificationUtils {
 	 * </ul>
 	 * 
 	 * @param originalOpType - the {@link Type} declared by the source
-	 *          {@link OpRef}
+	 *          {@link DefaultOpRef}
 	 * @param newArgs - the new argument {@link Type}s requested by the
-	 *          {@link OpRef}.
+	 *          {@link DefaultOpRef}.
 	 * @param newOutType - the new output {@link Type} requested by the
-	 *          {@link OpRef}.
+	 *          {@link DefaultOpRef}.
 	 * @return - a new {@code type} for a {@link SimplifiedOpRef}.
 	 */
 	public static ParameterizedType retypeOpType(Type originalOpType, Type[] newArgs, Type newOutType) {

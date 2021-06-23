@@ -9,7 +9,7 @@ import org.scijava.ops.simplify.SimplifiedOpInfo;
 /**
  * Class representing the result from type matching done by the
  * {@link OpMatcher}. Contains the original candidates which match
- * the types specified by {@link OpRef} and the final matches that match all
+ * the types specified by {@link DefaultOpRef} and the final matches that match all
  * inputs, outputs, and arguments.
  * 
  * @author David Kolb
@@ -18,19 +18,19 @@ public class MatchingResult {
 
 	private final List<OpCandidate> candidates;
 	private final List<OpCandidate> matches;
-	private final List<OpRef> originalQueries;
+	private final List<DefaultOpRef> originalQueries;
 
-	public static MatchingResult empty(final List<OpRef> originalQueries) {
+	public static MatchingResult empty(final List<DefaultOpRef> originalQueries) {
 		return new MatchingResult(new ArrayList<OpCandidate>(), new ArrayList<OpCandidate>(), originalQueries);
 	}
 	
-	public MatchingResult(final List<OpCandidate> candidates, final List<OpCandidate> matches, final List<OpRef> originalQueries) {
+	public MatchingResult(final List<OpCandidate> candidates, final List<OpCandidate> matches, final List<DefaultOpRef> originalQueries) {
 		this.candidates = candidates;
 		this.matches = matches;
 		this.originalQueries = originalQueries;
 	}
 
-	public List<OpRef> getOriginalQueries() {
+	public List<DefaultOpRef> getOriginalQueries() {
 		return originalQueries;
 	}
 

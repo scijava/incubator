@@ -27,32 +27,36 @@
  * #L%
  */
 
-package org.scijava.ops;
+package org.scijava.ops.function;
 
 import org.junit.Test;
-import org.scijava.ops.function.Inplaces;
+import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
 
-public class InplacesTest extends AbstractTestEnvironment {
+public class ComputersTest extends AbstractTestEnvironment {
 
 	private static Nil<double[]> nilDoubleArray = new Nil<>() {
 	};
 
 	@Test
-	public void testUnaryInplaces() {
-		Inplaces.Arity1<double[]> inplaceSqrt = Inplaces.match(ops.env(), "math.sqrt", nilDoubleArray);
-		final double[] a1 = { 4, 100, 36 };
-		inplaceSqrt.mutate(a1);
-		assert arrayEquals(a1, 2.0, 10.0, 6.0);
+	public void testUnaryComputers() {
+		Computers.Arity1<double[], double[]> sqrtComputer = Computers.match(ops.env(),
+			"math.sqrt", nilDoubleArray, nilDoubleArray);
+
+		double[] result = new double[3];
+		sqrtComputer.compute(new double[] { 4.0, 100.0, 25.0 }, result);
+		arrayEquals(result, 2d, 1d, 5d);
 	}
 
 	@Test
-	public void testBinaryInplaces() {
-		final Inplaces.Arity2_1<double[], double[]> inplaceAdd = Inplaces.match1(ops.env(), "math.add", nilDoubleArray,
+	public void testBinaryComputers() {
+		Computers.Arity2<double[], double[], double[]> addComputer = //
+			Computers.match(ops.env(), "math.add", nilDoubleArray, nilDoubleArray,
 				nilDoubleArray);
-		final double[] a1 = { 3, 5, 7 };
-		final double[] a2 = { 2, 4, 9 };
-		inplaceAdd.mutate(a1, a2);
-		assert arrayEquals(a1, 5.0, 9.0, 16.0);
+
+		double[] result = new double[3];
+		addComputer.compute(new double[] { 4.0, 100.0, 25.0 }, new double[] { 4d, 10d, 1.5 }, result);
+		arrayEquals(result, 8d, 110d, 26.5);
 	}
 }

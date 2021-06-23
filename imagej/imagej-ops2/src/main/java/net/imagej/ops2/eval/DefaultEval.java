@@ -31,9 +31,9 @@ package net.imagej.ops2.eval;
 
 import java.util.Map;
 
-import org.scijava.ops.OpService;
-import org.scijava.ops.core.Op;
+import org.scijava.ops.Op;
 import org.scijava.ops.function.Functions;
+import org.scijava.ops.impl.DefaultOpService;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.ItemIO;
@@ -54,11 +54,11 @@ import org.scijava.struct.ItemIO;
 @Parameter(key = "vars")
 @Parameter(key = "opService")
 @Parameter(key = "output")
-public class DefaultEval implements Functions.Arity3<String, Map<String, Object>, OpService, Object>
+public class DefaultEval implements Functions.Arity3<String, Map<String, Object>, DefaultOpService, Object>
 {
 
 	@Override
-	public Object apply(final String input, final Map<String, Object> vars, final OpService ops) {
+	public Object apply(final String input, final Map<String, Object> vars, final DefaultOpService ops) {
 		OpEvaluator e = new OpEvaluator(ops);
 		if (vars != null) e.setAll(vars);
 		return e.evaluate(input);

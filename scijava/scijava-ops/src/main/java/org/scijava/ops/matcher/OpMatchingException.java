@@ -1,7 +1,7 @@
 package org.scijava.ops.matcher;
 
 /**
- * Indicates that no op matching a given {@link OpRef} could be found.
+ * Indicates that no op matching a given {@link DefaultOpRef} could be found.
  * 
  * @author David Kolb
  */

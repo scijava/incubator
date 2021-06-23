@@ -27,65 +27,33 @@
  * #L%
  */
 
-package org.scijava.ops;
-
-import java.util.function.BiFunction;
+package org.scijava.ops.function;
 
 import org.junit.Test;
-import org.scijava.ops.function.Computers;
+import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.function.Inplaces;
 import org.scijava.types.Nil;
-import org.scijava.ops.util.Adapt;
 
-public class AdaptersTest extends AbstractTestEnvironment {
-
-	private static Nil<Double> nilDouble = new Nil<>() {
-	};
+public class InplacesTest extends AbstractTestEnvironment {
 
 	private static Nil<double[]> nilDoubleArray = new Nil<>() {
 	};
 
 	@Test
-	public void testComputerAsFunction() {
-		final Computers.Arity2<double[], double[], double[]> computer = ops.env().op( //
-				"test.adaptersC", new Nil<Computers.Arity2<double[], double[], double[]>>() {
-				}, //
-				new Nil[] { nilDoubleArray, nilDoubleArray, nilDoubleArray }, //
-				nilDoubleArray//
-		);
-
-		BiFunction<double[], double[], double[]> computerAsFunction = Adapt.ComputerAdapt.asBiFunction(computer,
-				(arr1) -> {
-					return new double[arr1.length];
-				});
-
-		final double[] a1 = { 3, 5, 7 };
-		final double[] a2 = { 2, 4, 9 };
-		double[] result = computerAsFunction.apply(a1, a2);
-		assert arrayEquals(result, 5.0, 9.0, 16.0);
+	public void testUnaryInplaces() {
+		Inplaces.Arity1<double[]> inplaceSqrt = Inplaces.match(ops.env(), "math.sqrt", nilDoubleArray);
+		final double[] a1 = { 4, 100, 36 };
+		inplaceSqrt.mutate(a1);
+		assert arrayEquals(a1, 2.0, 10.0, 6.0);
 	}
 
 	@Test
-	public void testFunctionAsComputer() {
-		// look up a function: Double result = math.add(Double v1, Double v2)
-		BiFunction<double[], double[], double[]> function = ops.env().op( //
-				"test.adaptersF", new Nil<BiFunction<double[], double[], double[]>>() {
-				}, //
-				new Nil[] { nilDoubleArray, nilDoubleArray }, //
-				nilDoubleArray//
-		);
-
-		Computers.Arity2<double[], double[], double[]> functionAsComputer = Adapt.FunctionAdapt.asComputer2(function,
-				(from, to) -> {
-					for (int i = 0; i < from.length; i++) {
-						to[i] = from[i];
-					}
-				});
-
+	public void testBinaryInplaces() {
+		final Inplaces.Arity2_1<double[], double[]> inplaceAdd = Inplaces.match1(ops.env(), "math.add", nilDoubleArray,
+				nilDoubleArray);
 		final double[] a1 = { 3, 5, 7 };
 		final double[] a2 = { 2, 4, 9 };
-		final double[] result = new double[a2.length];
-		functionAsComputer.compute(a1, a2, result);
-		assert arrayEquals(result, 5.0, 9.0, 16.0);
+		inplaceAdd.mutate(a1, a2);
+		assert arrayEquals(a1, 5.0, 9.0, 16.0);
 	}
-	
 }

@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.ops;
+package org.scijava.ops.impl;
 
 import static org.junit.Assert.fail;
 
@@ -39,30 +39,33 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.scijava.Context;
-import org.scijava.ops.core.Op;
-import org.scijava.ops.core.OpCollection;
+import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.Op;
+import org.scijava.ops.OpCollection;
+import org.scijava.ops.OpDependency;
+import org.scijava.ops.OpEnvironment;
+import org.scijava.ops.OpField;
 import org.scijava.ops.function.Producer;
 import org.scijava.ops.impl.DefaultOpEnvironment;
+import org.scijava.ops.impl.DefaultOpService;
 import org.scijava.ops.impl.MatchingConditions;
-import org.scijava.ops.matcher.OpRef;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.PluginService;
-import org.scijava.struct.ItemIO;
 import org.scijava.types.TypeService;
 
 @Plugin(type = OpCollection.class)
 public class OpCachingTest extends AbstractTestEnvironment {
 
 	/**
-	 * Obtains a new {@link OpService} for each test (we also need to create a new
+	 * Obtains a new {@link DefaultOpService} for each test (we also need to create a new
 	 * {@link Context} to ensure that we start with a fresh cache).
 	 */
 	@Before
 	public void setUpEach() {
-		context = new Context(OpService.class, PluginService.class,
+		context = new Context(DefaultOpService.class, PluginService.class,
 			TypeService.class);
-		ops = context.getService(OpService.class);
+		ops = context.getService(DefaultOpService.class);
 	}
 
 	/**

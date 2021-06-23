@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.ops;
+package org.scijava.ops.adapt;
 
 import com.google.common.collect.Streams;
 
@@ -37,7 +37,8 @@ import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 import org.junit.Test;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.OpBuilder;
 import org.scijava.ops.function.Computers;
 import org.scijava.types.Nil;
 

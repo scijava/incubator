@@ -36,7 +36,7 @@ import net.imglib2.algorithm.fft2.FFTMethods;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
-import org.scijava.ops.core.Op;
+import org.scijava.ops.Op;
 import org.scijava.ops.function.Functions;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;

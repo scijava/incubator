@@ -37,7 +37,7 @@ import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessibleInterval;
 
 import org.scijava.Priority;
-import org.scijava.ops.core.Op;
+import org.scijava.ops.Op;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers;
 import org.scijava.param.Parameter;

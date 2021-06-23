@@ -38,8 +38,8 @@ import net.imglib2.type.NativeType;
 import net.imglib2.util.Intervals;
 
 import org.scijava.Priority;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
 import org.scijava.ops.function.Computers;
 import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;

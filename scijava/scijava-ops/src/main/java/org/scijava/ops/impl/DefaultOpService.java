@@ -26,36 +26,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+package org.scijava.ops.impl;
 
-package org.scijava.ops;
+import org.scijava.ops.OpBuilder;
+import org.scijava.ops.OpEnvironment;
+import org.scijava.ops.OpService;
+import org.scijava.plugin.Plugin;
+import org.scijava.service.AbstractService;
+import org.scijava.service.Service;
 
-import org.junit.Test;
-import org.scijava.ops.function.Computers;
-import org.scijava.types.Nil;
+/**
+ * Service to provide a list of available ops structured in a prefix tree and to
+ * search for ops matching specified types.
+ *
+ * @author David Kolb
+ */
+@Plugin(type = Service.class)
+public class DefaultOpService extends AbstractService implements OpService {
 
-public class ComputersTest extends AbstractTestEnvironment {
+	private OpEnvironment env;
 
-	private static Nil<double[]> nilDoubleArray = new Nil<>() {
-	};
-
-	@Test
-	public void testUnaryComputers() {
-		Computers.Arity1<double[], double[]> sqrtComputer = Computers.match(ops.env(),
-			"math.sqrt", nilDoubleArray, nilDoubleArray);
-
-		double[] result = new double[3];
-		sqrtComputer.compute(new double[] { 4.0, 100.0, 25.0 }, result);
-		arrayEquals(result, 2d, 1d, 5d);
+	/**
+	 * Begins declaration of an op matching request for locating an op with a
+	 * particular name. Additional criteria are specified as chained method calls
+	 * on the returned {@link OpBuilder} object. See {@link OpBuilder} for
+	 * examples.
+	 * 
+	 * @param opName The name of the op to be matched.
+	 * @return An {@link OpBuilder} for refining the search criteria for an op.
+	 * @see OpBuilder
+	 */
+	@Override
+	public OpBuilder op(final String opName) {
+		return env().op(opName);
 	}
 
-	@Test
-	public void testBinaryComputers() {
-		Computers.Arity2<double[], double[], double[]> addComputer = //
-			Computers.match(ops.env(), "math.add", nilDoubleArray, nilDoubleArray,
-				nilDoubleArray);
+	/** Retrieves the motherlode of available ops. */
+	@Override
+	public OpEnvironment env() {
+		if (env == null) initEnv();
+		return env;
+	}
 
-		double[] result = new double[3];
-		addComputer.compute(new double[] { 4.0, 100.0, 25.0 }, new double[] { 4d, 10d, 1.5 }, result);
-		arrayEquals(result, 8d, 110d, 26.5);
+	// -- Helper methods - lazy initialization --
+
+	private synchronized void initEnv() {
+		if (env != null) return;
+		env = new DefaultOpEnvironment(context());
 	}
 }

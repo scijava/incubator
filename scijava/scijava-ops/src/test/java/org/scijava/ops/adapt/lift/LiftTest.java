@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.ops;
+package org.scijava.ops.adapt.lift;
 
 import com.google.common.collect.Streams;
 
@@ -38,6 +38,7 @@ import java.util.function.Function;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.scijava.ops.AbstractTestEnvironment;
 import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Functions;
 import org.scijava.types.Nil;
