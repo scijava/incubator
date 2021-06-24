@@ -56,11 +56,6 @@ import org.scijava.ops.Hints;
 import org.scijava.ops.Op;
 import org.scijava.ops.OpCandidate;
 import org.scijava.ops.OpCandidate.StatusCode;
-import org.scijava.ops.hint.AdaptationHints;
-import org.scijava.ops.hint.DefaultHints;
-import org.scijava.ops.hint.SimplificationHints;
-import org.scijava.ops.hint.BaseOpHints.Adaptation;
-import org.scijava.ops.hint.BaseOpHints.Simplification;
 import org.scijava.ops.OpCollection;
 import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
@@ -71,16 +66,20 @@ import org.scijava.ops.OpMethod;
 import org.scijava.ops.OpRef;
 import org.scijava.ops.OpUtils;
 import org.scijava.ops.OpWrapper;
+import org.scijava.ops.hint.AdaptationHints;
+import org.scijava.ops.hint.BaseOpHints.Adaptation;
+import org.scijava.ops.hint.BaseOpHints.Simplification;
+import org.scijava.ops.hint.DefaultHints;
+import org.scijava.ops.hint.SimplificationHints;
 import org.scijava.ops.matcher.DefaultOpMatcher;
+import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.ops.matcher.DependencyMatchingException;
-import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.matcher.OpAdaptationInfo;
 import org.scijava.ops.matcher.OpClassInfo;
 import org.scijava.ops.matcher.OpFieldInfo;
 import org.scijava.ops.matcher.OpMatcher;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.ops.matcher.OpMethodInfo;
-import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.ops.simplify.SimplifiedOpInfo;
 import org.scijava.param.FunctionalMethodType;
 import org.scijava.param.ParameterStructs;
@@ -91,6 +90,7 @@ import org.scijava.struct.ItemIO;
 import org.scijava.types.Nil;
 import org.scijava.types.TypeService;
 import org.scijava.types.Types;
+import org.scijava.types.inference.GenericAssignability;
 import org.scijava.util.ClassUtils;
 
 /**
@@ -120,12 +120,12 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	private Map<String, Set<OpInfo>> opDirectory;
 
 	/**
-	 * Map containing pairs of {@link MatchingConditions} (i.e. the {@link DefaultOpRef}
+	 * Map containing pairs of {@link MatchingConditions} (i.e. the {@link OpRef}
 	 * and {@Hints} used to find an Op) and the {@code Op}s that matched those
 	 * requests. Used to quickly return Ops when the matching conditions are
 	 * identical to those of a previous call.
 	 *
-	 * @see DefaultOpRef#equals(Object)
+	 * @see OpRef#equals(Object)
 	 */
 	private Map<MatchingConditions, Object> opCache;
 
@@ -308,7 +308,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * @return an Op satisfying the request described by {@code ref}.
 	 * @throws OpMatchingException
 	 */
-	private Object findOpInstance(final DefaultOpRef ref,
+	private Object findOpInstance(final OpRef ref,
 		Hints hints) throws OpMatchingException
 	{
 		// see if the ref has been matched already
@@ -344,7 +344,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return null;
 	}
 	
-	private OpCandidate findOpCandidate(DefaultOpRef ref, Hints hints) throws OpMatchingException{
+	private OpCandidate findOpCandidate(OpRef ref, Hints hints) throws OpMatchingException{
 		try {
 			// attempt to find a direct match
 			return matcher.findSingleMatch(this, ref, hints);
@@ -379,7 +379,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		}
 	}
 
-	private OpCandidate findSimplifiedOp(DefaultOpRef ref, Hints hints) throws OpMatchingException {
+	private OpCandidate findSimplifiedOp(OpRef ref, Hints hints) throws OpMatchingException {
 		Hints simplificationHints = SimplificationHints.generateHints(hints);
 		return matcher.findSingleMatch(this, ref, simplificationHints);
 	}
@@ -492,7 +492,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		final List<Object> resolvedDependencies = new ArrayList<>(dependencies.size());
 
 		for (final OpDependencyMember<?> dependency : dependencies) {
-			final DefaultOpRef dependencyRef = inferOpRef(dependency, typeVarAssigns);
+			final OpRef dependencyRef = inferOpRef(dependency, typeVarAssigns);
 			try {
 				Hints hintCopy = hints.getCopy();
 				hintCopy.setHint(Simplification.FORBIDDEN);
@@ -564,7 +564,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 				// adaptor since we know it is a Function)
 				Type srcOpType = Types.substituteTypeVariables(adaptor.inputs().get(0)
 					.getType(), map);
-				final DefaultOpRef srcOpRef = inferOpRef(srcOpType, ref.getName(), map);
+				final OpRef srcOpRef = inferOpRef(srcOpType, ref.getName(), map);
 				final OpCandidate srcCandidate = findAdaptationCandidate(srcOpRef, hints);
 				map.putAll(srcCandidate.typeVarAssigns());
 				Type adapterOpType = Types.substituteTypeVariables(adaptor.output()
@@ -595,7 +595,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		throw new DependencyMatchingException(sb.toString());
 	}
 
-	private OpCandidate findAdaptationCandidate(final DefaultOpRef srcOpRef, final Hints hints)
+	private OpCandidate findAdaptationCandidate(final OpRef srcOpRef, final Hints hints)
 		throws OpMatchingException
 	{
 		Hints adaptationHints = AdaptationHints.generateHints(hints);
@@ -607,7 +607,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		Type opType = ref.getType();
 		// TODO: clean this logic -- can this just be ref.typesMatch() ?
 		if (opType instanceof ParameterizedType) {
-			if (!MatchingUtils.checkGenericAssignability(adaptTo,
+			if (!GenericAssignability.checkGenericAssignability(adaptTo,
 				(ParameterizedType) opType, map, true))
 			{
 				return false;
@@ -619,13 +619,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		return true;
 	}
 
-	private DefaultOpRef inferOpRef(OpDependencyMember<?> dependency,
+	private OpRef inferOpRef(OpDependencyMember<?> dependency,
 		Map<TypeVariable<?>, Type> typeVarAssigns) throws OpMatchingException
 	{
 		final Type mappedDependencyType = Types.mapVarToTypes(new Type[] {
 			dependency.getType() }, typeVarAssigns)[0];
 		final String dependencyName = dependency.getDependencyName();
-		final DefaultOpRef inferredRef = inferOpRef(mappedDependencyType, dependencyName,
+		final OpRef inferredRef = inferOpRef(mappedDependencyType, dependencyName,
 			typeVarAssigns);
 		if (inferredRef != null) return inferredRef;
 		throw new OpMatchingException("Could not infer functional " +
@@ -640,7 +640,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * Computer&lt;Double[], Double[]&gt
 	 * </pre>
 	 * 
-	 * Will result in the following {@link DefaultOpRef}:
+	 * Will result in the following {@link OpRef}:
 	 * 
 	 * <pre>
 	 * Name: 'specified name'
@@ -657,7 +657,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 * @param name
 	 * @return null if the specified type has no functional method
 	 */
-	private DefaultOpRef inferOpRef(Type type, String name, Map<TypeVariable<?>, Type> typeVarAssigns)
+	private OpRef inferOpRef(Type type, String name, Map<TypeVariable<?>, Type> typeVarAssigns)
 			throws OpMatchingException {
 		List<FunctionalMethodType> fmts = ParameterStructs.findFunctionalMethodTypes(type);
 		if (fmts == null)

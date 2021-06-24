@@ -24,7 +24,6 @@ import org.scijava.ops.conversionLoss.LossReporter;
 import org.scijava.ops.hint.ImmutableHints;
 import org.scijava.ops.hint.BaseOpHints.Adaptation;
 import org.scijava.ops.hint.BaseOpHints.Simplification;
-import org.scijava.ops.matcher.DefaultOpCandidate;
 import org.scijava.ops.matcher.OpMatchingException;
 import org.scijava.param.ParameterStructs;
 import org.scijava.param.ValidityException;
@@ -255,7 +254,7 @@ public class SimplifiedOpInfo implements OpInfo {
 	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpRef ref,
 		Map<TypeVariable<?>, Type> typeVarAssigns)
 	{
-		return new DefaultOpCandidate(env, log, ref, this, typeVarAssigns);
+		return new OpCandidate(env, log, ref, this, typeVarAssigns);
 	}
 
 }

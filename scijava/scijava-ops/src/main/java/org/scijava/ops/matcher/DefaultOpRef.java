@@ -37,12 +37,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.scijava.log.Logger;
 import org.scijava.ops.Op;
-import org.scijava.ops.OpEnvironment;
-import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpRef;
 import org.scijava.types.Types;
+import org.scijava.types.inference.GenericAssignability;
 
 /**
  * Data structure which identifies an op by name and/or type(s) and/or argument
@@ -154,7 +152,7 @@ public class DefaultOpRef implements OpRef {
 	public boolean typesMatch(final Type opType, final Map<TypeVariable<?>, Type> typeVarAssigns) {
 		if (type == null) return true;
 		if (type instanceof ParameterizedType) {
-			if (!MatchingUtils.checkGenericAssignability(opType,
+			if (!GenericAssignability.checkGenericAssignability(opType,
 				(ParameterizedType) type, typeVarAssigns, true))
 			{
 				return false;

@@ -207,7 +207,7 @@ public class OpClassInfo implements OpInfo {
 	public OpCandidate createCandidate(OpEnvironment env, Logger log, OpRef ref,
 		Map<TypeVariable<?>, Type> typeVarAssigns)
 	{
-		return new DefaultOpCandidate(env, log, ref, this, typeVarAssigns);
+		return new OpCandidate(env, log, ref, this, typeVarAssigns);
 	}
 
 }

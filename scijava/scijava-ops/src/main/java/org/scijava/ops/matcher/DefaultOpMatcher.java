@@ -47,12 +47,12 @@ import org.scijava.log.Logger;
 import org.scijava.ops.Hints;
 import org.scijava.ops.OpCandidate;
 import org.scijava.ops.OpCandidate.StatusCode;
-import org.scijava.ops.hint.DefaultHints;
-import org.scijava.ops.hint.BaseOpHints.Simplification;
 import org.scijava.ops.OpEnvironment;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpRef;
 import org.scijava.ops.OpUtils;
+import org.scijava.ops.hint.BaseOpHints.Simplification;
+import org.scijava.ops.hint.DefaultHints;
 import org.scijava.ops.simplify.InfoSimplificationGenerator;
 import org.scijava.service.AbstractService;
 import org.scijava.struct.Member;
@@ -61,7 +61,7 @@ import org.scijava.types.Types.TypeVarInfo;
 
 /**
  * Default implementation of {@link OpMatcher}. Used for finding Ops which match
- * a {@link DefaultOpRef request}.
+ * a {@link OpRef request}.
  *
  * @author David Kolb
  */
@@ -74,32 +74,32 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 	}
 
 	@Override
-	public OpCandidate findSingleMatch(final OpEnvironment env, final DefaultOpRef ref) throws OpMatchingException {
+	public OpCandidate findSingleMatch(final OpEnvironment env, final OpRef ref) throws OpMatchingException {
 		return findMatch(env, ref).singleMatch();
 	}
 
 	@Override
-	public OpCandidate findSingleMatch(final OpEnvironment env, final DefaultOpRef ref, final Hints hints) throws OpMatchingException {
+	public OpCandidate findSingleMatch(final OpEnvironment env, final OpRef ref, final Hints hints) throws OpMatchingException {
 		return findMatch(env, ref, hints).singleMatch();
 	}
 
 	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final DefaultOpRef ref) {
+	public MatchingResult findMatch(final OpEnvironment env, final OpRef ref) {
 		return findMatch(env, Collections.singletonList(ref));
 	}
 
 	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final DefaultOpRef ref, final Hints hints) {
+	public MatchingResult findMatch(final OpEnvironment env, final OpRef ref, final Hints hints) {
 		return findMatch(env, Collections.singletonList(ref), hints);
 	}
 
 	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final List<DefaultOpRef> refs) {
+	public MatchingResult findMatch(final OpEnvironment env, final List<OpRef> refs) {
 		return findMatch(env, refs, new DefaultHints());
 	}
 
 	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final List<DefaultOpRef> refs, final Hints hints) {
+	public MatchingResult findMatch(final OpEnvironment env, final List<OpRef> refs, final Hints hints) {
 		// find candidates with matching name & type
 		final List<OpCandidate> candidates = findCandidates(env, refs, hints);
 		if (candidates.isEmpty()) {
@@ -111,22 +111,22 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 	}
 
 	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final DefaultOpRef ref) {
+	public List<OpCandidate> findCandidates(final OpEnvironment env, final OpRef ref) {
 		return findCandidates(env, Collections.singletonList(ref));
 	}
 
 	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final DefaultOpRef ref, final Hints hints) {
+	public List<OpCandidate> findCandidates(final OpEnvironment env, final OpRef ref, final Hints hints) {
 		return findCandidates(env, Collections.singletonList(ref), hints);
 	}
 
 	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<DefaultOpRef> refs) {
+	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<OpRef> refs) {
 		return findCandidates(env, refs, new DefaultHints());
 	}
 
 	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<DefaultOpRef> refs, final Hints hints) {
+	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<OpRef> refs, final Hints hints) {
 		final ArrayList<OpCandidate> candidates = new ArrayList<>();
 		for (final OpRef ref : refs) {
 			for (final OpInfo info : getInfos(env, ref, hints)) {
@@ -317,7 +317,7 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 
 	/**
 	 * Checks whether the output types of the candidate are applicable to the
-	 * input types of the {@link DefaultOpRef}. Sets candidate status code if there are
+	 * input types of the {@link OpRef}. Sets candidate status code if there are
 	 * too many, to few, or not matching types.
 	 *
 	 * @param candidate
@@ -374,7 +374,7 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 
 	/**
 	 * Checks whether the output type of the candidate matches the output type
-	 * of the {@link DefaultOpRef}. Sets candidate status code if they are not matching.
+	 * of the {@link OpRef}. Sets candidate status code if they are not matching.
 	 *
 	 * @param candidate
 	 *            the candidate to check output for

@@ -1,14 +1,14 @@
 
 package org.scijava.ops.simplify;
 
-import com.google.common.collect.Streams;
-
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.scijava.ops.Hints;
@@ -19,10 +19,9 @@ import org.scijava.ops.function.Computers;
 import org.scijava.ops.function.Computers.Arity1;
 import org.scijava.ops.hint.BaseOpHints.Adaptation;
 import org.scijava.ops.hint.BaseOpHints.Simplification;
-import org.scijava.ops.matcher.OpMatchingException;
-import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
+import org.scijava.types.inference.GenericAssignability;
 
 public class SimplifiedOpRef implements OpRef {
 
@@ -83,7 +82,7 @@ public class SimplifiedOpRef implements OpRef {
 		return copyOp;
 	}
 
-	public static SimplifiedOpRef simplificationOf(OpEnvironment env, OpRef ref, Hints hints) throws OpMatchingException {
+	public static SimplifiedOpRef simplificationOf(OpEnvironment env, OpRef ref, Hints hints) {
 		Class<?> opType = Types.raw(ref.getType());
 		int mutableIndex = SimplificationUtils.findMutableArgIndex(opType);
 		if (mutableIndex == -1) return new SimplifiedOpRef(ref, env);
@@ -117,9 +116,8 @@ public class SimplifiedOpRef implements OpRef {
 	 * @param hints
 	 * @return an {@code Op} able to copy data between {@link Object}s of
 	 *         {@link Type} {@code copyType}
-	 * @throws OpMatchingException
 	 */
-	private static Computers.Arity1<?, ?> simplifierCopyOp(OpEnvironment env, Type copyType, Hints hints) throws OpMatchingException{
+	private static Computers.Arity1<?, ?> simplifierCopyOp(OpEnvironment env, Type copyType, Hints hints) {
 			Hints hintsCopy = hints.getCopy();
 			hintsCopy.setHint(Adaptation.FORBIDDEN);
 			hintsCopy.setHint(Simplification.FORBIDDEN);
@@ -161,16 +159,71 @@ public class SimplifiedOpRef implements OpRef {
 
 	@Override
 	public boolean typesMatch(Type opType) {
-		// TODO Auto-generated method stub
-		return false;
+		return typesMatch(opType, new HashMap<>());
 	}
 
 	@Override
 	public boolean typesMatch(Type opType,
 		Map<TypeVariable<?>, Type> typeVarAssigns)
 	{
-		// TODO Auto-generated method stub
-		return false;
+		if (type == null) return true;
+		if (type instanceof ParameterizedType) {
+			if (!GenericAssignability.checkGenericAssignability(opType,
+				(ParameterizedType) type, typeVarAssigns, true))
+			{
+				return false;
+			}
+		}
+		else {
+			if (!Types.isAssignable(opType, type)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// -- Object methods --
+
+	@Override
+	public String toString() {
+		String n = name == null ? "" : "Name: \"" + name + "\", Types: ";
+		n += type + "\n";
+		n += "Input Types: \n";
+		for (Type arg : args) {
+			n += "\t\t* ";
+			n += arg == null ? "" : arg.getTypeName();
+			n += "\n";
+		}
+		n += "Output Type: \n";
+		n += "\t\t* ";
+		n += outType == null ? "" : outType.getTypeName();
+		n += "\n";
+		return n.substring(0, n.length() - 1);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final SimplifiedOpRef other = (SimplifiedOpRef) obj;
+		if (!Objects.equals(name, other.name))
+			return false;
+		if (!Objects.equals(type, other.type))
+			return false;
+		if (!Objects.equals(outType, other.outType))
+			return false;
+		if (!Arrays.equals(args, other.args))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.deepHashCode(new Object[] {name, type, outType, args});
 	}
 
 	// -- Helper methods --
