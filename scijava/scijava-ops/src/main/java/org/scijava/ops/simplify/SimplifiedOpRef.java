@@ -4,6 +4,7 @@ package org.scijava.ops.simplify;
 import com.google.common.collect.Streams;
 
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,23 +24,31 @@ import org.scijava.ops.matcher.DefaultOpRef;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
 
-public class SimplifiedOpRef extends DefaultOpRef {
+public class SimplifiedOpRef implements OpRef {
+
+	/** Name of the op, or null for any name. */
+	private final String name;
+
+	/** Type which the op must match. */
+	private final Type type;
+
+	/** The op's output parameter types, or null for no constraints. */
+	private final Type outType;
+
+	/** Arguments to be passed to the op. */
+	private final Type[] args;
 
 	private final OpRef srcRef;
 	private final List<List<OpInfo>> simplifierSets;
 	private final List<OpInfo> outputFocusers;
 	private final Optional<Computers.Arity1<?, ?>> copyOp;
 
-	private SimplifiedOpRef(String name, Type type, Type outType,
-		Type[] args)
-	{
-		super(name, type, outType, args);
-		throw new UnsupportedOperationException("Simplified OpRef requires original OpRef!");
-	}
-
 	private SimplifiedOpRef(OpRef ref, OpEnvironment env) {
 		// TODO: this is probably incorrect
-		super(ref.getName(), ref.getType(), ref.getOutType(), ref.getArgs());
+		this.name = ref.getName();
+		this.type = ref.getType();
+		this.outType = ref.getOutType();
+		this.args = ref.getArgs();
 		this.srcRef = ref;
 		this.simplifierSets = SimplificationUtils.simplifyArgs(env, ref.getArgs());
 		this.outputFocusers = SimplificationUtils.getFocusers(env, ref.getOutType());
@@ -48,7 +57,10 @@ public class SimplifiedOpRef extends DefaultOpRef {
 
 	private SimplifiedOpRef(OpRef ref, OpEnvironment env, Computers.Arity1<?, ?> copyOp) {
 		// TODO: this is probably incorrect
-		super(ref.getName(), ref.getType(), ref.getOutType(), ref.getArgs());
+		this.name = ref.getName();
+		this.type = ref.getType(); 
+		this.outType = ref.getOutType();
+		this.args = ref.getArgs();
 		this.srcRef = ref;
 		this.simplifierSets = SimplificationUtils.simplifyArgs(env, ref.getArgs());
 		this.outputFocusers = SimplificationUtils.getFocusers(env, ref.getOutType());
@@ -115,6 +127,60 @@ public class SimplifiedOpRef extends DefaultOpRef {
 			Nil<?> copyNil = Nil.of(copyType);
 			Type copierType = Types.parameterize(Computers.Arity1.class, new Type[] {copyType, copyType});
 			return (Arity1<?, ?>) env.op("copy", Nil.of(copierType), new Nil<?>[] {copyNil, copyNil}, copyNil, hintsCopy);
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public Type getType() {
+		return type;
+	}
+
+	@Override
+	public Type getOutType() {
+		return outType;
+	}
+
+	@Override
+	public Type[] getArgs() {
+		return args;
+	}
+
+	@Override
+	public String getLabel() {
+		final StringBuilder sb = new StringBuilder();
+		append(sb, name);
+		if (type != null) {
+			append(sb, Types.name(type));
+		}
+		return sb.toString();
+	}
+
+	@Override
+	public boolean typesMatch(Type opType) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean typesMatch(Type opType,
+		Map<TypeVariable<?>, Type> typeVarAssigns)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	// -- Helper methods --
+
+	private void append(final StringBuilder sb, final String s) {
+		if (s == null)
+			return;
+		if (sb.length() > 0)
+			sb.append("/");
+		sb.append(s);
 	}
 
 }
