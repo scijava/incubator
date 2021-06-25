@@ -28,7 +28,6 @@ import org.scijava.ops.OpDependency;
 import org.scijava.ops.OpDependencyMember;
 import org.scijava.ops.OpInfo;
 import org.scijava.ops.OpMethod;
-import org.scijava.ops.matcher.MatchingUtils;
 import org.scijava.ops.simplify.Simplifier;
 import org.scijava.ops.util.AnnotationUtils;
 import org.scijava.struct.ItemIO;
@@ -89,8 +88,8 @@ public final class ParameterStructs {
 	}
 	
 	//TODO: Javadoc
-	public static Struct structOf(final OpInfo opInfo, final Type newType) throws ValidityException {
-		final List<Member<?>> items = parse(opInfo, newType);
+	public static Struct structOf(final Type newType) throws ValidityException {
+		final List<Member<?>> items = parse(newType);
 		return () -> items;
 	}
 	
@@ -133,7 +132,7 @@ public final class ParameterStructs {
 		// Parse class level (i.e., generic) @Parameter annotations.
 		final Class<?> paramsClass = findParametersDeclaration(type);
 		if (paramsClass != null) {
-			parseFunctionalParameters(items, names, problems, paramsClass, type, false);
+			parseFunctionalParameters(items, names, problems, paramsClass);
 		}
 
 		// Parse field level @OpDependency annotations.
@@ -165,7 +164,7 @@ public final class ParameterStructs {
 		final Type fieldType = Types.fieldType(field, c);
 
 		checkModifiers(field.toString() + ": ", problems, field.getModifiers(), false, Modifier.FINAL);
-		parseFunctionalParameters(items, names, problems, field, fieldType, false);
+		parseFunctionalParameters(items, names, problems, fieldType);
 
 		// Fail if there were any problems.
 		if (!problems.isEmpty()) {
@@ -176,12 +175,12 @@ public final class ParameterStructs {
 	}
 
 	//TODO: Javadoc
-	public static List<Member<?>> parse(final OpInfo opInfo, final Type newType) throws ValidityException {
+	public static List<Member<?>> parse(final Type newType) throws ValidityException {
 		final ArrayList<Member<?>> items = new ArrayList<>();
 		final ArrayList<ValidityProblem> problems = new ArrayList<>();
 		final Set<String> names = new HashSet<>();
 
-		parseFunctionalParameters(items, names, problems, opInfo.getAnnotationBearer(), newType, true);
+		parseFunctionalParameters(items, names, problems, newType);
 
 		// Fail if there were any problems.
 		if (!problems.isEmpty()) {
@@ -215,7 +214,7 @@ public final class ParameterStructs {
 			}
 			
 			// Parse method level @Parameter annotations.
-			parseFunctionalParameters(items, names, problems, method, functionalType, true);
+			parseFunctionalParameters(items, names, problems, functionalType);
 
 			// Parse method level @OpDependency annotations.
 			parseMethodOpDependencies(items, problems, c, method);
@@ -492,7 +491,7 @@ public final class ParameterStructs {
 //	}
 	
 	private static void parseFunctionalParameters(final ArrayList<Member<?>> items, final Set<String> names, final ArrayList<ValidityProblem> problems,
-			AnnotatedElement annotationBearer, Type type, final boolean synthesizeAnnotations) {
+			Type type) {
 		//Search for the functional method of 'type' and map its signature to ItemIO
 		List<FunctionalMethodType> fmts;
 		try {

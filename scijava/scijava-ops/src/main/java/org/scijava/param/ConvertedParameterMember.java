@@ -22,6 +22,10 @@ public class ConvertedParameterMember<T> implements Member<T>{
 		this.newType = newType;
 	}
 
+	public static <T> ConvertedParameterMember<T> from(Member<T> m, Type t) {
+		return new ConvertedParameterMember<>(m, t);
+	}
+
 	@Override
 	public String getKey() {
 		return original.getKey();

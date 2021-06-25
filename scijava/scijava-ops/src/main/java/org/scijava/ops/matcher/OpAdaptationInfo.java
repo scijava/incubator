@@ -47,10 +47,9 @@ public class OpAdaptationInfo implements OpInfo {
 		this.type = type;
 		this.adaptor = adaptor;
 
-		// NOTE: since the source Op has already been shown to be valid, there is not
-		// much for us to do here.
+		// HACK: this Struct is incomplete - it does not contain OpDependencies
 		try {
-			struct = ParameterStructs.structOf(srcInfo, type);
+			struct = ParameterStructs.structOf(type);
 			OpUtils.checkHasSingleOutput(struct);
 		} catch (ValidityException e) {
 			validityException = e;

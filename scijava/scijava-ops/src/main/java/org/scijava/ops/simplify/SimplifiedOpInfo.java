@@ -25,7 +25,7 @@ import org.scijava.ops.hint.ImmutableHints;
 import org.scijava.ops.hint.BaseOpHints.Adaptation;
 import org.scijava.ops.hint.BaseOpHints.Simplification;
 import org.scijava.ops.matcher.OpMatchingException;
-import org.scijava.param.ParameterStructs;
+import org.scijava.param.ConvertedParameterMember;
 import org.scijava.param.ValidityException;
 import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
@@ -52,18 +52,49 @@ public class SimplifiedOpInfo implements OpInfo {
 		Type[] inputs = metadata.originalInputs();
 		Type output = metadata.focusedOutput();
 		this.opType = SimplificationUtils.retypeOpType(info.opType(), inputs, output);
-		try {
-			this.struct = ParameterStructs.structOf(info, opType);
-		}
-		catch (ValidityException exc) {
-			validityException = exc;
-		}
+		this.struct = generateStruct(info.struct(), inputs, output);
 
 		this.priority = calculatePriority(info, metadata, env);
 		List<String> hintList = new ArrayList<>(srcInfo.declaredHints().getHints().values());
 		hintList.remove(Simplification.ALLOWED);
 		hintList.add(Simplification.FORBIDDEN);
 		this.hints = new ImmutableHints(hintList.toArray(String[]::new));
+	}
+
+	/**
+	 * Generates a new {@link Struct} for this {@link SimplifiedOpInfo}. Using
+	 * {@code srcStruct} as a template, this method retypes the inputs of
+	 * {@code srcStruct} using {@code inputs}, and the output using
+	 * {@code output}.
+	 * <p>
+	 * This method makes a couple of assumptions:
+	 * <ol>
+	 * <li>That {@code srcStruct} is valid
+	 * <li>That there are {@code inputs.length} input {@link Member}s in
+	 * {@code srcStruct}
+	 * <li>That there is <b>one</b> output {@link Member} in {@code srcStruct}
+	 * </ol>
+	 * We should consider adding the evalutation of these assumptions
+	 * 
+	 * @param srcStruct
+	 * @param inputs
+	 * @param output
+	 * @return a new {@link Struct} reflecting the simplified arguments / focused
+	 *         output of this {@link SimplifiedOpInfo}
+	 */
+	private Struct generateStruct(Struct srcStruct, Type[] inputs, Type output) {
+		List<Member<?>> newMembers = new ArrayList<>();
+		int inputIndex = 0;
+		for (Member<?> m : srcStruct.members()) {
+			if (m.isInput()) {
+				m = ConvertedParameterMember.from(m, inputs[inputIndex++]);
+			}
+			else if (m.isOutput()) {
+				m = ConvertedParameterMember.from(m, output);
+			}
+			newMembers.add(m);
+		}
+		return () -> newMembers;
 	}
 
 	@Override
