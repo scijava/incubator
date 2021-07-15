@@ -20,7 +20,7 @@ public abstract class AbstractHints implements Hints {
 	public AbstractHints(String... startingHints) {
 		hints = new HashMap<>();
 		for(String hint : startingHints)
-			setHint(hint);
+			set(hint);
 	}
 
 	AbstractHints(Map<String, String> hints) {
@@ -28,24 +28,24 @@ public abstract class AbstractHints implements Hints {
 	}
 
 	@Override
-	public String setHint(String hintType, Object value) {
-		String hint = hintType + getDelimiter() + value;
+	public String set(String hintType, Object value) {
+		String hint = hintType + hintDelimiter() + value;
 		return hints.put(hintType, hint);
 	}
 
 	@Override
-	public boolean containsHintType(String prefix) {
+	public boolean containsType(String prefix) {
 		return hints.containsKey(prefix);
 	}
 
 	@Override
-	public boolean containsHint(String hint) {
+	public boolean contains(String hint) {
 		String prefix = getPrefix(hint);
 		return hints.containsKey(prefix) && hint.equals(hints.get(prefix));
 	}
 
 	@Override
-	public String getHint(String prefix) {
+	public String get(String prefix) {
 		if (!hints.containsKey(prefix)) throw new NoSuchElementException(
 			"No hint of type " + prefix + " is contained!");
 		return hints.get(prefix);
@@ -56,12 +56,12 @@ public abstract class AbstractHints implements Hints {
 	}
 
 	@Override
-	public Map<String, String> getHints() {
+	public Map<String, String> all() {
 		return hints;
 	}
 
 	@Override
-	public char getDelimiter() {
+	public char hintDelimiter() {
 		return '.';
 	}
 
@@ -69,7 +69,7 @@ public abstract class AbstractHints implements Hints {
 	public boolean equals(Object that) {
 		if(!(that instanceof AbstractHints)) return false;
 		AbstractHints thoseHints = (AbstractHints) that;
-		return getHints().equals(thoseHints.getHints());
+		return all().equals(thoseHints.all());
 	}
 
 	@Override

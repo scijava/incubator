@@ -24,14 +24,14 @@ public class AdaptationHintTest extends AbstractTestEnvironment {
 	public void testAdaptation() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Adaptation.ALLOWED);
+		hints.set(Adaptation.ALLOWED);
 		ops.env().setHints(hints);
 		@SuppressWarnings("unused")
 		Computers.Arity1<Double[], Double[]> adaptable = ops.op(
 			"test.adaptation.hints").inType(Double[].class).outType(Double[].class)
 			.computer();
 		// make sure we cannot find the Op when adaptation is not allowed
-		hints.setHint(Adaptation.FORBIDDEN);
+		hints.set(Adaptation.FORBIDDEN);
 		ops.env().setHints(hints);
 		try {
 			ops.op("test.adaptation.hints").inType(Double[].class).outType(
@@ -46,13 +46,13 @@ public class AdaptationHintTest extends AbstractTestEnvironment {
 	public void testAdaptationPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Adaptation.ALLOWED);
+		hints.set(Adaptation.ALLOWED);
 		@SuppressWarnings("unused")
 		Computers.Arity1<Double[], Double[]> adaptable = ops.op(
 			"test.adaptation.hints").inType(Double[].class).outType(Double[].class)
 			.computer(hints);
 		// make sure we cannot find the Op when adaptation is not allowed
-		hints.setHint(Adaptation.FORBIDDEN);
+		hints.set(Adaptation.FORBIDDEN);
 		try {
 			ops.op("test.adaptation.hints").inType(Double[].class).outType(
 				Double[].class).computer(hints);
@@ -70,7 +70,7 @@ public class AdaptationHintTest extends AbstractTestEnvironment {
 	public void testNonAdaptableOp() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Adaptation.ALLOWED);
+		hints.set(Adaptation.ALLOWED);
 		ops.env().setHints(hints);
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
@@ -91,7 +91,7 @@ public class AdaptationHintTest extends AbstractTestEnvironment {
 	public void testNonAdaptableOpPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Adaptation.ALLOWED);
+		hints.set(Adaptation.ALLOWED);
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
 			"test.adaptation.unadaptable").inType(Double[].class).outType(Double[].class)

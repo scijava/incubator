@@ -20,25 +20,25 @@ import java.util.Map;
  */
 public interface Hints {
 
-	default String setHint(String hint) {
-		int delimIndex = hint.indexOf(getDelimiter());
+	default String set(String hint) {
+		int delimIndex = hint.indexOf(hintDelimiter());
 		String hintType = hint.substring(0, delimIndex);
 		String setting = hint.substring(delimIndex + 1);
-		return setHint(hintType, setting);
+		return set(hintType, setting);
 	}
 
-	public String setHint(String hintType, Object setting);
+	public String set(String hintType, Object setting);
 
-	public String getHint(String hintType);
+	public String get(String hintType);
 
-	public boolean containsHint(String hint);
+	public boolean contains(String hint);
 
-	public boolean containsHintType(String hintType);
+	public boolean containsType(String hintType);
 
-	public Map<String, String> getHints();
+	public Map<String, String> all();
 
-	public Hints getCopy();
+	public Hints copy();
 
-	char getDelimiter();
+	char hintDelimiter();
 
 }

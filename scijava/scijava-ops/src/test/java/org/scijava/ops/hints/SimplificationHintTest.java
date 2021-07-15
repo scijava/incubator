@@ -25,14 +25,14 @@ public class SimplificationHintTest extends AbstractTestEnvironment {
 	public void testSimplification() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Simplification.ALLOWED);
+		hints.set(Simplification.ALLOWED);
 		ops.env().setHints(hints);
 		@SuppressWarnings("unused")
 		Function<Integer[], Integer[]> adaptable = ops.op(
 			"test.simplification.hints").inType(Integer[].class).outType(
 				Integer[].class).function();
 		// make sure we cannot find the Op when adaptation is not allowed
-		hints.setHint(Simplification.FORBIDDEN);
+		hints.set(Simplification.FORBIDDEN);
 		ops.env().setHints(hints);
 		try {
 			ops.op("test.simplification.hints").inType(Integer[].class).outType(
@@ -50,13 +50,13 @@ public class SimplificationHintTest extends AbstractTestEnvironment {
 	public void testSimplificationPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Simplification.ALLOWED);
+		hints.set(Simplification.ALLOWED);
 		@SuppressWarnings("unused")
 		Function<Integer[], Integer[]> adaptable = ops.op(
 			"test.simplification.hints").inType(Integer[].class).outType(
 				Integer[].class).function(hints);
 		// make sure we cannot find the Op when adaptation is not allowed
-		hints.setHint(Simplification.FORBIDDEN);
+		hints.set(Simplification.FORBIDDEN);
 		try {
 			ops.op("test.simplification.hints").inType(Integer[].class).outType(
 				Integer[].class).function(hints);
@@ -78,7 +78,7 @@ public class SimplificationHintTest extends AbstractTestEnvironment {
 	public void testUnsimplifiableOp() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Simplification.ALLOWED);
+		hints.set(Simplification.ALLOWED);
 		ops.env().setHints(hints);
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
@@ -103,7 +103,7 @@ public class SimplificationHintTest extends AbstractTestEnvironment {
 	public void testUnsimplifiableOpPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
 		Hints hints = new DefaultHints();
-		hints.setHint(Simplification.ALLOWED);
+		hints.set(Simplification.ALLOWED);
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
 			"test.simplification.unsimplifiable").inType(Double[].class).outType(

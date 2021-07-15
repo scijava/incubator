@@ -50,7 +50,7 @@ public class OpAdaptationInfo implements OpInfo {
 			validityException = e;
 		}
 
-		List<String> hintList = new ArrayList<>(srcInfo.declaredHints().getHints().values());
+		List<String> hintList = new ArrayList<>(srcInfo.declaredHints().all().values());
 		hintList.remove(Adaptation.ALLOWED);
 		hintList.add(Adaptation.FORBIDDEN);
 		this.hints = new ImmutableHints(hintList.toArray(String[]::new));

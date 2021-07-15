@@ -171,15 +171,15 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	}
 
 	private Set<OpInfo> filterInfos(Set<OpInfo> infos, Hints hints) {
-		boolean adapting = hints.containsHint(Adaptation.IN_PROGRESS);
-		boolean simplifying = hints.containsHint(Simplification.IN_PROGRESS);
+		boolean adapting = hints.contains(Adaptation.IN_PROGRESS);
+		boolean simplifying = hints.contains(Simplification.IN_PROGRESS);
 		// if we aren't doing any 
 		if (!(adapting || simplifying)) return infos;
 		return infos.parallelStream() //
 				// filter out unadaptable ops
-				.filter(info -> !adapting || !info.declaredHints().containsHint(Adaptation.FORBIDDEN)) //
+				.filter(info -> !adapting || !info.declaredHints().contains(Adaptation.FORBIDDEN)) //
 				// filter out unadaptable ops
-				.filter(info -> !simplifying || !info.declaredHints().containsHint(Simplification.FORBIDDEN)) //
+				.filter(info -> !simplifying || !info.declaredHints().contains(Simplification.FORBIDDEN)) //
 				.collect(Collectors.toSet());
 	}
 
@@ -354,13 +354,13 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		catch (OpMatchingException e1) {
 			// no direct match; find an adapted match
 			try {
-				if (hints.containsHint(Adaptation.ALLOWED)) return adaptOp(ref, hints);
+				if (hints.contains(Adaptation.ALLOWED)) return adaptOp(ref, hints);
 				throw new OpMatchingException("No matching Op for request: " + ref +
 					"\n(adaptation is disabled)", e1);
 			}
 			catch (OpMatchingException e2) {
 				try {
-					if (hints.containsHint(Simplification.ALLOWED)) return findSimplifiedOp(
+					if (hints.contains(Simplification.ALLOWED)) return findSimplifiedOp(
 						ref, hints);
 					throw new OpMatchingException("No matching Op for request: " + ref +
 						"\n(simplification is disabled)", e1);
@@ -496,10 +496,10 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 		for (final OpDependencyMember<?> dependency : dependencies) {
 			final OpRef dependencyRef = inferOpRef(dependency, typeVarAssigns);
 			try {
-				Hints hintCopy = hints.getCopy();
-				hintCopy.setHint(Simplification.FORBIDDEN);
+				Hints hintCopy = hints.copy();
+				hintCopy.set(Simplification.FORBIDDEN);
 				if(!dependency.isAdaptable()) {
-					hintCopy.setHint(Adaptation.FORBIDDEN);
+					hintCopy.set(Adaptation.FORBIDDEN);
 				}
 				resolvedDependencies.add(findOpInstance(dependencyRef, hintCopy));
 			}
@@ -763,7 +763,7 @@ public class DefaultOpEnvironment extends AbstractContextual implements OpEnviro
 	 */
 	@Override
 	public void setHints(Hints hints) {
-		this.environmentHints = hints.getCopy();
+		this.environmentHints = hints.copy();
 	}
 
 	/**
