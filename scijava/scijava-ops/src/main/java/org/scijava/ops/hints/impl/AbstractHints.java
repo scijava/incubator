@@ -28,9 +28,9 @@ public abstract class AbstractHints implements Hints {
 	}
 
 	@Override
-	public String setHint(String hint) {
-		String prefix = getPrefix(hint);
-		return hints.put(prefix, hint);
+	public String setHint(String hintType, Object value) {
+		String hint = hintType + getDelimiter() + value;
+		return hints.put(hintType, hint);
 	}
 
 	@Override
@@ -58,6 +58,11 @@ public abstract class AbstractHints implements Hints {
 	@Override
 	public Map<String, String> getHints() {
 		return hints;
+	}
+
+	@Override
+	public char getDelimiter() {
+		return '.';
 	}
 
 	@Override
