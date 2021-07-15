@@ -16,13 +16,13 @@ public class AdaptationHints extends AbstractHints {
 
 	private AdaptationHints(Map<String, String> map) {
 		super(map);
-		setHint(Adaptation.IN_PROGRESS);
+		set(Adaptation.IN_PROGRESS);
 	}
 
 	public static AdaptationHints generateHints(Hints hints) {
 		// collect all old hints that are not Adaptable
 		Map<String, String> map = new HashMap<>();
-		hints.getHints().entrySet().parallelStream().filter(e -> e
+		hints.all().entrySet().parallelStream().filter(e -> e
 			.getKey() != Adaptation.prefix).forEach(e -> map.put(e.getKey(), e
 				.getValue()));
 
@@ -33,12 +33,12 @@ public class AdaptationHints extends AbstractHints {
 	}
 
 	@Override
-	public String setHint(String hint) {
-		return super.setHint(hint);
+	public String set(String hint) {
+		return super.set(hint);
 	}
 
 	@Override
-	public Hints getCopy() {
+	public Hints copy() {
 		return AdaptationHints.generateHints(this);
 	}
 

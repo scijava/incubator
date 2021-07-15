@@ -140,7 +140,7 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 
 	private Iterable<OpInfo> getInfos(OpEnvironment env, OpRef ref, Hints hints) {
 		Iterable<OpInfo> suitableInfos = env.infos(ref.getName(), hints);
-		if(hints.containsHint(Simplification.IN_PROGRESS)) {
+		if(hints.contains(Simplification.IN_PROGRESS)) {
 			Set<OpInfo> simpleInfos = new HashSet<>();
 			for(OpInfo info: suitableInfos) {
 				boolean functionallyAssignable = Types.isAssignable(Types.raw(info.opType()), Types.raw(ref.getType()));

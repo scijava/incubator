@@ -4,22 +4,41 @@ package org.scijava.ops.hints;
 import java.util.Map;
 
 /**
- * A basic interface for storing and accessing Hints.
- *
+ * A basic interface for storing and accessing Hints. Hints should always come
+ * in the form of
+ * <p>
+ * {@code hintType<delimiter>setting}
+ * <p>
+ * For example, suppose you have a hintType {@code Precision}, with settings
+ * {@code lossless} and {@code lossy}. Suppose also that the {@code delimiter}
+ * is ".". A possible Hint could be :
+ * <p>
+ * {@code Precision.lossless}
+ * <p>
+ * 
  * @author Gabriel Selzer
  */
 public interface Hints {
 
-	public String setHint(String hint);
+	default String set(String hint) {
+		int delimIndex = hint.indexOf(hintDelimiter());
+		String hintType = hint.substring(0, delimIndex);
+		String setting = hint.substring(delimIndex + 1);
+		return set(hintType, setting);
+	}
 
-	public String getHint(String hintType);
+	public String set(String hintType, Object setting);
 
-	public boolean containsHint(String hint);
+	public String get(String hintType);
 
-	public boolean containsHintType(String hintType);
+	public boolean contains(String hint);
 
-	public Map<String, String> getHints();
+	public boolean containsType(String hintType);
 
-	public Hints getCopy();
+	public Map<String, String> all();
+
+	public Hints copy();
+
+	char hintDelimiter();
 
 }

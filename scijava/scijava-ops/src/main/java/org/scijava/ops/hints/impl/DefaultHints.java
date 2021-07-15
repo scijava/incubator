@@ -23,8 +23,8 @@ public class DefaultHints extends AbstractHints {
 	}
 
 	@Override
-	public Hints getCopy() {
-		return new DefaultHints(new HashMap<>(getHints()));
+	public Hints copy() {
+		return new DefaultHints(new HashMap<>(all()));
 	}
 
 }

@@ -24,13 +24,13 @@ public class ImmutableHints extends AbstractHints {
 	}
 
 	@Override
-	public String setHint(String hint) {
+	public String set(String hint) {
 		throw new UnsupportedOperationException("ImmutableHints cannot alter the original set of Hints!");
 	}
 
 	@Override
-	public Hints getCopy() {
-		return new ImmutableHints(new HashMap<>(getHints()));
+	public Hints copy() {
+		return new ImmutableHints(new HashMap<>(all()));
 	}
 
 }
