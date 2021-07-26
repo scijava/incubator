@@ -1,5 +1,5 @@
 
-package org.scijava.ops.engine;
+package org.scijava.ops.api;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;

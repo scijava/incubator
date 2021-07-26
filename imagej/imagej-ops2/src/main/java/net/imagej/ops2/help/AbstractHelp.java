@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.engine.OpCandidate;
-import org.scijava.ops.engine.OpInfo;
 import org.scijava.ops.engine.OpUtils;
 
 /**

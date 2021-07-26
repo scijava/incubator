@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.scijava.InstantiableException;
-import org.scijava.ops.engine.OpInfo;
+import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.engine.OpInfoGenerator;
 import org.scijava.ops.engine.OpUtils;
 import org.scijava.ops.engine.matcher.impl.OpClassInfo;
