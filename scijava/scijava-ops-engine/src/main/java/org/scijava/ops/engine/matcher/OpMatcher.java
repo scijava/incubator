@@ -31,10 +31,10 @@ package org.scijava.ops.engine.matcher;
 
 import java.util.List;
 
-import org.scijava.ops.engine.Hints;
+import org.scijava.ops.api.Hints;
+import org.scijava.ops.api.OpEnvironment;
+import org.scijava.ops.api.OpRef;
 import org.scijava.ops.engine.OpCandidate;
-import org.scijava.ops.engine.OpEnvironment;
-import org.scijava.ops.engine.OpRef;
 
 /**
  * Finds Ops which match an {@link OpRef}.

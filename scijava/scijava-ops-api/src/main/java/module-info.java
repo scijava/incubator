@@ -1,7 +1,9 @@
-module org.scijava.ops.spi {
+module org.scijava.ops.api {
 
-	exports org.scijava.ops.spi;
+	exports org.scijava.ops.api;
 
-	requires org.scijava;
+	requires org.scijava.function;
+	requires org.scijava.struct;
+	requires org.scijava.types;
 
 }

@@ -40,10 +40,14 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.scijava.Context;
 import org.scijava.function.Producer;
+import org.scijava.ops.api.OpEnvironment;
 import org.scijava.ops.engine.AbstractTestEnvironment;
+<<<<<<< HEAD
 import org.scijava.ops.engine.OpEnvironment;
 import org.scijava.ops.engine.OpHistoryService;
 import org.scijava.ops.engine.OpInstance;
+=======
+>>>>>>> WIP: Partition scijava-ops-api
 import org.scijava.ops.engine.OpService;
 import org.scijava.ops.spi.Op;
 import org.scijava.ops.spi.OpCollection;

@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.ops.engine;
+package org.scijava.ops.api;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
-import org.scijava.ops.engine.matcher.OpMatcher;
 import org.scijava.types.Types;
 
 /**
