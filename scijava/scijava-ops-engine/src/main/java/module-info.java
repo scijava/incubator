@@ -33,9 +33,6 @@ module org.scijava.ops.engine {
 	opens org.scijava.ops.engine.util to therapi.runtime.javadoc;
 	opens org.scijava.ops.engine.math to therapi.runtime.javadoc;
 
-	// FIXME: This is a file name and is thus unstable
-	requires geantyref;
-
 	requires java.desktop;
 
 	requires org.scijava;

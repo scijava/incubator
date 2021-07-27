@@ -44,13 +44,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.scijava.ops.api.Hints;
+import org.scijava.ops.api.OpCandidate;
 import org.scijava.ops.api.OpEnvironment;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpRef;
-import org.scijava.ops.engine.OpCandidate;
-import org.scijava.ops.engine.OpUtils;
+import org.scijava.ops.api.OpUtils;
+import org.scijava.ops.api.OpCandidate.StatusCode;
 import org.scijava.ops.engine.BaseOpHints.Simplification;
-import org.scijava.ops.engine.OpCandidate.StatusCode;
 import org.scijava.ops.engine.hint.DefaultHints;
 import org.scijava.ops.engine.matcher.MatchingResult;
 import org.scijava.ops.engine.matcher.OpMatcher;

@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.scijava.InstantiableException;
 import org.scijava.ops.api.OpInfo;
-import org.scijava.ops.engine.OpInfoGenerator;
-import org.scijava.ops.engine.OpUtils;
+import org.scijava.ops.api.OpInfoGenerator;
+import org.scijava.ops.api.OpUtils;
 import org.scijava.ops.engine.matcher.impl.OpFieldInfo;
 import org.scijava.ops.engine.matcher.impl.OpMethodInfo;
 import org.scijava.ops.spi.OpCollection;

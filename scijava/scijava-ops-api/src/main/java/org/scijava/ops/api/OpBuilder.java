@@ -42,8 +42,6 @@ import org.scijava.function.Computers;
 import org.scijava.function.Functions;
 import org.scijava.function.Inplaces;
 import org.scijava.function.Producer;
-import org.scijava.ops.api.Hints;
-import org.scijava.ops.api.OpEnvironment;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
 
