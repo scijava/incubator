@@ -24,9 +24,6 @@ module org.scijava.ops.engine {
 	opens $package to $opensToString.call($package, $scijavaPackages, $therapiPackages);
 #end
 
-	// FIXME: This is a file name and is thus unstable
-	requires geantyref;
-
 	requires java.desktop;
 
 	requires org.scijava;

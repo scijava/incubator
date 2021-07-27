@@ -4,8 +4,7 @@ module org.scijava.ops.api {
 
 	requires org.scijava;
 	requires org.scijava.function;
-	requires org.scijava.struct;
-	requires org.scijava.ops.spi;
+	requires transitive org.scijava.struct;
 	requires org.scijava.types;
 
 }

@@ -1,8 +1,6 @@
-package org.scijava.ops.engine;
+package org.scijava.ops.api;
 
 import java.util.List;
-
-import org.scijava.ops.api.OpInfo;
 
 public interface OpInfoGenerator {
 
