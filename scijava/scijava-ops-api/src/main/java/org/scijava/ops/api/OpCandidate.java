@@ -207,10 +207,10 @@ public class OpCandidate {
 		return info.toString();
 	}
 
-	public StructInstance<?> createOpInstance(List<?> dependencies)
+	public StructInstance<?> createOpInstance(List<?> dependencies, ProgressTracker pt)
 	{
 		if (getStatusCode().equals(StatusCode.MATCH)) {
-			return opInfo().createOpInstance(dependencies);
+			return opInfo().createOpInstance(dependencies, pt);
 		}
 
 		throw new IllegalStateException(
@@ -218,9 +218,9 @@ public class OpCandidate {
 				getStatus());
 	}
 
-	public Object createOp(List<?> dependencies)
+	public Object createOp(List<?> dependencies, ProgressTracker pt)
 	{
-		return createOpInstance(dependencies).object();
+		return createOpInstance(dependencies, pt).object();
 	}
 
 }

@@ -1,8 +1,6 @@
 
 package org.scijava.ops.engine.matcher.impl;
 
-import com.google.common.collect.Streams;
-
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -14,13 +12,13 @@ import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpDependencyMember;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpUtils;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.engine.BaseOpHints.Adaptation;
 import org.scijava.ops.engine.hint.ImmutableHints;
 import org.scijava.ops.engine.struct.FunctionalParameters;
 import org.scijava.ops.engine.struct.OpRetypingMemberParser;
 import org.scijava.ops.engine.struct.RetypingRequest;
 import org.scijava.struct.FunctionalMethodType;
-import org.scijava.struct.ItemIO;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 import org.scijava.struct.Structs;
@@ -113,8 +111,8 @@ public class OpAdaptationInfo implements OpInfo {
 	 * @param dependencies - the list of depencies <b>for the source Op</b>
 	 */
 	@Override
-	public StructInstance<?> createOpInstance(List<?> dependencies) {
-		final Object op = srcInfo.createOpInstance(dependencies).object();
+	public StructInstance<?> createOpInstance(List<?> dependencies, ProgressTracker pt) {
+		final Object op = srcInfo.createOpInstance(dependencies, pt).object();
 		final Object adaptedOp = adaptor.apply(op);
 		return struct().createInstance(adaptedOp);
 	}

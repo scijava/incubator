@@ -58,6 +58,12 @@ public interface OpHistory {
 	 */
 	public Graph<OpInfo> opExecutionChain(UUID id);
 
+	/**
+	 * Returns the {@link ProgressTracker} tasked with reporting the progress of
+	 * the Op chain associated with the passed {@link UUID}
+	 */
+	public ProgressTracker progressTrackerFor(UUID id);
+
 	// -- HISTORY MAINTENANCE API -- //
 
 	/**
@@ -103,5 +109,7 @@ public interface OpHistory {
 	 *          identifiable by {@code executionChainID}.
 	 */
 	public void logTopLevelWrapper(UUID executionChainID, Object wrapper);
+
+	public void logProgressTracker(UUID executionChainID, ProgressTracker pt);
 
 }

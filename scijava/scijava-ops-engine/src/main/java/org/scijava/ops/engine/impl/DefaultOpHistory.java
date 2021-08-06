@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.scijava.ops.api.OpExecution;
 import org.scijava.ops.api.OpHistory;
 import org.scijava.ops.api.OpInfo;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
@@ -72,6 +73,14 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 	private final Map<UUID, Object> wrapperRecord =
 		new ConcurrentHashMap<>();
 
+	/**
+	 * {@link Map} responsible for recording the {@link ProgressTracker}
+	 * responsible for recording the progress of calls to the Op chain associated
+	 * with the given {@link UUID}
+	 */
+	private final Map<UUID, ProgressTracker> trackerRecord =
+		new ConcurrentHashMap<>();
+
 	// -- USER API -- //
 
 	/**
@@ -125,6 +134,11 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 		if (!dependencyChain.containsKey(id)) throw new IllegalArgumentException(
 			"UUID " + id + " has not been registered to an Op execution chain");
 		return dependencyChain.get(id);
+	}
+
+	@Override
+	public ProgressTracker progressTrackerFor(UUID id) {
+		return trackerRecord.get(id);
 	}
 
 	// -- HISTORY MAINTENANCE API -- //
@@ -197,6 +211,11 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 		Object former = wrapperRecord.putIfAbsent(executionChainID, wrapper);
 		if (former != null) throw new IllegalArgumentException("Execution ID " +
 			executionChainID + " has already logged a Top-Level Op!");
+	}
+
+	@Override
+	public void logProgressTracker(UUID executionChainID, ProgressTracker pt) {
+		trackerRecord.put(executionChainID, pt);
 	}
 
 	// -- HELPER METHODS -- //

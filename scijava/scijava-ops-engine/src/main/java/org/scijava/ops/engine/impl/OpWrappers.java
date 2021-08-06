@@ -19,7 +19,11 @@ import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpHistory;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpWrapper;
+import org.scijava.ops.api.ProgressReporter;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.engine.BaseOpHints.DependencyMatching;
+import org.scijava.ops.engine.impl.DefaultOpExecution;
+import org.scijava.ops.engine.impl.TernaryProgressReporter;
 import org.scijava.plugin.Plugin;
 import org.scijava.types.GenericTyped;
 
@@ -31,20 +35,24 @@ public class OpWrappers {
 	public static class ProducerOpWrapper<T> implements OpWrapper<Producer<T>> {
 
 		@Override
-		public Producer<T> wrap(final Producer<T> op, final OpInfo info, final Hints hints, final OpHistory history, final UUID executionID, final Type reifiedType) {
+		public Producer<T> wrap(final Producer<T> op, final OpInfo info, final Hints hints, final OpHistory history, ProgressTracker tracker, final UUID executionID, final Type reifiedType) {
 			class GenericTypedProducer implements Producer<T>, GenericTyped {
 
 				@Override
 				public T create() {
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					T out = op.create();
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -76,6 +84,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -89,13 +98,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -125,6 +138,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -138,13 +152,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -174,6 +192,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -187,13 +206,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -223,6 +246,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -236,13 +260,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -272,6 +300,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -285,13 +314,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -321,6 +354,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -334,13 +368,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -370,6 +408,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -383,13 +422,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -419,6 +462,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -432,13 +476,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -468,6 +516,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -481,13 +530,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -517,6 +570,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -530,13 +584,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -566,6 +624,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -579,13 +638,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -615,6 +678,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -628,13 +692,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -664,6 +732,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -677,13 +746,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -713,6 +786,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -726,13 +800,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -762,6 +840,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -775,13 +854,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -811,6 +894,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -824,13 +908,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, in16);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -862,6 +950,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -875,13 +964,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -910,6 +1003,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -923,13 +1017,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -958,6 +1056,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -971,13 +1070,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1006,6 +1109,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1019,13 +1123,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1054,6 +1162,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1067,13 +1176,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1102,6 +1215,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1115,13 +1229,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1150,6 +1268,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1163,13 +1282,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1198,6 +1321,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1211,13 +1335,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1246,6 +1374,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1259,13 +1388,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1294,6 +1427,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1307,13 +1441,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1342,6 +1480,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1355,13 +1494,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1390,6 +1533,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1403,13 +1547,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1438,6 +1586,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1451,13 +1600,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1486,6 +1639,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1499,13 +1653,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1534,6 +1692,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1547,13 +1706,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1582,6 +1745,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1595,13 +1759,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1630,6 +1798,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1643,13 +1812,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute(in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, in16, out);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1680,6 +1853,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1693,13 +1867,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1728,6 +1906,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1741,13 +1920,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1776,6 +1959,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1789,13 +1973,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1824,6 +2012,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1837,13 +2026,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1872,6 +2065,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1885,13 +2079,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1920,6 +2118,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1933,13 +2132,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -1968,6 +2171,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -1981,13 +2185,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2016,6 +2224,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2029,13 +2238,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2064,6 +2277,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2077,13 +2291,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2112,6 +2330,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2125,13 +2344,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2160,6 +2383,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2173,13 +2397,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2208,6 +2436,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2221,13 +2450,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2256,6 +2489,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2269,13 +2503,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2304,6 +2542,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2317,13 +2556,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2352,6 +2595,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2365,13 +2609,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2400,6 +2648,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2413,13 +2662,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2448,6 +2701,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2461,13 +2715,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2496,6 +2754,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2509,13 +2768,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2544,6 +2807,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2557,13 +2821,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2592,6 +2860,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2605,13 +2874,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2640,6 +2913,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2653,13 +2927,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2688,6 +2966,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2701,13 +2980,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2736,6 +3019,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2749,13 +3033,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2784,6 +3072,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2797,13 +3086,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2832,6 +3125,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2845,13 +3139,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2880,6 +3178,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2893,13 +3192,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2928,6 +3231,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2941,13 +3245,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -2976,6 +3284,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -2989,13 +3298,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3024,6 +3337,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3037,13 +3351,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3072,6 +3390,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3085,13 +3404,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3120,6 +3443,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3133,13 +3457,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3168,6 +3496,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3181,13 +3510,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3216,6 +3549,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3229,13 +3563,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3264,6 +3602,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3277,13 +3616,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3312,6 +3655,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3325,13 +3669,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3360,6 +3708,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3373,13 +3722,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3408,6 +3761,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3421,13 +3775,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3456,6 +3814,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3469,13 +3828,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3504,6 +3867,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3517,13 +3881,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3552,6 +3920,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3565,13 +3934,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3600,6 +3973,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3613,13 +3987,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3648,6 +4026,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3661,13 +4040,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3696,6 +4079,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3709,13 +4093,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3744,6 +4132,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3757,13 +4146,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3792,6 +4185,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3805,13 +4199,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3840,6 +4238,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3853,13 +4252,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3888,6 +4291,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3901,13 +4305,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3936,6 +4344,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3949,13 +4358,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -3984,6 +4397,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -3997,13 +4411,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4032,6 +4450,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4045,13 +4464,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4080,6 +4503,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4093,13 +4517,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4128,6 +4556,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4141,13 +4570,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4176,6 +4609,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4189,13 +4623,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4224,6 +4662,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4237,13 +4676,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4272,6 +4715,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4285,13 +4729,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4320,6 +4768,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4333,13 +4782,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4368,6 +4821,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4381,13 +4835,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4416,6 +4874,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4429,13 +4888,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4464,6 +4927,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4477,13 +4941,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4512,6 +4980,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4525,13 +4994,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4560,6 +5033,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4573,13 +5047,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4608,6 +5086,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4621,13 +5100,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4656,6 +5139,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4669,13 +5153,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4704,6 +5192,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4717,13 +5206,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4752,6 +5245,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4765,13 +5259,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4800,6 +5298,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4813,13 +5312,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4848,6 +5351,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4861,13 +5365,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4896,6 +5404,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4909,13 +5418,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4944,6 +5457,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -4957,13 +5471,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -4992,6 +5510,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5005,13 +5524,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5040,6 +5563,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5053,13 +5577,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5088,6 +5616,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5101,13 +5630,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5136,6 +5669,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5149,13 +5683,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5184,6 +5722,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5197,13 +5736,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5232,6 +5775,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5245,13 +5789,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5280,6 +5828,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5293,13 +5842,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5328,6 +5881,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5341,13 +5895,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5376,6 +5934,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5389,13 +5948,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5424,6 +5987,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5437,13 +6001,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5472,6 +6040,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5485,13 +6054,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5520,6 +6093,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5533,13 +6107,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5568,6 +6146,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5581,13 +6160,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5616,6 +6199,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5629,13 +6213,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5664,6 +6252,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5677,13 +6266,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5712,6 +6305,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5725,13 +6319,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5760,6 +6358,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5773,13 +6372,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5808,6 +6411,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5821,13 +6425,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5856,6 +6464,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5869,13 +6478,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5904,6 +6517,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5917,13 +6531,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -5952,6 +6570,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -5965,13 +6584,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6000,6 +6623,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6013,13 +6637,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6048,6 +6676,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6061,13 +6690,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6096,6 +6729,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6109,13 +6743,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6144,6 +6782,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6157,13 +6796,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6192,6 +6835,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6205,13 +6849,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6240,6 +6888,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6253,13 +6902,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6288,6 +6941,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6301,13 +6955,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6336,6 +6994,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6349,13 +7008,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6384,6 +7047,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6397,13 +7061,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6432,6 +7100,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6445,13 +7114,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6480,6 +7153,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6493,13 +7167,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6528,6 +7206,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6541,13 +7220,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6576,6 +7259,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6589,13 +7273,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6624,6 +7312,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6637,13 +7326,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6672,6 +7365,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6685,13 +7379,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6720,6 +7418,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6733,13 +7432,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6768,6 +7471,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6781,13 +7485,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6816,6 +7524,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6829,13 +7538,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6864,6 +7577,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6877,13 +7591,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6912,6 +7630,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6925,13 +7644,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -6960,6 +7683,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -6973,13 +7697,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7008,6 +7736,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7021,13 +7750,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7056,6 +7789,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7069,13 +7803,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7104,6 +7842,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7117,13 +7856,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7152,6 +7895,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7165,13 +7909,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7200,6 +7948,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7213,13 +7962,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7248,6 +8001,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7261,13 +8015,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7296,6 +8054,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7309,13 +8068,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7344,6 +8107,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7357,13 +8121,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType, in15Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7392,6 +8160,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7405,13 +8174,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7440,6 +8213,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7453,13 +8227,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7488,6 +8266,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7501,13 +8280,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7536,6 +8319,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7549,13 +8333,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7584,6 +8372,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7597,13 +8386,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7632,6 +8425,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7645,13 +8439,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7680,6 +8478,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7693,13 +8492,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7728,6 +8531,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7741,13 +8545,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7776,6 +8584,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7789,13 +8598,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7824,6 +8637,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7837,13 +8651,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7872,6 +8690,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7885,13 +8704,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7920,6 +8743,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7933,13 +8757,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -7968,6 +8796,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -7981,13 +8810,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -8016,6 +8849,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -8029,13 +8863,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -8064,6 +8902,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -8077,13 +8916,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType, in15Type, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -8112,6 +8955,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -8125,13 +8969,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, ioType, in16Type);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -8160,6 +9008,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -8173,13 +9022,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate(in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, ioType);
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {

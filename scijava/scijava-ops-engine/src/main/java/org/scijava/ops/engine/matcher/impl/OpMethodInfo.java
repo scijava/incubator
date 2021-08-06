@@ -49,6 +49,7 @@ import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpDependencyMember;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpUtils;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.api.OpHints;
 import org.scijava.ops.engine.hint.ImmutableHints;
 import org.scijava.ops.engine.struct.MethodOpDependencyMemberParser;
@@ -158,7 +159,7 @@ public class OpMethodInfo implements OpInfo {
 
 	@Override
 	public StructInstance<?> createOpInstance(
-		final List<? extends Object> dependencies)
+		final List<? extends Object> dependencies, ProgressTracker pt)
 	{
 
 		// Case 1: no dependencies - lambdaMetaFactory is fastest

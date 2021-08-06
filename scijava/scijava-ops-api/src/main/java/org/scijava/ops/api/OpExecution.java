@@ -37,6 +37,13 @@ public interface OpExecution {
 	Object wrappedExecutor();
 
 	/**
+	 * Returns the {@link ProgressTracker} describing the execution's progress
+	 * 
+	 * @return the {@link ProgressTracker}
+	 */
+	ProgressTracker progressTracker();
+
+	/**
 	 * Describes whether {@code o} is the output of this
 	 * {@link DefaultOpExecution}
 	 *

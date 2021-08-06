@@ -40,9 +40,10 @@ import java.util.List;
 import org.scijava.Priority;
 import org.scijava.ValidityProblem;
 import org.scijava.ops.api.Hints;
+import org.scijava.ops.api.OpHints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpUtils;
-import org.scijava.ops.api.OpHints;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.engine.hint.ImmutableHints;
 import org.scijava.ops.engine.struct.FieldParameterMemberParser;
 import org.scijava.ops.spi.OpField;
@@ -143,7 +144,7 @@ public class OpFieldInfo implements OpInfo {
 	}
 
 	@Override
-	public StructInstance<?> createOpInstance(List<?> dependencies)
+	public StructInstance<?> createOpInstance(List<?> dependencies, ProgressTracker pt)
 	{
 		if (dependencies != null && !dependencies.isEmpty())
 			throw new IllegalArgumentException(

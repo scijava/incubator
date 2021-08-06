@@ -1,8 +1,12 @@
 
 package org.scijava.ops.api;
 
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+
 /**
- * Interface used as a "slot" for a {@link ProgressReporter}
+ * Defines API for an Object that manages {@link ProgressReporter}s for a
+ * particular Op chain
  * <p>
  * NB: We deliberately avoid any sort of {@code getReporter()} method. This
  * prevents any race conditions between a user wishing to inquire about the
@@ -14,14 +18,38 @@ package org.scijava.ops.api;
  */
 public interface ProgressTracker {
 
-	public boolean setReporter(ProgressReporter p);
+	// -- USER API -- //
 
-	public Object progressOf();
+	default ProgressReporter setReporter(ProgressReporter p, Object... inputs) {
+		return setReporter(Objects.hash(inputs), p);
+	}
 
-	public double getProgress();
+	default double getProgress(Object... inputs) throws InterruptedException,
+		ExecutionException
+	{
+		return getProgress(Objects.hash(inputs));
+	}
 
-	public boolean hasStarted();
+	default boolean hasStarted(Object... inputs) throws InterruptedException,
+		ExecutionException
+	{
+		return hasStarted(Objects.hash(inputs));
+	}
 
-	public boolean hasCompleted();
+	default boolean isCompleted(Object... inputs) throws InterruptedException,
+		ExecutionException
+	{
+		return isCompleted(Objects.hash(inputs));
+	}
+
+	// -- IMPLEMENTATION METHODS
+
+	ProgressReporter setReporter(int hash, ProgressReporter p);
+
+	double getProgress(int hash) throws InterruptedException, ExecutionException;
+
+	boolean hasStarted(int hash) throws InterruptedException, ExecutionException;
+
+	boolean isCompleted(int hash) throws InterruptedException, ExecutionException;
 
 }

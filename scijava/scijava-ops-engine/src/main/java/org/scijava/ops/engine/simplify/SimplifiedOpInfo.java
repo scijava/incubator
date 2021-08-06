@@ -12,6 +12,7 @@ import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpEnvironment;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpUtils;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.engine.BaseOpHints.Simplification;
 import org.scijava.ops.engine.conversionLoss.LossReporter;
 import org.scijava.ops.engine.hint.ImmutableHints;
@@ -210,9 +211,9 @@ public class SimplifiedOpInfo implements OpInfo {
 	 * @param dependencies - this Op's dependencies
 	 */
 	@Override
-	public StructInstance<?> createOpInstance(List<?> dependencies)
+	public StructInstance<?> createOpInstance(List<?> dependencies, ProgressTracker pt)
 	{
-		final Object op = srcInfo.createOpInstance(dependencies).object();
+		final Object op = srcInfo.createOpInstance(dependencies, pt).object();
 		try {
 			Object simpleOp = SimplificationUtils.javassistOp(op, metadata);
 			return struct().createInstance(simpleOp);

@@ -168,6 +168,13 @@ public final class OpUtils {
 			.collect(Collectors.toList());
 	}
 
+	public static List<ProgressTrackerMember<?>> progressTrackers(Struct struct) {
+		return struct.members().stream() //
+			.filter(member -> member instanceof ProgressTrackerMember) //
+			.map(member -> (ProgressTrackerMember<?>) member) //
+			.collect(Collectors.toList());
+	}
+
 	public static Type[] types(OpCandidate candidate) {
 		return getTypes(candidate.struct().members());
 	}

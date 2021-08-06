@@ -54,10 +54,12 @@ import org.scijava.ops.api.OpCandidate;
 import org.scijava.ops.api.OpCandidate.StatusCode;
 import org.scijava.ops.api.OpDependencyMember;
 import org.scijava.ops.api.OpEnvironment;
+import org.scijava.ops.api.OpHistory;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpInfoGenerator;
 import org.scijava.ops.api.OpRef;
 import org.scijava.ops.api.OpWrapper;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.engine.BaseOpHints.Adaptation;
 import org.scijava.ops.engine.BaseOpHints.DependencyMatching;
 import org.scijava.ops.engine.BaseOpHints.Simplification;
@@ -307,12 +309,24 @@ public class DefaultOpEnvironment implements OpEnvironment {
 		cacheOp(conditions, instance);
 	}
 	
+	private ProgressTracker getProgressTracker(OpHistory history,
+		UUID id)
+	{
+		ProgressTracker pt = history.progressTrackerFor(id);
+		if (pt != null) return pt;
+		// TODO: Consider parallel concerns
+		history.logProgressTracker(id, new DefaultProgressTracker());
+		return history.progressTrackerFor(id);
+
+	}
+
 	private Object wrapViaCache(MatchingConditions conditions,
 		UUID executionChainID)
 	{
 		OpInstance instance = getInstance(conditions);
+		ProgressTracker tracker = getProgressTracker(history.getHistory(), executionChainID);
 		Object wrappedOp = wrapOp(instance.op(), instance.info(), conditions
-			.hints(), executionChainID, instance.typeVarAssigns());
+			.hints(), executionChainID, tracker, instance.typeVarAssigns());
 		if (!conditions.hints().containsHint(DependencyMatching.IN_PROGRESS))
 			history.getHistory().logTopLevelWrapper(executionChainID, wrappedOp);
 		return wrappedOp;
@@ -410,7 +424,8 @@ public class DefaultOpEnvironment implements OpEnvironment {
 	private Object instantiateOp(final OpCandidate candidate, Hints hints)
 	{
 		final List<MatchingConditions> instances = resolveOpDependencies(candidate, hints);
-		Object op = candidate.createOp(wrappedDeps(instances, hints.executionChainID()));
+		final ProgressTracker pt = getProgressTracker(history.getHistory(), hints.executionChainID());
+		Object op = candidate.createOp(wrappedDeps(instances, hints.executionChainID()), pt);
 		history.getHistory().logDependencies(hints.executionChainID(), candidate.opInfo(), infos(instances));
 		return op;
 	}
@@ -432,7 +447,7 @@ public class DefaultOpEnvironment implements OpEnvironment {
 	 * @return an {@link Op} wrapping of op.
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> T wrapOp(T op, OpInfo opInfo, Hints hints, UUID executionID, Map<TypeVariable<?>, Type> typeVarAssigns) {
+	private <T> T wrapOp(T op, OpInfo opInfo, Hints hints, UUID executionID, ProgressTracker tracker, Map<TypeVariable<?>, Type> typeVarAssigns) {
 		// TODO: synchronize this
 		if (wrappers == null)
 			initWrappers();
@@ -446,7 +461,7 @@ public class DefaultOpEnvironment implements OpEnvironment {
 			Type reifiedSuperType = Types.substituteTypeVariables(exactSuperType, typeVarAssigns);
 			// wrap the Op
 			final OpWrapper<T> opWrapper = (OpWrapper<T>) wrappers.get(Types.raw(reifiedSuperType));
-			return opWrapper.wrap(op, opInfo, hints, history.getHistory(), executionID, reifiedSuperType);
+			return opWrapper.wrap(op, opInfo, hints, history.getHistory(), tracker, executionID, reifiedSuperType);
 		} catch (IllegalArgumentException | SecurityException exc) {
 			log.error(exc.getMessage() != null ? exc.getMessage() : "Cannot wrap " + op.getClass());
 			return op;
@@ -596,9 +611,10 @@ public class DefaultOpEnvironment implements OpEnvironment {
 					.map(c -> wrapViaCache(c, hints.executionChainID())) //
 					.collect(Collectors.toList());
 
+				ProgressTracker pt = getProgressTracker(history.getHistory(), hints.executionChainID());
 				@SuppressWarnings("unchecked")
 				Function<Object, Object> adaptorOp = //
-					(Function<Object, Object>) adaptor.createOpInstance(dependencies) //
+					(Function<Object, Object>) adaptor.createOpInstance(dependencies, pt) //
 						.object(); //
 
 				// grab the first type parameter from the OpInfo and search for

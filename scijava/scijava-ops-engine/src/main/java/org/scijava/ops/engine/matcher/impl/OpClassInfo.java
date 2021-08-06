@@ -36,17 +36,21 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.scijava.Priority;
 import org.scijava.ValidityProblem;
 import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpDependencyMember;
+import org.scijava.ops.api.OpHints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpUtils;
-import org.scijava.ops.api.OpHints;
+import org.scijava.ops.api.ProgressTracker;
+import org.scijava.ops.api.ProgressTrackerMember;
 import org.scijava.ops.engine.hint.ImmutableHints;
 import org.scijava.ops.engine.struct.ClassOpDependencyMemberParser;
 import org.scijava.ops.engine.struct.ClassParameterMemberParser;
+import org.scijava.ops.engine.struct.ClassProgressTrackerMemberParser;
 import org.scijava.plugin.Plugin;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
@@ -78,7 +82,9 @@ public class OpClassInfo implements OpInfo {
 		this.names = Arrays.asList(names);
 		List<ValidityProblem> problems = new ArrayList<>();
 		try {
-			struct = Structs.from(opClass, problems, new ClassParameterMemberParser(), new ClassOpDependencyMemberParser());
+			struct = Structs.from(opClass, problems, new ClassParameterMemberParser(),
+				new ClassOpDependencyMemberParser(),
+				new ClassProgressTrackerMemberParser());
 			OpUtils.checkHasSingleOutput(struct);
 		} catch (ValidityException e) {
 			validityException = e;
@@ -123,7 +129,7 @@ public class OpClassInfo implements OpInfo {
 	}
 
 	@Override
-	public StructInstance<?> createOpInstance(List<?> dependencies) {
+	public StructInstance<?> createOpInstance(List<?> dependencies, ProgressTracker pt) {
 		final Object op;
 		try {
 			// TODO: Consider whether this is really the best way to
@@ -157,6 +163,18 @@ public class OpClassInfo implements OpInfo {
 						"\n" + "\tFound Op to inject: " + dependencies.get(i).getClass()
 							.getName() + //
 						"\n" + "\tField signature: " + dependencyMember.getType(), ex);
+			}
+		}
+
+		final Optional<ProgressTrackerMember<?>> trackerOptional = progressTracker();
+		if (trackerOptional.isPresent()) {
+			final ProgressTrackerMember<?> trackerMember = trackerOptional.get();
+			try {
+				trackerMember.createInstance(op).set(pt);
+			}
+			catch (final Exception ex) {
+				throw new IllegalStateException(
+					"Exception trying to inject ProgressTracker.");
 			}
 		}
 		return struct().createInstance(op);

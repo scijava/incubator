@@ -3,7 +3,7 @@
  * corresponding template in templates/ and rerun bin/generate.groovy.
  */
 
-package org.scijava.ops.engine.matcher.impl;
+package org.scijava.ops.engine.impl;
 
 import java.lang.reflect.Type;
 import java.util.UUID;
@@ -19,8 +19,11 @@ import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpHistory;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpWrapper;
+import org.scijava.ops.api.ProgressReporter;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.engine.BaseOpHints.DependencyMatching;
 import org.scijava.ops.engine.impl.DefaultOpExecution;
+import org.scijava.ops.engine.impl.TernaryProgressReporter;
 import org.scijava.plugin.Plugin;
 import org.scijava.types.GenericTyped;
 
@@ -32,20 +35,24 @@ public class OpWrappers {
 	public static class ProducerOpWrapper<T> implements OpWrapper<Producer<T>> {
 
 		@Override
-		public Producer<T> wrap(final Producer<T> op, final OpInfo info, final Hints hints, final OpHistory history, final UUID executionID, final Type reifiedType) {
+		public Producer<T> wrap(final Producer<T> op, final OpInfo info, final Hints hints, final OpHistory history, ProgressTracker tracker, final UUID executionID, final Type reifiedType) {
 			class GenericTypedProducer implements Producer<T>, GenericTyped {
 
 				@Override
 				public T create() {
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					T out = op.create();
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -79,6 +86,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -92,13 +100,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					O out = op.apply($applyArgs.call($arity));
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -133,6 +145,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -146,13 +159,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.compute($computeArgs.call($arity));
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
@@ -187,6 +204,7 @@ public class OpWrappers {
 			final OpInfo info, //
 			final Hints hints, //
 			final OpHistory history, //
+			final ProgressTracker tracker, //
 			final UUID executionID, //
 			final Type reifiedType)
 		{
@@ -200,13 +218,17 @@ public class OpWrappers {
 				{
 					// Log a new execution
 					DefaultOpExecution e = null;
+					ProgressReporter p = new TernaryProgressReporter(op);
+					tracker.setReporter(p);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-						e = new DefaultOpExecution(executionID, info, op, this);
+						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
 					}
 
 					// Call the op
+					p.reportStart();
 					op.mutate($mutateArgs.call($arity, $a));
+					p.reportComplete();
 
 					// Log execution completion
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {

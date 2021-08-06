@@ -7,9 +7,12 @@ import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpHistory;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpWrapper;
+import org.scijava.ops.api.ProgressReporter;
+import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.engine.BaseOpHints.DependencyMatching;
 import org.scijava.ops.engine.conversionLoss.LossReporter;
 import org.scijava.ops.engine.impl.DefaultOpExecution;
+import org.scijava.ops.engine.impl.TernaryProgressReporter;
 import org.scijava.plugin.Plugin;
 import org.scijava.types.GenericTyped;
 import org.scijava.types.Nil;
@@ -35,6 +38,7 @@ public class LossReporterWrapper<I, O> //
 		final OpInfo info, //
 		final Hints hints, //
 		final OpHistory history, //
+		final ProgressTracker tracker, //
 		final UUID executionID, //
 		final Type reifiedType)
 	{
@@ -48,17 +52,21 @@ public class LossReporterWrapper<I, O> //
 			{
 				// Log a new execution
 				DefaultOpExecution e = null;
+				ProgressReporter p = new TernaryProgressReporter(op);
 				if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
-					e = new DefaultOpExecution(executionID, info, op, this);
+					tracker.setReporter(p);
+					e = new DefaultOpExecution(executionID, info, op, this, tracker);
 					history.addExecution(e);
 				}
 
 				// Call the op
+				p.reportStart();
 				Double output = op.apply(from, to);
 
 				// Log a new execution
 				if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 					e.complete(output);
+					p.reportComplete();
 				}
 				return output;
 			}

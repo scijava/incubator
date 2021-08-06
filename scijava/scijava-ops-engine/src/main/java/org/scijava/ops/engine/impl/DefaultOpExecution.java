@@ -7,6 +7,7 @@ import java.util.concurrent.Future;
 
 import org.scijava.ops.api.OpExecution;
 import org.scijava.ops.api.OpInfo;
+import org.scijava.ops.api.ProgressTracker;
 
 /**
  * Describes the execution of an Op
@@ -27,6 +28,9 @@ public class DefaultOpExecution implements OpExecution {
 	/** The {@link Object} returned by the call to {@link DefaultOpEnvironment} */
 	private final Object wrappedInstance;
 
+	/** The {@link ProgressTracker} used by the Op / OpWrapper */
+	private final ProgressTracker tracker;
+
 	/**
 	 * The {@link Object} produced by this execution of {@code wrappedInstance}
 	 * (or {@code instance}, if {@code wrappedInstance} is {@code null}.
@@ -34,21 +38,23 @@ public class DefaultOpExecution implements OpExecution {
 	private final CompletableFuture<Object> output;
 
 	public DefaultOpExecution(UUID executionHash, OpInfo info, Object instance,
-		Object wrappedOp)
+		Object wrappedOp, ProgressTracker tracker)
 	{
 		this.executionHash = executionHash;
 		this.info = info;
 		this.instance = instance;
 		this.wrappedInstance = wrappedOp;
 		this.output = new CompletableFuture<>();
+		this.tracker = tracker;
 	}
 
-	public DefaultOpExecution(UUID executionHash, OpInfo info, Object instance) {
+	public DefaultOpExecution(UUID executionHash, OpInfo info, Object instance, ProgressTracker tracker) {
 		this.executionHash = executionHash;
 		this.info = info;
 		this.instance = instance;
 		this.wrappedInstance = null;
 		this.output = new CompletableFuture<>();
+		this.tracker = tracker;
 	}
 
 	/**
@@ -80,6 +86,16 @@ public class DefaultOpExecution implements OpExecution {
 	@Override
 	public Object wrappedExecutor() {
 		return wrappedInstance;
+	}
+
+	/**
+	 * Returns the {@link ProgressTracker} describing the execution's progress
+	 * 
+	 * @return the {@link ProgressTracker}
+	 */
+	@Override
+	public ProgressTracker progressTracker() {
+		return tracker;
 	}
 
 	/**

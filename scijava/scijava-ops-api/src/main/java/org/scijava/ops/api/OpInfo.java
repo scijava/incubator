@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
@@ -53,6 +53,14 @@ public interface OpInfo extends Comparable<OpInfo> {
 	default List<OpDependencyMember<?>> dependencies() {
 		return OpUtils.dependencies(struct());
 	}
+
+	default Optional<ProgressTrackerMember<?>> progressTracker() {
+		List<ProgressTrackerMember<?>> list = OpUtils.progressTrackers(struct());
+		if (list.size() == 0) return Optional.empty();
+		if (list.size() > 1) throw new IllegalStateException(
+			"Only one ProgressTracker allowed per Op!");
+		return Optional.of(list.get(0));
+	}
 	
 	default OpCandidate createCandidate(OpEnvironment env, OpRef ref, Map<TypeVariable<?>, Type> typeVarAssigns) {
 		return new OpCandidate(env, ref, this, typeVarAssigns);
@@ -65,7 +73,7 @@ public interface OpInfo extends Comparable<OpInfo> {
 	String implementationName();
 
 	/** Create a StructInstance using the Struct metadata backed by an object of the op itself. */
-	StructInstance<?> createOpInstance(List<?> dependencies);
+	StructInstance<?> createOpInstance(List<?> dependencies, ProgressTracker pt);
 
 	// TODO Consider if we really want to keep the following methods.
 	boolean isValid();
