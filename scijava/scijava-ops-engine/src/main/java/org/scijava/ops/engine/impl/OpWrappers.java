@@ -99,7 +99,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -153,7 +153,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -207,7 +207,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -261,7 +261,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -315,7 +315,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -369,7 +369,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -423,7 +423,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -477,7 +477,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -531,7 +531,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -585,7 +585,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -639,7 +639,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -693,7 +693,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -747,7 +747,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -801,7 +801,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -855,7 +855,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -909,7 +909,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, in16);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -965,7 +965,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1018,7 +1018,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1071,7 +1071,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1124,7 +1124,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1177,7 +1177,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1230,7 +1230,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1283,7 +1283,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1336,7 +1336,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1389,7 +1389,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1442,7 +1442,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1495,7 +1495,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1548,7 +1548,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1601,7 +1601,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1654,7 +1654,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1707,7 +1707,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1760,7 +1760,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1813,7 +1813,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1, in2, in3, in4, in5, in6, in7, in8, in9, in10, in11, in12, in13, in14, in15, in16, out);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1868,7 +1868,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1921,7 +1921,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -1974,7 +1974,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2027,7 +2027,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2080,7 +2080,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2133,7 +2133,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2186,7 +2186,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2239,7 +2239,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2292,7 +2292,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2345,7 +2345,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2398,7 +2398,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2451,7 +2451,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2504,7 +2504,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2557,7 +2557,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2610,7 +2610,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2663,7 +2663,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2716,7 +2716,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2769,7 +2769,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2822,7 +2822,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2875,7 +2875,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2928,7 +2928,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -2981,7 +2981,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3034,7 +3034,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3087,7 +3087,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3140,7 +3140,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3193,7 +3193,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3246,7 +3246,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3299,7 +3299,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3352,7 +3352,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3405,7 +3405,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3458,7 +3458,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3511,7 +3511,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3564,7 +3564,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3617,7 +3617,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3670,7 +3670,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3723,7 +3723,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3776,7 +3776,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3829,7 +3829,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3882,7 +3882,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3935,7 +3935,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -3988,7 +3988,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4041,7 +4041,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4094,7 +4094,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4147,7 +4147,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4200,7 +4200,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4253,7 +4253,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4306,7 +4306,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4359,7 +4359,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4412,7 +4412,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4465,7 +4465,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4518,7 +4518,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4571,7 +4571,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4624,7 +4624,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4677,7 +4677,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4730,7 +4730,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4783,7 +4783,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4836,7 +4836,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4889,7 +4889,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4942,7 +4942,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -4995,7 +4995,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5048,7 +5048,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5101,7 +5101,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5154,7 +5154,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5207,7 +5207,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5260,7 +5260,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5313,7 +5313,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5366,7 +5366,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5419,7 +5419,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5472,7 +5472,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5525,7 +5525,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5578,7 +5578,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5631,7 +5631,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5684,7 +5684,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5737,7 +5737,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5790,7 +5790,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5843,7 +5843,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5896,7 +5896,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -5949,7 +5949,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6002,7 +6002,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6055,7 +6055,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6108,7 +6108,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6161,7 +6161,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6214,7 +6214,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6267,7 +6267,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6320,7 +6320,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6373,7 +6373,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6426,7 +6426,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6479,7 +6479,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6532,7 +6532,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6585,7 +6585,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6638,7 +6638,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6691,7 +6691,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6744,7 +6744,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6797,7 +6797,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6850,7 +6850,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6903,7 +6903,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -6956,7 +6956,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7009,7 +7009,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7062,7 +7062,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7115,7 +7115,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7168,7 +7168,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7221,7 +7221,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7274,7 +7274,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7327,7 +7327,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7380,7 +7380,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7433,7 +7433,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7486,7 +7486,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7539,7 +7539,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7592,7 +7592,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7645,7 +7645,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7698,7 +7698,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7751,7 +7751,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7804,7 +7804,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7857,7 +7857,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7910,7 +7910,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -7963,7 +7963,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8016,7 +8016,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8069,7 +8069,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8122,7 +8122,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType, in15Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8175,7 +8175,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8228,7 +8228,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, ioType, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8281,7 +8281,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, ioType, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8334,7 +8334,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, ioType, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8387,7 +8387,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, ioType, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8440,7 +8440,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, ioType, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8493,7 +8493,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, ioType, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8546,7 +8546,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, ioType, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8599,7 +8599,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, ioType, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8652,7 +8652,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, ioType, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8705,7 +8705,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, ioType, in11Type, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8758,7 +8758,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, ioType, in12Type, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8811,7 +8811,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, ioType, in13Type, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8864,7 +8864,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, ioType, in14Type, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8917,7 +8917,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, ioType, in15Type, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -8970,7 +8970,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, ioType, in16Type);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -9023,7 +9023,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, in1Type, in2Type, in3Type, in4Type, in5Type, in6Type, in7Type, in8Type, in9Type, in10Type, in11Type, in12Type, in13Type, in14Type, in15Type, ioType);
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);

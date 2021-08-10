@@ -111,15 +111,7 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 	 */
 	@Override
 	public Graph<OpInfo> opExecutionChain(Object op) {
-		// return dependency chain if op was an Op or wrapped an Op
-		UUID opID = findUUIDInOpRecord(op);
-		if (opID != null) return dependencyChain.get(opID);
-		UUID wrapperID = findUUIDInWrapperRecord(op);
-		if (wrapperID != null) return dependencyChain.get(wrapperID);
-
-		// op not recorded - throw an exception
-		throw new IllegalArgumentException(
-			"No record of op being returned in a matching Execution!");
+		return dependencyChain.get(findUUID(op));
 	}
 
 	/**
@@ -139,6 +131,12 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 	@Override
 	public ProgressTracker progressTrackerFor(UUID id) {
 		return trackerRecord.get(id);
+	}
+
+	@Override
+	public ProgressTracker progressTrackerFor(Object o) {
+		UUID oID = findUUID(o);
+		return progressTrackerFor(oID);
 	}
 
 	// -- HISTORY MAINTENANCE API -- //
@@ -222,6 +220,14 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 
 	private MutableGraph<OpInfo> buildGraph() {
 		return GraphBuilder.directed().allowsSelfLoops(false).build();
+	}
+
+	private UUID findUUID(Object op) {
+		UUID opID = findUUIDInOpRecord(op);
+		if (opID != null) return opID;
+		UUID wrapperID = findUUIDInWrapperRecord(op);
+		if (wrapperID != null) return wrapperID;
+		throw new IllegalArgumentException("Object " + op + " does not have an associated UUID!");
 	}
 
 	private UUID findUUIDInOpRecord(Object op) {

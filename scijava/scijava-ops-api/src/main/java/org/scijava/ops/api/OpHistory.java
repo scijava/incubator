@@ -64,6 +64,12 @@ public interface OpHistory {
 	 */
 	public ProgressTracker progressTrackerFor(UUID id);
 
+	/**
+	 * Returns the {@link ProgressTracker} tasked with reporting the progress of
+	 * the Op chain associated with the passed {@link Object}
+	 */
+	public ProgressTracker progressTrackerFor(Object o);
+
 	// -- HISTORY MAINTENANCE API -- //
 
 	/**

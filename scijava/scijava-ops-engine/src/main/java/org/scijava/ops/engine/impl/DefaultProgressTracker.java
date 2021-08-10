@@ -28,9 +28,17 @@ public class DefaultProgressTracker implements ProgressTracker {
 		ExecutionException
 	{
 		ProgressReporter p = executionReporters.get(hash);
-		if (p == null) throw new IllegalArgumentException(
-			"No ProgressReporter has been logged for such a hash!");
-		return p.getProgress();
+		if (p != null) {
+			return p.getProgress();
+		}
+		// TODO: remove
+//		if (p == null) throw new IllegalArgumentException(
+//			"No ProgressReporter has been logged for such a hash!");
+//		return p.getProgress();
+
+		// If we don't have a ProgressReporter, we can assume that no progress has
+		// been made on the operation.
+		return 0.0; 
 	}
 
 	@Override
@@ -38,9 +46,15 @@ public class DefaultProgressTracker implements ProgressTracker {
 		ExecutionException
 	{
 		ProgressReporter p = executionReporters.get(hash);
-		if (p == null) throw new IllegalArgumentException(
-			"No ProgressReporter has been logged for such a hash!");
-		return p.hasStarted();
+		// TODO: delete
+//		if (p == null) throw new IllegalArgumentException(
+//			"No ProgressReporter has been logged for such a hash!");
+		if (p != null) {
+			return p.hasStarted();
+		}
+		// If we don't have a ProgressReporter, we can assume that the operation has
+		// not yet started.
+		return false; 
 	}
 
 	@Override
@@ -48,9 +62,17 @@ public class DefaultProgressTracker implements ProgressTracker {
 		ExecutionException
 	{
 		ProgressReporter p = executionReporters.get(hash);
-		if (p == null) throw new IllegalArgumentException(
-			"No ProgressReporter has been logged for such a hash!");
-		return p.isComplete();
+		// TODO: delete
+//		if (p == null) throw new IllegalArgumentException(
+//			"No ProgressReporter has been logged for such a hash!");
+//		return p.isComplete();
+
+		if (p != null) {
+			return p.isComplete();
+		}
+		// If we don't have a ProgressReporter, we can assume that the operation has
+		// not yet started.
+		return false; 
 	}
 
 }

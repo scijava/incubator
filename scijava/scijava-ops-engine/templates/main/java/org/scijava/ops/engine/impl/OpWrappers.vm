@@ -101,7 +101,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, $applyArgs.call($arity));
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -160,7 +160,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, $computeArgs.call($arity));
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);
@@ -219,7 +219,7 @@ public class OpWrappers {
 					// Log a new execution
 					DefaultOpExecution e = null;
 					ProgressReporter p = new TernaryProgressReporter(op);
-					tracker.setReporter(p);
+					tracker.setReporter(p, $mutateArgs.call($arity, $a));
 					if (!hints.containsHint(DependencyMatching.IN_PROGRESS)) {
 						e = new DefaultOpExecution(executionID, info, op, this, tracker);
 						history.addExecution(e);

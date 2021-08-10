@@ -1,7 +1,6 @@
 package org.scijava.ops.engine.impl;
 
-import java.util.function.BiFunction;
-
+import org.scijava.function.Computers;
 import org.scijava.ops.api.ProgressReporter;
 import org.scijava.ops.api.ProgressTracker;
 import org.scijava.ops.spi.Op;
@@ -9,25 +8,20 @@ import org.scijava.ops.spi.OpProgressReporter;
 import org.scijava.plugin.Plugin;
 
 @Plugin(type = Op.class, name = "test.progressAdd")
-public class ProgressReportingOp implements BiFunction<Double[], Double[], Double[]>{
+public class ProgressReportingOp implements Computers.Arity2<int[], int[], int[]>{
 
 	@OpProgressReporter
 	ProgressTracker pt;
 
 	@Override
-	public Double[] apply(Double[] t, Double[] u) {
-		int numElements = Math.min(t.length, u.length);
-		Double[] out = new Double[numElements];
+	public void compute(int[] t, int[] u, int[] out) {
+		ProgressReporter p = new DefaultProgressReporter(this, out.length);
+		pt.setReporter(p, t, u, out);
 
-		ProgressReporter p = new DefaultProgressReporter(this, numElements);
-		pt.setReporter(p);
-
-		for(int i = 0; i < numElements; i++) {
+		for(int i = 0; i < out.length; i++) {
 			out[i] = t[i] + u[i];
 			p.reportPixel();
 		}
-		
-		return out;
 	}
 
 }
