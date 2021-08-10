@@ -20,8 +20,8 @@ public interface ProgressTracker {
 
 	// -- USER API -- //
 
-	default ProgressReporter setReporter(ProgressReporter p, Object... inputs) {
-		return setReporter(Objects.hash(inputs), p);
+	default void setReporter(ProgressReporter p, Object... inputs) {
+		setReporter(Objects.hash(inputs), p);
 	}
 
 	default double getProgress(Object... inputs) throws InterruptedException,
