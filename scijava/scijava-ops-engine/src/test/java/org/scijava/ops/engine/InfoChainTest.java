@@ -55,7 +55,7 @@ public class InfoChainTest extends AbstractTestEnvironment {
 	}
 
 	private OpInfo singularInfoOfName(String name) {
-		Iterator<OpInfo> infos = ops.env().infos("test.infoChain").iterator();
+		Iterator<OpInfo> infos = ops.env().infos(name).iterator();
 		Assert.assertTrue(infos.hasNext());
 		OpInfo info = infos.next();
 		Assert.assertFalse(infos.hasNext());
