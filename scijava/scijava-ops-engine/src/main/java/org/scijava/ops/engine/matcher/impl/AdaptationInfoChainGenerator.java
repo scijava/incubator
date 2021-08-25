@@ -45,7 +45,7 @@ public class AdaptationInfoChainGenerator implements InfoChainGenerator {
 		OpInfo originalInfo = originalChain.info();
 		// TODO: The op type is wrong!
 		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
-		if (!Types.isAssignable(adaptorChain.info().inputs().get(0).getType(), originalInfo.opType(), typeVarAssigns)) throw new IllegalArgumentException("The adaptor cannot be used on Op " + originalInfo);
+		if (!Types.isAssignable(originalInfo.opType(), adaptorChain.info().inputs().get(0).getType(), typeVarAssigns)) throw new IllegalArgumentException("The adaptor cannot be used on Op " + originalInfo);
 		Type adaptedOpType = Types.substituteTypeVariables(adaptorChain.info().output().getType(), typeVarAssigns);
 		OpInfo adaptedInfo = new OpAdaptationInfo(originalInfo, adaptedOpType, adaptorChain);
 		return new InfoChain(adaptedInfo, originalChain.dependencies());

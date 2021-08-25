@@ -10,6 +10,7 @@ import java.util.function.Function;
 import org.junit.Assert;
 import org.junit.Test;
 import org.scijava.Priority;
+import org.scijava.function.Computers;
 import org.scijava.function.Producer;
 import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.InfoChain;
@@ -205,7 +206,7 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 	}
 
 	@Test
-	public void testAdaptationWithDependenciesRecoveryFromString() {
+	public void testAdaptedOpWithDependencies() {
 		Function<Double[][], Thing[]> f = ops.op("test.provenanceMapper").inType(Double[][].class).outType(Thing[].class).function();
 		@SuppressWarnings("unchecked")
 		InfoChain chain = ((RichOp<Function<Double[], Thing[]>>) f).infoChain();
@@ -223,6 +224,25 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		OpInfo info = infos.next();
 		Assert.assertFalse(infos.hasNext());
 		return info;
+	}
+
+	@OpField(names = "test.provenanceComputer")
+	public final Computers.Arity1<Double[], Double[]> op = (in, out) -> {
+		for (int i = 0; i < in.length && i < out.length; i++)
+			out[i] = in[i];
+	};
+
+	@Test
+	public void testAdaptatorWithDependencies() {
+		Function<Double[], Double[]> f = ops.op("test.provenanceComputer").inType(Double[].class).outType(Double[].class).function();
+		@SuppressWarnings("unchecked")
+		InfoChain chain = ((RichOp<Function<Double[], Double[]>>) f).infoChain();
+		String signature = chain.signature();
+		Nil<Function<Double[], Double[]>> special = new Nil<>() {};
+		Nil<Double[]> inType = Nil.of(Double[].class);
+		Nil<Double[]> outType = Nil.of(Double[].class);
+		Function<Double[], Double[]> actual = ops.env().opFromID(signature, special, new Nil[] {inType}, outType);
+		Double[] apply = actual.apply(new Double[] {1., 2., 3.});
 	}
 
 }

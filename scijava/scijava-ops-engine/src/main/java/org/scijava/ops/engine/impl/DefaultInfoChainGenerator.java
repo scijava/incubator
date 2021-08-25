@@ -66,7 +66,7 @@ public class DefaultInfoChainGenerator implements InfoChainGenerator {
 
 	@Override
 	public double priority() {
-		return 1e-10;
+		return -(1e10);
 	}
 
 }
