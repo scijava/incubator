@@ -204,6 +204,19 @@ public class ProvenanceTest extends AbstractTestEnvironment {
 		apply = actual.apply(new Double[] {1., 2., 3.});
 	}
 
+	@Test
+	public void testAdaptationWithDependenciesRecoveryFromString() {
+		Function<Double[][], Thing[]> f = ops.op("test.provenanceMapper").inType(Double[][].class).outType(Thing[].class).function();
+		@SuppressWarnings("unchecked")
+		InfoChain chain = ((RichOp<Function<Double[], Thing[]>>) f).infoChain();
+		String signature = chain.signature();
+		Nil<Function<Double[][], Thing[]>> special = new Nil<>() {};
+		Nil<Double[][]> inType = Nil.of(Double[][].class);
+		Nil<Thing[]> outType = Nil.of(Thing[].class);
+		Function<Double[][], Thing[]> actual = ops.env().opFromID(signature, special, new Nil[] {inType}, outType);
+		Thing[] apply = actual.apply(new Double[][] {new Double[] {1., 2., 3.}});
+	}
+
 	private OpInfo singularInfoOfName(String name) {
 		Iterator<OpInfo> infos = ops.env().infos(name).iterator();
 		Assert.assertTrue(infos.hasNext());
