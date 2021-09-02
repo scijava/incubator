@@ -34,27 +34,25 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import org.scijava.ops.api.Hints;
+import org.scijava.discovery.Discoverer;
 import org.scijava.ops.api.OpCandidate;
+import org.scijava.ops.api.OpCandidate.StatusCode;
 import org.scijava.ops.api.OpEnvironment;
-import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpRef;
 import org.scijava.ops.api.OpUtils;
-import org.scijava.ops.api.OpCandidate.StatusCode;
-import org.scijava.ops.api.features.MatchingResult;
-import org.scijava.ops.api.features.BaseOpHints.Simplification;
-import org.scijava.ops.engine.hint.DefaultHints;
-import org.scijava.ops.engine.matcher.OpMatcher;
-import org.scijava.ops.engine.simplify.InfoSimplificationGenerator;
+import org.scijava.ops.api.features.DependencyMatchingException;
+import org.scijava.ops.api.features.MatchingConditions;
+import org.scijava.ops.api.features.MatchingRoutine;
+import org.scijava.ops.api.features.OpMatcher;
+import org.scijava.ops.api.features.OpMatchingException;
 import org.scijava.service.AbstractService;
 import org.scijava.struct.Member;
 import org.scijava.types.Types;
@@ -68,108 +66,115 @@ import org.scijava.types.Types.TypeVarInfo;
  */
 public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 
-	@Override
-	public OpCandidate findSingleMatch(final OpEnvironment env, final OpRef ref) {
-		return findMatch(env, ref).singleMatch();
+	private final List<MatchingRoutine> matchers;
+
+	public DefaultOpMatcher(Collection<? extends MatchingRoutine> matchers) {
+		this.matchers = new ArrayList<>(matchers);
+		Collections.sort(this.matchers);
 	}
 
-	@Override
-	public OpCandidate findSingleMatch(final OpEnvironment env, final OpRef ref, final Hints hints) {
-		return findMatch(env, ref, hints).singleMatch();
-	}
-
-	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final OpRef ref) {
-		return findMatch(env, Collections.singletonList(ref));
-	}
-
-	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final OpRef ref, final Hints hints) {
-		return findMatch(env, Collections.singletonList(ref), hints);
-	}
-
-	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final List<OpRef> refs) {
-		return findMatch(env, refs, new DefaultHints());
-	}
-
-	@Override
-	public MatchingResult findMatch(final OpEnvironment env, final List<OpRef> refs, final Hints hints) {
-		// find candidates with matching name & type
-		final List<OpCandidate> candidates = findCandidates(env, refs, hints);
-		if (candidates.isEmpty()) {
-			return MatchingResult.empty(refs);
-		}
-		// narrow down candidates to the exact matches
-		final List<OpCandidate> matches = filterMatches(candidates);
-		return new MatchingResult(candidates, matches, refs);
-	}
-
-	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final OpRef ref) {
-		return findCandidates(env, Collections.singletonList(ref));
-	}
-
-	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final OpRef ref, final Hints hints) {
-		return findCandidates(env, Collections.singletonList(ref), hints);
-	}
-
-	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<OpRef> refs) {
-		return findCandidates(env, refs, new DefaultHints());
-	}
-
-	@Override
-	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<OpRef> refs, final Hints hints) {
-		final ArrayList<OpCandidate> candidates = new ArrayList<>();
-		for (final OpRef ref : refs) {
-			for (final OpInfo info : getInfos(env, ref, hints)) {
-				Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
-				if (ref.typesMatch(info.opType(), typeVarAssigns)) {
-					OpCandidate candidate = info.createCandidate(env, ref, typeVarAssigns);
-					candidates.add(candidate);
-				}
-			}
-		}
-		return candidates;
-	}
-
-	private Iterable<OpInfo> getInfos(OpEnvironment env, OpRef ref, Hints hints) {
-		Iterable<OpInfo> suitableInfos = env.infos(ref.getName(), hints);
-		if(hints.contains(Simplification.IN_PROGRESS) && !hints.contains(Simplification.FORBIDDEN)) {
-			Set<OpInfo> simpleInfos = new HashSet<>();
-			for(OpInfo info: suitableInfos) {
-				boolean functionallyAssignable = Types.isAssignable(Types.raw(info.opType()), Types.raw(ref.getType()));
-				if(!functionallyAssignable) continue;
-				try {
-					InfoSimplificationGenerator gen = new InfoSimplificationGenerator(info, env);
-					simpleInfos.add(gen.generateSuitableInfo(env, ref, hints));
-				} catch(Throwable e) {continue; }
-			}
-			// TODO: should this also return suitableInfos (i.e. combine the two)?
-			return simpleInfos;
-		}
-		return suitableInfos;
-	}
-
-	@Override
-	public List<OpCandidate> filterMatches(final List<OpCandidate> candidates) {
-		final List<OpCandidate> validCandidates = checkCandidates(candidates);
-
-		// List of valid candidates needs to be sorted according to priority.
-		// This is used as an optimization in order to not look at ops with
-		// lower priority than the already found one.
-		validCandidates.sort((c1, c2) -> Double.compare(c2.priority(), c1.priority()));
-
-		List<OpCandidate> matches;
-		matches = filterMatches(validCandidates, (cand) -> typesPerfectMatch(cand));
-		if (!matches.isEmpty())
-			return matches;
-
-		matches = filterMatches(validCandidates, (cand) -> typesMatch(cand));
-		return matches;
-	}
+//	@Override
+//	public OpCandidate findSingleMatch(final OpEnvironment env, final OpRef ref) {
+//		return findMatch(env, ref).singleMatch();
+//	}
+//
+//	@Override
+//	public OpCandidate findSingleMatch(final OpEnvironment env, final OpRef ref, final Hints hints) {
+//		return findMatch(env, ref, hints).singleMatch();
+//	}
+//
+//	@Override
+//	public MatchingResult findMatch(final OpEnvironment env, final OpRef ref) {
+//		return findMatch(env, Collections.singletonList(ref));
+//	}
+//
+//	@Override
+//	public MatchingResult findMatch(final OpEnvironment env, final OpRef ref, final Hints hints) {
+//		return findMatch(env, Collections.singletonList(ref), hints);
+//	}
+//
+//	@Override
+//	public MatchingResult findMatch(final OpEnvironment env, final List<OpRef> refs) {
+//		return findMatch(env, refs, new DefaultHints());
+//	}
+//
+//	@Override
+//	public MatchingResult findMatch(final OpEnvironment env, final List<OpRef> refs, final Hints hints) {
+//		// find candidates with matching name & type
+//		final List<OpCandidate> candidates = findCandidates(env, refs, hints);
+//		if (candidates.isEmpty()) {
+//			return MatchingResult.empty(refs);
+//		}
+//		// narrow down candidates to the exact matches
+//		final List<OpCandidate> matches = filterMatches(candidates);
+//		return new MatchingResult(candidates, matches, refs);
+//	}
+//
+//	@Override
+//	public List<OpCandidate> findCandidates(final OpEnvironment env, final OpRef ref) {
+//		return findCandidates(env, Collections.singletonList(ref));
+//	}
+//
+//	@Override
+//	public List<OpCandidate> findCandidates(final OpEnvironment env, final OpRef ref, final Hints hints) {
+//		return findCandidates(env, Collections.singletonList(ref), hints);
+//	}
+//
+//	@Override
+//	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<OpRef> refs) {
+//		return findCandidates(env, refs, new DefaultHints());
+//	}
+//
+//	@Override
+//	public List<OpCandidate> findCandidates(final OpEnvironment env, final List<OpRef> refs, final Hints hints) {
+//		final ArrayList<OpCandidate> candidates = new ArrayList<>();
+//		for (final OpRef ref : refs) {
+//			for (final OpInfo info : getInfos(env, ref, hints)) {
+//				Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
+//				if (ref.typesMatch(info.opType(), typeVarAssigns)) {
+//					OpCandidate candidate = info.createCandidate(env, ref, typeVarAssigns);
+//					candidates.add(candidate);
+//				}
+//			}
+//		}
+//		return candidates;
+//	}
+//
+//	private Iterable<OpInfo> getInfos(OpEnvironment env, OpRef ref, Hints hints) {
+//		Iterable<OpInfo> suitableInfos = env.infos(ref.getName(), hints);
+//		if(hints.contains(Simplification.IN_PROGRESS) && !hints.contains(Simplification.FORBIDDEN)) {
+//			Set<OpInfo> simpleInfos = new HashSet<>();
+//			for(OpInfo info: suitableInfos) {
+//				boolean functionallyAssignable = Types.isAssignable(Types.raw(info.opType()), Types.raw(ref.getType()));
+//				if(!functionallyAssignable) continue;
+//				try {
+//					InfoSimplificationGenerator gen = new InfoSimplificationGenerator(info, env);
+//					simpleInfos.add(gen.generateSuitableInfo(env, ref, hints));
+//				} catch(Throwable e) {continue; }
+//			}
+//			// TODO: should this also return suitableInfos (i.e. combine the two)?
+//			return simpleInfos;
+//		}
+//		return suitableInfos;
+//	}
+//
+//	@Override
+//	public List<OpCandidate> filterMatches(final List<OpCandidate> candidates) {
+//		final List<OpCandidate> validCandidates = checkCandidates(candidates);
+//
+//		// List of valid candidates needs to be sorted according to priority.
+//		// This is used as an optimization in order to not look at ops with
+//		// lower priority than the already found one.
+//		validCandidates.sort((c1, c2) -> Double.compare(c2.priority(), c1.priority()));
+//
+//		List<OpCandidate> matches;
+//		matches = filterMatches(validCandidates, (cand) -> typesPerfectMatch(cand));
+//		if (!matches.isEmpty())
+//			return matches;
+//
+//		matches = filterMatches(validCandidates, (cand) -> typesMatch(cand));
+//		return matches;
+//	}
 
 	/**
 	 * Checks whether the arg types of the candidate satisfy the padded arg
@@ -392,5 +397,33 @@ public class DefaultOpMatcher extends AbstractService implements OpMatcher {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public OpCandidate match(MatchingConditions conditions, OpEnvironment env) {
+		List<OpMatchingException> exceptions = new ArrayList<>(matchers.size());
+		// in priority order, search for a match
+		for (MatchingRoutine r : matchers) {
+			try {
+				return r.match(conditions, this, env);
+			}
+			catch (OpMatchingException e) {
+				exceptions.add(e);
+			}
+		}
+
+		// in the case of no matches, throw an agglomerated exception
+		throw agglomeratedException(exceptions);
+	}
+
+	private OpMatchingException agglomeratedException(
+		List<OpMatchingException> list)
+	{
+		OpMatchingException agglomerated = new OpMatchingException(
+			"No MatchingRoutine was able to produce a match!");
+		for (int i = 0; i < list.size(); i++) {
+			agglomerated.addSuppressed(list.get(i));
+		}
+		return agglomerated;
 	}
 }
