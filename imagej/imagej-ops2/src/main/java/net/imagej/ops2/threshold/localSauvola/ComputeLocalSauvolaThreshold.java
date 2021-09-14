@@ -35,11 +35,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * <p>
@@ -61,11 +59,6 @@ import org.scijava.struct.ItemIO;
  */
 @Plugin(type = Op.class, name = "threshold.localSauvola",
 	priority = Priority.LOW)
-@Parameter(key = "inputNeighborhood")
-@Parameter(key = "inputCenterPixel")
-@Parameter(key = "k", required = false)
-@Parameter(key = "r", required = false)
-@Parameter(key = "output")
 public class ComputeLocalSauvolaThreshold<T extends RealType<T>> implements
 	Computers.Arity4<Iterable<T>, T, Double, Double, BitType>
 {
@@ -79,6 +72,15 @@ public class ComputeLocalSauvolaThreshold<T extends RealType<T>> implements
 	@OpDependency(name = "stats.stdDev")
 	private Computers.Arity1<Iterable<T>, DoubleType> stdDeviationOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param inputNeighborhood
+	 * @param inputCenterPixel
+	 * @param k (required = false)
+	 * @param r (required = false)
+	 * @param output
+	 */
 	@Override
 	public void compute(final Iterable<T> inputNeighborhood,
 		final T inputCenterPixel, final Double k, final Double r,

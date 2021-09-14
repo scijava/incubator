@@ -40,17 +40,12 @@ import java.util.function.Function;
 
 import net.imagej.mesh.Mesh;
 import net.imagej.mesh.naive.NaiveDoubleMesh;
-import net.imagej.ops2.geom.geom3d.mesh.Horizon;
-import net.imagej.ops2.geom.geom3d.mesh.TriangularFacet;
-import net.imagej.ops2.geom.geom3d.mesh.Vertex;
 import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * This quickhull implementation is based on the paper
@@ -62,8 +57,6 @@ import org.scijava.struct.ItemIO;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "geom.convexHull")
-@Parameter(key = "input")
-@Parameter(key = "convexHull")
 public class DefaultConvexHull3D implements Function<Mesh, Mesh>
 {
 
@@ -80,6 +73,12 @@ public class DefaultConvexHull3D implements Function<Mesh, Mesh>
 //		return epsilon;
 //	}
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param convexHull
+	 */
 	@Override
 	public Mesh apply(final Mesh input) {
 		Mesh output = new NaiveDoubleMesh();
@@ -612,11 +611,15 @@ public class DefaultConvexHull3D implements Function<Mesh, Mesh>
 }
 
 @Plugin(type = Op.class, name = "geom.convexHullEpsilon")
-@Parameter(key = "input")
-@Parameter(key = "epsilon")
 class DefaultConvexHull3DEpsilon implements Function<Mesh, Double>
 {
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param epsilon
+	 */
 	@Override
 	public Double apply(final Mesh input) {
 		Set<Vertex> vertices = new LinkedHashSet<>();

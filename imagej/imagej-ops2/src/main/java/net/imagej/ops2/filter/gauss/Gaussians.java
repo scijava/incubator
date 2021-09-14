@@ -47,11 +47,9 @@ import net.imglib2.view.Views;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpField;
-import org.scijava.ops.core.OpCollection;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.OpCollection;
+import org.scijava.ops.spi.OpField;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link OpCollection} containing various wrappings of Gaussian operations.

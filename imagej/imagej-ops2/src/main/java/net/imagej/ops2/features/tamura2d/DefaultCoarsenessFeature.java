@@ -48,11 +48,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Intervals;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * 
@@ -64,8 +62,6 @@ import org.scijava.struct.ItemIO;
  * @param <O>
  */
 @Plugin(type = Op.class, name = "features.tamura.coarseness")
-@Parameter(key = "input")
-@Parameter(key = "output")
 public class DefaultCoarsenessFeature<I extends RealType<I>, O extends RealType<O>>
 		implements Computers.Arity1<RandomAccessibleInterval<I>, O> {
 
@@ -74,6 +70,12 @@ public class DefaultCoarsenessFeature<I extends RealType<I>, O extends RealType<
 			OutOfBoundsFactory<I, RandomAccessibleInterval<I>>, RandomAccessibleInterval<I>> meanOp;
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 		if (input.numDimensions() != 2)

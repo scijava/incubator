@@ -33,15 +33,11 @@ import net.imagej.mesh.Mesh;
 import net.imagej.ops2.geom.AbstractConvexity;
 
 import org.scijava.Priority;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "geom.convexity", label = "Geometric (3D): Convexity", priority = Priority.VERY_HIGH)
-@Parameter(key = "input")
-@Parameter(key = "convexity")
 public class DefaultConvexityMesh extends AbstractConvexity<Mesh> {}

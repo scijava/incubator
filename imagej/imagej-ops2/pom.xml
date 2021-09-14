@@ -12,8 +12,8 @@
 	<groupId>net.imagej</groupId>
 	<artifactId>imagej-ops2</artifactId>
 
-	<name>ImageJ Ops</name>
-	<description>ImageJ Operations: a framework for reusable algorithms.</description>
+	<name>ImageJ Ops 2</name>
+	<description>ImageJ Operations 2: a framework for reusable algorithms.</description>
 	<url>http://imagej.net/ImageJ_Ops</url>
 	<inceptionYear>2014</inceptionYear>
 	<organization>
@@ -210,7 +210,8 @@
 		<license.projectName>ImageJ software for multidimensional image processing and analysis.</license.projectName>
 
 		<!-- NB While we depend on old scijava-common -->
-		<allowedDuplicateClasses>org.scijava.*</allowedDuplicateClasses>
+		<imagej-ops2.allowedDuplicateClasses>${scijava.allowedDuplicateClasses}, org.scijava.*,com.github.therapi.runtimejavadoc.repack.com.eclipsesource.json.*</imagej-ops2.allowedDuplicateClasses>
+		<allowedDuplicateClasses>${imagej-ops2.allowedDuplicateClasses}</allowedDuplicateClasses>
 
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
@@ -272,7 +273,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.scijava</groupId>
-			<artifactId>scijava-ops</artifactId>
+			<artifactId>scijava-ops-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scijava-ops-spi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scijava-ops-engine</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -298,10 +309,6 @@
 
 		<!-- Third party dependencies -->
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 		</dependency>
@@ -320,18 +327,13 @@
 
 		<!-- Test scope dependencies -->
 		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -38,11 +38,9 @@ import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Generic implementation of {@link net.imagej.ops2.Ops.Geometric.Spareness}.
@@ -52,8 +50,6 @@ import org.scijava.struct.ItemIO;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "geom.spareness", label = "Geometric (3D): Spareness", priority = Priority.VERY_HIGH)
-@Parameter(key = "input")
-@Parameter(key = "spareness")
 public class DefaultSparenessMesh implements Computers.Arity1<Mesh, DoubleType> {
 
 	@OpDependency(name = "geom.secondMoment")
@@ -62,6 +58,12 @@ public class DefaultSparenessMesh implements Computers.Arity1<Mesh, DoubleType> 
 	@OpDependency(name = "geom.size")
 	private Function<Mesh, DoubleType> volume;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param spareness
+	 */
 	@Override
 	public void compute(final Mesh input, final DoubleType output) {
 

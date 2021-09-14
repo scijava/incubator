@@ -39,11 +39,9 @@ import net.imglib2.view.composite.CompositeIntervalView;
 import net.imglib2.view.composite.RealComposite;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Hessian filter using the sobel filter with separated kernel.
@@ -55,8 +53,6 @@ import org.scijava.struct.ItemIO;
  */
 
 @Plugin(type = Op.class, name = "filter.hessian")
-@Parameter(key = "input")
-@Parameter(key = "output")
 public class HessianRAI<T extends RealType<T>>
 		implements Function<RandomAccessibleInterval<T>, CompositeIntervalView<T, RealComposite<T>>> {
 
@@ -66,6 +62,12 @@ public class HessianRAI<T extends RealType<T>>
 	@OpDependency(name = "create.img")
 	private Function<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> createRAI;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @return the output
+	 */
 	@Override
 	public CompositeIntervalView<T, RealComposite<T>> apply(RandomAccessibleInterval<T> input) {
 		List<RandomAccessibleInterval<T>> derivatives = new ArrayList<>();
