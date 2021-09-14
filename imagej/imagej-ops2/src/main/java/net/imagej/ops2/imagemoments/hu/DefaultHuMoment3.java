@@ -34,11 +34,9 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the {@code imageMoments.huMoment3}.
@@ -52,8 +50,6 @@ import org.scijava.struct.ItemIO;
  * @see <a href="https://en.wikipedia.org/wiki/Image_moment#Rotation_invariants"> This page </a>
  */
 @Plugin(type = Op.class, name = "imageMoments.huMoment3", label = "Image Moment: HuMoment3")
-@Parameter(key = "input")
-@Parameter(key = "output")
 public class DefaultHuMoment3<I extends RealType<I>, O extends RealType<O>> implements AbstractImageMomentOp<I, O> {
 
 	@OpDependency(name = "imageMoments.normalizedCentralMoment30")
@@ -68,6 +64,12 @@ public class DefaultHuMoment3<I extends RealType<I>, O extends RealType<O>> impl
 	@OpDependency(name = "imageMoments.normalizedCentralMoment03")
 	private Computers.Arity1<RandomAccessibleInterval<I>, O> normalizedCentralMoment03Func;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param output
+	 */
 	@Override
 	public void computeMoment(final RandomAccessibleInterval<I> input,
 		final O output)

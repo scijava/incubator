@@ -39,8 +39,7 @@ import java.util.function.Function;
 
 import org.scijava.function.Computers;
 import org.scijava.ops.OpField;
-import org.scijava.ops.core.OpCollection;
-import org.scijava.param.Parameter;
+import org.scijava.ops.OpCollection;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -56,8 +55,6 @@ public class ComputerToIterables$classGenerics.call($maxArity) {
 
 #foreach($arity in [0..$maxArity])
 	@OpField(names = "adapt")
-	@Parameter(key = "fromOp")
-	@Parameter(key = "toOp")
 	public final Function<$computerArity.call($arity)$generics.call($arity), $computerArity.call($arity)$iterableGenerics.call($arity)> liftComputer$arity = 
 		(computer) -> {
 			return ($computeArgs.call($arity)) -> {

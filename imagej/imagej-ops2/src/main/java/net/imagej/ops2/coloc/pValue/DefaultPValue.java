@@ -48,11 +48,9 @@ import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * This algorithm repeatedly executes a colocalization algorithm, computing a
@@ -62,17 +60,21 @@ import org.scijava.struct.ItemIO;
  * Statistical Approach".
  */
 @Plugin(type = Op.class, name = "coloc.pValue")
-@Parameter(key = "image1")
-@Parameter(key = "image2")
-@Parameter(key = "op")
-@Parameter(key = "nrRandomizations")
-@Parameter(key = "psfSize")
-@Parameter(key = "seed")
-@Parameter(key = "executorService")
-@Parameter(key = "output")
 public class DefaultPValue<T extends RealType<T>, U extends RealType<U>> implements
 		Computers.Arity7<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double>, Integer, Dimensions, Long, ExecutorService, PValueResult> {
 
+	/**
+	 * TODO
+	 *
+	 * @param image1
+	 * @param image2
+	 * @param op
+	 * @param nrRandomizations
+	 * @param psfSize
+	 * @param seed
+	 * @param executorService
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<T> image1, final RandomAccessibleInterval<U> image2,
 			final BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double> op,
@@ -191,18 +193,22 @@ public class DefaultPValue<T extends RealType<T>, U extends RealType<U>> impleme
 }
 
 @Plugin(type = Op.class, name = "coloc.pValue")
-@Parameter(key = "image1")
-@Parameter(key = "image2")
-@Parameter(key = "op")
-@Parameter(key = "nrRandomizations")
-@Parameter(key = "executorService")
-@Parameter(key = "output")
 class PValueSimpleWithRandomizations<T extends RealType<T>, U extends RealType<U>> implements
 		Computers.Arity5<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double>, Integer, ExecutorService, PValueResult> {
 
 	@OpDependency(name = "coloc.pValue")
 	private Computers.Arity7<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double>, Integer, Dimensions, Long, ExecutorService, PValueResult> pValueOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param image1
+	 * @param image2
+	 * @param op
+	 * @param nrRandomizations
+	 * @param executorService
+	 * @param output
+	 */
 	@Override
 	public void compute(RandomAccessibleInterval<T> in1, RandomAccessibleInterval<U> in2,
 			BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double> in3, Integer in4,
@@ -214,17 +220,21 @@ class PValueSimpleWithRandomizations<T extends RealType<T>, U extends RealType<U
 }
 
 @Plugin(type = Op.class, name = "coloc.pValue")
-@Parameter(key = "image1")
-@Parameter(key = "image2")
-@Parameter(key = "op")
-@Parameter(key = "executorService")
-@Parameter(key = "output")
 class PValueSimple<T extends RealType<T>, U extends RealType<U>> implements
 		Computers.Arity4<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double>, ExecutorService, PValueResult> {
 
 	@OpDependency(name = "coloc.pValue")
 	private Computers.Arity5<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double>, Integer, ExecutorService, PValueResult> pValueOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param image1
+	 * @param image2
+	 * @param op
+	 * @param executorService
+	 * @param output
+	 */
 	@Override
 	public void compute(RandomAccessibleInterval<T> in1, RandomAccessibleInterval<U> in2,
 			BiFunction<RandomAccessibleInterval<T>, RandomAccessibleInterval<U>, Double> in3, ExecutorService in4,

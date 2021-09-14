@@ -37,10 +37,8 @@ import net.imglib2.roi.geom.real.Polygon2D;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Generic implementation of {@code geom.boundarySize}.
@@ -48,10 +46,14 @@ import org.scijava.struct.ItemIO;
  * @author Daniel Seebacher (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "geom.boundarySize", label = "Geometric (2D): Perimeter")
-@Parameter(key = "input")
-@Parameter(key = "boundarySize")
 public class DefaultPerimeterLength implements Computers.Arity1<Polygon2D, DoubleType> {
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param boundarySize
+	 */
 	@Override
 	public void compute(final Polygon2D input, final DoubleType output) {
 		double perimeter = 0;

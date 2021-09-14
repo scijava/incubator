@@ -36,23 +36,25 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "geom.verticesCountConvexHull", label = "Geometric (3D): Convex Hull Vertices Count", priority = Priority.VERY_HIGH)
-@Parameter(key = "input")
-@Parameter(key = "verticesCountConvexHull")
 public class DefaultVerticesCountConvexHullMesh implements Computers.Arity1<Mesh, DoubleType> {
 
 	@OpDependency(name = "geom.convexHull")
 	private Function<Mesh, Mesh> convexHullFunc;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param verticesCountConvexHull
+	 */
 	@Override
 	public void compute(final Mesh input, final DoubleType output) {
 		output.set(convexHullFunc.apply(input).vertices().size());

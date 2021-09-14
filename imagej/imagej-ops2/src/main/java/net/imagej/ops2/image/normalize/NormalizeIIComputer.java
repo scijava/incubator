@@ -39,11 +39,9 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.Util;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Normalizes an {@link RandomAccessibleInterval} given its minimum and maximum to
@@ -58,12 +56,6 @@ import org.scijava.struct.ItemIO;
  *            input.
  */
 @Plugin(type = Op.class, name = "image.normalize")
-@Parameter(key = "input")
-@Parameter(key = "sourceMin")
-@Parameter(key = "sourceMax")
-@Parameter(key = "targetMin")
-@Parameter(key = "targetMax")
-@Parameter(key = "output")
 public class NormalizeIIComputer<I extends RealType<I>, O extends RealType<O>>
 		implements Computers.Arity5<RandomAccessibleInterval<I>, I, I, O, O, RandomAccessibleInterval<O>> {
 
@@ -90,6 +82,16 @@ public class NormalizeIIComputer<I extends RealType<I>, O extends RealType<O>>
 		return result;
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param sourceMin
+	 * @param sourceMax
+	 * @param targetMin
+	 * @param targetMax
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> input, final I sourceMin, final I sourceMax, final O targetMin,
 			final O targetMax, final RandomAccessibleInterval<O> output) {

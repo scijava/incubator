@@ -33,10 +33,8 @@ import net.imglib2.type.numeric.RealType;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the {@code stats.min}.
@@ -48,10 +46,14 @@ import org.scijava.struct.ItemIO;
  *            input type
  */
 @Plugin(type = Op.class, name = "stats.min")
-@Parameter(key = "iterableInput")
-@Parameter(key = "min")
 public class IterableMin<T extends RealType<T>> implements Computers.Arity1<Iterable<T>, T> {
 
+	/**
+	 * TODO
+	 *
+	 * @param iterableInput
+	 * @param min
+	 */
 	@Override
 	public void compute(final Iterable<T> input, final T output) {
 		// Re-use output to compare against

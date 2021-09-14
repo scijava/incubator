@@ -42,11 +42,9 @@ import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Ops which compute and apply a local threshold to an image.
@@ -311,10 +309,6 @@ public final class ApplyThresholdMethodLocal {
 		}
 	}
 
-	@Parameter(key = "input")
-	@Parameter(key = "inputNeighborhoodShape")
-	@Parameter(key = "outOfBoundsFactory", required = false)
-	@Parameter(key = "output")
 	private abstract static class AbstractApplyLocalHistogramBasedThreshold<T extends RealType<T>>
 		implements
 		Computers.Arity3<RandomAccessibleInterval<T>, Shape, OutOfBoundsFactory<T, RandomAccessibleInterval<T>>, //
@@ -332,6 +326,14 @@ public final class ApplyThresholdMethodLocal {
 
 		private Computers.Arity2<Iterable<T>, T, BitType> thresholdOp;
 
+		/**
+		 * TODO
+		 *
+		 * @param input
+		 * @param inputNeighborhoodShape
+		 * @param outOfBoundsFactory (required = false)
+		 * @param output
+		 */
 		@Override
 		public void compute(final RandomAccessibleInterval<T> input,
 			final Shape inputNeighborhoodShape,

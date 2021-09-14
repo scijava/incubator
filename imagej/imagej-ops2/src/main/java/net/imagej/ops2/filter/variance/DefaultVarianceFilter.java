@@ -36,11 +36,9 @@ import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.view.Views;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Default implementation of {@link VarianceFilterOp}.
@@ -50,10 +48,6 @@ import org.scijava.struct.ItemIO;
  *            type
  */
 @Plugin(type = Op.class, name = "filter.variance")
-@Parameter(key = "input")
-@Parameter(key = "shape")
-@Parameter(key = "outOfBoundsFactory")
-@Parameter(key = "output")
 public class DefaultVarianceFilter<T, V> implements
 		Computers.Arity3<RandomAccessibleInterval<T>, Shape, OutOfBoundsFactory<T, RandomAccessibleInterval<T>>, RandomAccessibleInterval<V>> {
 
@@ -63,6 +57,14 @@ public class DefaultVarianceFilter<T, V> implements
 	@OpDependency(name = "map.neighborhood")
 	private Computers.Arity3<RandomAccessibleInterval<T>, Shape, Computers.Arity1<Iterable<T>, V>, RandomAccessibleInterval<V>> mapper;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param shape
+	 * @param outOfBoundsFactory
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<T> input, final Shape inputNeighborhoodShape,
 			final OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBoundsFactory,

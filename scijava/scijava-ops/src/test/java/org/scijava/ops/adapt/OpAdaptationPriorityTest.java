@@ -38,14 +38,12 @@ import org.junit.Test;
 import org.scijava.function.Computers;
 import org.scijava.function.Producer;
 import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.OpBuilder;
+import org.scijava.ops.OpCollection;
 import org.scijava.ops.OpField;
 import org.scijava.ops.adapt.functional.ComputersToFunctionsViaFunction;
 import org.scijava.ops.adapt.functional.ComputersToFunctionsViaSource;
-import org.scijava.ops.core.OpCollection;
-import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Ensures that higher-priority adapt Ops are used over lower-priority adapt
@@ -75,21 +73,16 @@ public class OpAdaptationPriorityTest extends AbstractTestEnvironment {
 	}
 
 	@OpField(names = "test.priorityOp")
-	@Parameter(key = "input")
-	@Parameter(key = "output")
 	public static final Computers.Arity1<Double, PriorityThing> priorityOp = (in,
 		out) -> {
 		out.increasePriority(in);
 	};
 
 	@OpField(names = "create")
-	@Parameter(key = "output")
 	public static final Producer<PriorityThing> priorityThingProducer =
 		() -> new PriorityThing(10000);
 
 	@OpField(names = "create")
-	@Parameter(key = "input")
-	@Parameter(key = "output")
 	public static final Function<Double, PriorityThing> priorityThingFunction = (
 		in) -> new PriorityThing(in);
 

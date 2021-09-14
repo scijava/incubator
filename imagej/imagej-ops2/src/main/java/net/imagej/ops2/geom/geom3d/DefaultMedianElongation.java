@@ -38,11 +38,9 @@ import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.scijava.Priority;
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Generic implementation of
@@ -54,13 +52,17 @@ import org.scijava.struct.ItemIO;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "geom.medianElongation", label = "Geometric (3D): Median Elongation", priority = Priority.VERY_HIGH)
-@Parameter(key = "input")
-@Parameter(key = "medianElongation")
 public class DefaultMedianElongation implements Computers.Arity1<Mesh, DoubleType> {
 
 	@OpDependency(name = "geom.secondMoment")
 	private Function<Mesh, RealMatrix> inertiaTensor;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param medianElongation
+	 */
 	@Override
 	public void compute(final Mesh input, final DoubleType output) {
 		final RealMatrix it = inertiaTensor.apply(input);

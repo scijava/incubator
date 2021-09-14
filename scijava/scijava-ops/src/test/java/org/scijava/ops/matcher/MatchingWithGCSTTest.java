@@ -8,10 +8,9 @@ import java.util.function.Function;
 
 import org.junit.Test;
 import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.OpBuilder;
+import org.scijava.ops.OpCollection;
 import org.scijava.ops.OpField;
-import org.scijava.ops.core.OpCollection;
-import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.types.Nil;
 import org.scijava.types.Types;
@@ -53,8 +52,6 @@ public class MatchingWithGCSTTest extends AbstractTestEnvironment {
 	}
 
 	@OpField(names = "test.listTypeReification")
-	@Parameter(key = "input")
-	@Parameter(key = "output")
 	public static final Function<List<? extends Thing>, List<Double>> fooOP = (in) -> {
 		List<Double> returnList = new ArrayList<>();
 		returnList.add(0.);

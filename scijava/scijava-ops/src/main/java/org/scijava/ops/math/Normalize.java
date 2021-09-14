@@ -3,23 +3,24 @@ package org.scijava.ops.math;
 import java.util.Arrays;
 
 import org.scijava.function.Functions;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 public class Normalize {
 
 	public static final String NAMES = "math.minmax";
 
 	@Plugin(type = Op.class, name = NAMES)
-	@Parameter(key = "numbers")
-	@Parameter(key = "newMin")
-	@Parameter(key = "newMax")
-	@Parameter(key = "normalized")
 	public static class MathMinMaxNormalizeFunction implements Functions.Arity3<double[], Double, Double, double[]> {
 
-		@Override
+			/**
+		 * TODO
+		 * 
+		 * @param numbers
+		 * @param newMin
+		 * @param newMax
+		 */
+	@Override
 		public double[] apply(double[] t, Double newMin, Double newMax) {
 			if (newMax == null) {
 				newMax = 1.0;

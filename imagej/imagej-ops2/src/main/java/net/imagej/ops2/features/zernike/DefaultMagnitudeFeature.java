@@ -28,18 +28,15 @@
  */
 package net.imagej.ops2.features.zernike;
 
-import net.imagej.ops2.features.zernike.helper.ZernikeMoment;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.function.Computers;
 import org.scijava.function.Functions;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * 
@@ -51,16 +48,20 @@ import org.scijava.struct.ItemIO;
  *            Input Type
  */
 @Plugin(type = Op.class, name = "features.zernike.magnitude")
-@Parameter(key = "input")
-@Parameter(key = "order")
-@Parameter(key = "repetition")
-@Parameter(key = "output")
 public class DefaultMagnitudeFeature<T extends RealType<T>>
 		implements Computers.Arity3<IterableInterval<T>, Integer, Integer, DoubleType> {
 
 	@OpDependency(name = "features.zernike.computer")
 	private Functions.Arity3<IterableInterval<T>, Integer, Integer, ZernikeMoment> zernikeOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param order
+	 * @param repetition
+	 * @param output
+	 */
 	@Override
 	public void compute(IterableInterval<T> input, Integer order, Integer repetition, DoubleType output) {
 		if (input.numDimensions() != 2)

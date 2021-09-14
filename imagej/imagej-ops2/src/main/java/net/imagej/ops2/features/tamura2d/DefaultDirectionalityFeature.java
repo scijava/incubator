@@ -45,11 +45,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Implementation of Tamura's Directionality Feature
@@ -60,9 +58,6 @@ import org.scijava.struct.ItemIO;
  */
 @SuppressWarnings("rawtypes")
 @Plugin(type = Op.class, name = "features.tamura.directionality")
-@Parameter(key = "input")
-@Parameter(key = "histogramSize")
-@Parameter(key = "output")
 public class DefaultDirectionalityFeature<I extends RealType<I>, O extends RealType<O>>
 	implements Computers.Arity2<RandomAccessibleInterval<I>, Integer, O> {
 
@@ -74,6 +69,13 @@ public class DefaultDirectionalityFeature<I extends RealType<I>, O extends RealT
 	private BiFunction<Dimensions, I, Img<I>> imgCreator;
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param histogramSize
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> input,
 		Integer histogramSize, final O output)

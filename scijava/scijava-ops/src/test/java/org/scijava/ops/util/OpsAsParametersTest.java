@@ -6,29 +6,21 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.junit.Test;
-import org.scijava.function.Functions;
 import org.scijava.ops.AbstractTestEnvironment;
+import org.scijava.ops.Op;
+import org.scijava.ops.OpBuilder;
+import org.scijava.ops.OpCollection;
 import org.scijava.ops.OpField;
-import org.scijava.ops.core.Op;
-import org.scijava.ops.core.OpCollection;
-import org.scijava.ops.core.builder.OpBuilder;
-import org.scijava.types.Nil;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
+import org.scijava.types.Nil;
 
 @Plugin(type = OpCollection.class)
 public class OpsAsParametersTest extends AbstractTestEnvironment {
 
 	@OpField(names = "test.parameter.computer")
-	@Parameter(key = "input")
-	@Parameter(key = "output")
 	public final Function<Number, Double> func = (x) -> x.doubleValue();
 
 	@OpField(names = "test.parameter.op")
-	@Parameter(key = "inputList")
-	@Parameter(key = "op")
-	@Parameter(key = "outputList")
 	public final BiFunction<List<Number>, Function<Number, Double>, List<Double>> biFunc = (x, op) -> {
 		List<Double> output = new ArrayList<>();
 		for (Number n : x)
@@ -57,7 +49,7 @@ public class OpsAsParametersTest extends AbstractTestEnvironment {
 		list.add(20.5);
 		list.add(4.0d);
 
-		BiFunction<List<Number>, Function<Number, Double>, List<Double>> thing = FunctionUtils.match(ops.env(),
+		BiFunction<List<Number>, Function<Number, Double>, List<Double>> thing = OpBuilder.matchFunction(ops.env(),
 				"test.parameter.op", new Nil<List<Number>>() {
 				}, new Nil<Function<Number, Double>>() {
 				}, new Nil<List<Double>>() {
@@ -75,7 +67,7 @@ public class OpsAsParametersTest extends AbstractTestEnvironment {
 		list.add(20.5);
 		list.add(4.0d);
 
-		Function<Number, Double> funcClass = FunctionUtils.match(ops.env(), "test.parameter.class", new Nil<Number>() {
+		Function<Number, Double> funcClass = OpBuilder.matchFunction(ops.env(), "test.parameter.class", new Nil<Number>() {
 		}, new Nil<Double>() {
 		});
 
@@ -86,8 +78,6 @@ public class OpsAsParametersTest extends AbstractTestEnvironment {
 }
 
 @Plugin(type = Op.class, name = "test.parameter.class")
-@Parameter(key = "input")
-@Parameter(key = "output")
 class FuncClass implements Function<Number, Double> {
 
 	@Override

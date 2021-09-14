@@ -34,11 +34,9 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the {@code imageMoments.normalizedCentralMoment21}.
@@ -50,8 +48,6 @@ import org.scijava.struct.ItemIO;
  */
 @Plugin(type = Op.class, name = "imageMoments.normalizedCentralMoment21",
 	label = "Image Moment: NormalizedCentralMoment21")
-@Parameter(key = "input")
-@Parameter(key = "output")
 public class DefaultNormalizedCentralMoment21<I extends RealType<I>, O extends RealType<O>>
 	implements AbstractImageMomentOp<I, O> 
 {

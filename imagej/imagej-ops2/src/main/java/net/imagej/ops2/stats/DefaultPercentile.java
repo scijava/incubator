@@ -32,11 +32,9 @@ package net.imagej.ops2.stats;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the n-th {@code stats.percentile}.
@@ -50,15 +48,19 @@ import org.scijava.struct.ItemIO;
  *            output type
  */
 @Plugin(type = Op.class, name = "stats.percentile")
-@Parameter(key = "iterableInput")
-@Parameter(key = "percent", min="0", max="100")
-@Parameter(key = "percentile")
 public class DefaultPercentile<I extends RealType<I>, O extends RealType<O>>
 		implements Computers.Arity2<Iterable<I>, Double, O> {
 
 	@OpDependency(name = "stats.quantile")
 	private Computers.Arity2<Iterable<I>, Double, O> op;
 
+	/**
+	 * TODO
+	 *
+	 * @param iterableInput
+	 * @param percent
+	 * @param percentile
+	 */
 	@Override
 	public void compute(final Iterable<I> input, final Double percent, final O output) {
 		op.compute(input, percent / 100, output);

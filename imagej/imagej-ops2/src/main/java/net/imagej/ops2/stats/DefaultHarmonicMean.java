@@ -33,11 +33,9 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the {@code stats.harmonicMean} using
@@ -49,8 +47,6 @@ import org.scijava.struct.ItemIO;
  * @param <O> output type
  */
 @Plugin(type = Op.class, name = "stats.harmonicMean")
-@Parameter(key = "iterableInput")
-@Parameter(key = "harmonicMean")
 public class DefaultHarmonicMean<I extends RealType<I>, O extends RealType<O>>
 	implements Computers.Arity1<RandomAccessibleInterval<I>, O>
 {
@@ -61,6 +57,12 @@ public class DefaultHarmonicMean<I extends RealType<I>, O extends RealType<O>>
 	@OpDependency(name = "stats.sumOfInverses")
 	private Computers.Arity1<RandomAccessibleInterval<I>, O> sumOfInversesComputer;
 
+	/**
+	 * TODO
+	 *
+	 * @param iterableInput
+	 * @param harmonicMean
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 		final O area = output.createVariable();

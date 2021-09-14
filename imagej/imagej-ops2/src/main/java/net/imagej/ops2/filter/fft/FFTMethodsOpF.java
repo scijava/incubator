@@ -41,11 +41,9 @@ import net.imglib2.type.numeric.RealType;
 import org.scijava.Priority;
 import org.scijava.function.Computers;
 import org.scijava.function.Functions;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Function that uses FFTMethods to perform a forward FFT
@@ -57,12 +55,6 @@ import org.scijava.struct.ItemIO;
  *            TODO Documentation
  */
 @Plugin(type = Op.class, name = "filter.fft", priority = Priority.HIGH)
-@Parameter(key = "input")
-@Parameter(key = "borderSize", description = "the size of border to apply in each dimension")
-@Parameter(key = "fast", description = "whether to perform a fast FFT; default true")
-@Parameter(key = "fftType", description = "the complex type of the output")
-@Parameter(key = "executorService")
-@Parameter(key = "output")
 public class FFTMethodsOpF<T extends RealType<T>, C extends ComplexType<C>> implements
 		Functions.Arity5<RandomAccessibleInterval<T>, long[], Boolean, C, ExecutorService, RandomAccessibleInterval<C>> {
 
@@ -81,6 +73,16 @@ public class FFTMethodsOpF<T extends RealType<T>, C extends ComplexType<C>> impl
 	 * (if possible). If the input dimensions are not supported by the underlying
 	 * FFT implementation the input will be extended to the nearest size that is
 	 * supported.
+	 */
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param borderSize the size of border to apply in each dimension
+	 * @param fast whether to perform a fast FFT; default true
+	 * @param fftType the complex type of the output
+	 * @param executorService
+	 * @return the output
 	 */
 	@Override
 	public RandomAccessibleInterval<C> apply(final RandomAccessibleInterval<T> input, final long[] borderSize,

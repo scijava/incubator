@@ -30,10 +30,8 @@
 package net.imagej.ops2.identity;
 
 import org.scijava.function.Inplaces;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Default implementation of the {@link IdentityOp} op.
@@ -41,10 +39,14 @@ import org.scijava.struct.ItemIO;
  * @author Curtis Rueden
  */
 @Plugin(type = Op.class, name = "identity")
-@Parameter(key = "io")
 public class DefaultIdentity<A> implements Inplaces.Arity1<A>
 {
 
+	/**
+	 * TODO
+	 *
+	 * @param io
+	 */
 	@Override
 	public void mutate(final A input) {
 		// NB: No implementation needed.

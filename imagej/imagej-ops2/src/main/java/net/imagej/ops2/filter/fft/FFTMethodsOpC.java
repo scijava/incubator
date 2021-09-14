@@ -38,10 +38,8 @@ import net.imglib2.type.numeric.RealType;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Forward FFT computer that operates on an RAI and wraps FFTMethods. The input
@@ -54,15 +52,19 @@ import org.scijava.struct.ItemIO;
  * @param <C>
  */
 @Plugin(type = Op.class, name = "filter.fft", priority = Priority.NORMAL)
-@Parameter(key = "input")
-@Parameter(key = "executorService")
-@Parameter(key = "output")
 public class FFTMethodsOpC<T extends RealType<T>, C extends ComplexType<C>>
 	implements Computers.Arity2<RandomAccessibleInterval<T>, ExecutorService, RandomAccessibleInterval<C>>
 {
 
 	/**
 	 * Computes an ND FFT using FFTMethods
+	 */
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param executorService
+	 * @param output
 	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<T> input,

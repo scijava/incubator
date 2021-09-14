@@ -41,11 +41,9 @@ import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
 import org.scijava.function.Computers;
+import org.scijava.ops.Op;
 import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Calculates the derivative (with sobel kernel) of an image in a given
@@ -57,9 +55,6 @@ import org.scijava.struct.ItemIO;
  *            type of input
  */
 @Plugin(type = Op.class, name = "filter.partialDerivative")
-@Parameter(key = "input")
-@Parameter(key = "dimension")
-@Parameter(key = "output")
 public class PartialDerivativeRAI<T extends RealType<T>>
 		implements Computers.Arity2<RandomAccessibleInterval<T>, Integer, RandomAccessibleInterval<T>> {
 
@@ -172,6 +167,13 @@ public class PartialDerivativeRAI<T extends RealType<T>>
 
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param dimension
+	 * @param output
+	 */
 	@Override
 	public void compute(RandomAccessibleInterval<T> input, final Integer dimension,
 			RandomAccessibleInterval<T> output) {
