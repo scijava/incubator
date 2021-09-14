@@ -37,11 +37,9 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpField;
-import org.scijava.ops.core.OpCollection;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.OpCollection;
+import org.scijava.ops.spi.OpField;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Rotates the vector by the quaternion.

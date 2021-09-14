@@ -42,11 +42,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Performs the 2-D partial derivative Gaussian kernel convolutions on an image,
@@ -55,10 +53,6 @@ import org.scijava.struct.ItemIO;
  * @author Gabe Selzer
  */
 @Plugin(type = Op.class, name = "filter.derivativeGauss")
-@Parameter(key = "input")
-@Parameter(key = "sigma", description = "the sigma in each dimension of the gaussian")
-@Parameter(key = "derivatives", description = "the value at each index indicates the derivative to take in each dimension of the image.")
-@Parameter(key = "output")
 public class DefaultDerivativeGauss<T extends RealType<T>>
 		implements Computers.Arity3<RandomAccessibleInterval<T>, double[], int[], RandomAccessibleInterval<DoubleType>> {
 	
@@ -279,6 +273,14 @@ public class DefaultDerivativeGauss<T extends RealType<T>>
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param sigma the sigma in each dimension of the gaussian
+	 * @param derivatives the value at each index indicates the derivative to take in each dimension of the image.
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<T> input, final double[] sigma, final int[] derivatives, final RandomAccessibleInterval<DoubleType> output) {
 

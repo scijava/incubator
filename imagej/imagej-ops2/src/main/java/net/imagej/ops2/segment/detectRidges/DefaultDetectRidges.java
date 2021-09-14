@@ -48,11 +48,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.function.Computers;
 import org.scijava.function.Functions;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Performs the Ridge Detection algorithm on a 2-Dimensional, gray-scale image.
@@ -60,12 +58,6 @@ import org.scijava.struct.ItemIO;
  * @author Gabe Selzer
  */
 @Plugin(type = Op.class, name = "segment.detectRidges")
-@Parameter(key = "input")
-@Parameter(key = "width")
-@Parameter(key = "lowerThreshold")
-@Parameter(key = "higherThreshold")
-@Parameter(key = "ridgeLengthMin")
-@Parameter(key = "ridges")
 public class DefaultDetectRidges<T extends RealType<T>> implements
 		Functions.Arity5<RandomAccessibleInterval<T>, Double, Double, Double, Integer, List<DefaultWritablePolyline>> {
 
@@ -229,6 +221,16 @@ public class DefaultDetectRidges<T extends RealType<T>> implements
 		}
 	}
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param width
+	 * @param lowerThreshold
+	 * @param higherThreshold
+	 * @param ridgeLengthMin
+	 * @param ridges
+	 */
 	@Override
 	public List<DefaultWritablePolyline> apply(final RandomAccessibleInterval<T> input, final Double width,
 			final Double lowerThreshold, final Double higherThreshold, final Integer ridgeLengthMin) {

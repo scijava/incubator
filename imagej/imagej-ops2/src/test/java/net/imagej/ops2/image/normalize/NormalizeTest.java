@@ -41,7 +41,8 @@ import net.imglib2.util.Pair;
 import net.imglib2.view.Views;
 
 import org.junit.jupiter.api.Test;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.scijava.ops.api.OpBuilder;
+import org.scijava.ops.api.OpBuilder;
 import org.scijava.types.Nil;
 
 /**

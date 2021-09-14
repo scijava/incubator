@@ -37,11 +37,9 @@ import net.imglib2.util.Pair;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the {@code stats.max}. Leans on other Ops.
@@ -50,13 +48,17 @@ import org.scijava.struct.ItemIO;
  * @param <T> input type
  */
 @Plugin(type = Op.class, name = "stats.min", priority = Priority.HIGH)
-@Parameter(key = "iterableInput")
-@Parameter(key = "max")
 public class DefaultMin<T extends RealType<T>> implements Computers.Arity1<RandomAccessibleInterval<T>, T> {
 	
 	@OpDependency(name = "stats.minMax")
 	private Function<RandomAccessibleInterval<T>, Pair<T, T>> minMaxOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param iterableInput
+	 * @param max
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<T> input, final T output) {
 		output.set(minMaxOp.apply(input).getA());

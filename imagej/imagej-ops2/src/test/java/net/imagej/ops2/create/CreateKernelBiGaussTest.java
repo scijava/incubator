@@ -38,7 +38,6 @@ import net.imglib2.type.numeric.complex.ComplexDoubleType;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.jupiter.api.Test;
-import org.scijava.ops.core.builder.OpBuilder;
 import org.scijava.types.Nil;
 
 /**

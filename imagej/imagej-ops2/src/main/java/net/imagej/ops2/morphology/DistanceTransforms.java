@@ -10,12 +10,10 @@ import net.imglib2.type.numeric.RealType;
 
 import org.scijava.function.Computers;
 import org.scijava.function.Inplaces;
-import org.scijava.ops.OpField;
-import org.scijava.ops.core.ExceptionUtils;
-import org.scijava.ops.core.OpCollection;
-import org.scijava.param.Parameter;
+import org.scijava.ops.engine.util.ExceptionUtils;
+import org.scijava.ops.spi.OpCollection;
+import org.scijava.ops.spi.OpField;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 @Plugin(type = OpCollection.class)
 public class DistanceTransforms<T extends RealType<T>, U extends RealType<U>> {

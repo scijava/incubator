@@ -36,7 +36,8 @@ import net.imagej.ops2.AbstractOpTest;
 import net.imglib2.type.logic.BitType;
 
 import org.junit.jupiter.api.Test;
-import org.scijava.ops.core.builder.OpBuilder;
+import org.scijava.ops.api.OpBuilder;
+import org.scijava.ops.api.OpBuilder;
 
 /**
  * Tests {@link BooleanTypeLogic}.

@@ -33,10 +33,8 @@ import net.imglib2.type.BooleanType;
 import net.imglib2.type.Type;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * An Op that sets the output to the <code>defaultVal</code> iff the input is
@@ -45,13 +43,17 @@ import org.scijava.struct.ItemIO;
  * @author Leon Yang
  */
 @Plugin(type = Op.class, name = "logic.default")
-@Parameter(key = "input")
-@Parameter(key = "defaultValue")
-@Parameter(key = "output")
 public class Default<I extends BooleanType<I>, O extends Type<O>> implements
 	Computers.Arity2<I, O, O> 
 {
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param defaultValue
+	 * @param output
+	 */
 	@Override
 	public void compute(final I input, final O defaultVal, final O output) {
 		if (!input.get()) output.set(defaultVal);
