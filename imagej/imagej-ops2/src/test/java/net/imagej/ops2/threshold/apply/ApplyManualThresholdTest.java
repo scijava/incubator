@@ -39,7 +39,8 @@ import net.imglib2.type.numeric.integer.UnsignedShortType;
 
 import org.junit.jupiter.api.Test;
 import org.scijava.function.Computers;
-import org.scijava.ops.util.ComputerUtils;
+import org.scijava.ops.api.OpBuilder;
+import org.scijava.ops.api.OpBuilder;
 import org.scijava.types.Nil;
 
 /**
@@ -52,7 +53,7 @@ public class ApplyManualThresholdTest extends AbstractThresholdTest {
 	@Test
 	public void testApplyThreshold() throws IncompatibleTypeException {
 		Computers.Arity3<Img<UnsignedShortType>, UnsignedShortType, Comparator<UnsignedShortType>, Iterable<BitType>> createFunc =
-			ComputerUtils.match(ops.env(), "threshold.apply",
+			OpBuilder.matchComputer(ops.env(), "threshold.apply",
 				new Nil<Img<UnsignedShortType>>()
 				{}, new Nil<UnsignedShortType>() {},
 				new Nil<Comparator<UnsignedShortType>>()

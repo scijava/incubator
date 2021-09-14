@@ -35,11 +35,9 @@ import net.imglib2.roi.geom.real.Polygon2D;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Generic implementation of {@code geom.eccentricity}.
@@ -50,8 +48,6 @@ import org.scijava.struct.ItemIO;
  * @author Tim-Oliver Buchholz, University of Konstanz
  */
 @Plugin(type = Op.class, name = "geom.eccentricity", label = "Geometric (2D): Eccentricity")
-@Parameter(key = "input")
-@Parameter(key = "eccentricity")
 public class DefaultEccentricity implements Computers.Arity1<Polygon2D, DoubleType> {
 
 	@OpDependency(name = "geom.minorAxis")
@@ -59,6 +55,12 @@ public class DefaultEccentricity implements Computers.Arity1<Polygon2D, DoubleTy
 	@OpDependency(name = "geom.majorAxis")
 	private Function<Polygon2D, DoubleType> majorAxisFunc;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param eccentricity
+	 */
 	@Override
 	public void compute(final Polygon2D input, final DoubleType output) {
 

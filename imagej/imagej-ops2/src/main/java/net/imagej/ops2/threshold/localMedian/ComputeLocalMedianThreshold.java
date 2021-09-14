@@ -34,11 +34,9 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Local threshold method using median.
@@ -47,10 +45,6 @@ import org.scijava.struct.ItemIO;
  * @author Stefan Helfrich (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "threshold.localMedian")
-@Parameter(key = "inputNeighborhood")
-@Parameter(key = "inputCenterPixel")
-@Parameter(key = "c")
-@Parameter(key = "output")
 public class ComputeLocalMedianThreshold<T extends RealType<T>> implements
 	Computers.Arity3<Iterable<T>, T, Double, BitType>
 {
@@ -58,6 +52,14 @@ public class ComputeLocalMedianThreshold<T extends RealType<T>> implements
 	@OpDependency(name = "stats.median")
 	private Computers.Arity1<Iterable<T>, DoubleType> medianOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param inputNeighborhood
+	 * @param inputCenterPixel
+	 * @param c
+	 * @param output
+	 */
 	@Override
 	public void compute(final Iterable<T> inputNeighborhood,
 		final T inputCenterPixel, final Double c, final BitType output)

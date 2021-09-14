@@ -40,11 +40,9 @@ import net.imglib2.view.Views;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpEnvironment;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.api.OpEnvironment;
+import org.scijava.ops.spi.Op;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Evaluates a {@link CenterAwareComputerOp} for each {@link Neighborhood} on
@@ -59,13 +57,17 @@ import org.scijava.struct.ItemIO;
  * @see CenterAwareComputerOp
  */
 @Plugin(type = Op.class, name = "map.neighborhood")
-@Parameter(key = "input")
-@Parameter(key = "shape")
-@Parameter(key = "op")
-@Parameter(key = "output")
 public class MapNeighborhoodWithCenter<I, O> implements Computers.Arity3<RandomAccessibleInterval<I>, Shape, Computers.Arity2<Iterable<I>, I, O>, IterableInterval<O>>
 {
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param shape
+	 * @param op
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> in1, final Shape in2,
 		final Computers.Arity2<Iterable<I>, I, O> centerAwareOp, final IterableInterval<O> out)
@@ -98,14 +100,18 @@ public class MapNeighborhoodWithCenter<I, O> implements Computers.Arity3<RandomA
  * @author Gabriel Selzer
  */
 @Plugin(type = Op.class, name = "map.neighborhood", priority = Priority.HIGH)
-@Parameter(key = "input")
-@Parameter(key = "shape")
-@Parameter(key = "op")
-@Parameter(key = "output")
 class MapNeighborhoodWithCenterAllRAI<I, O> implements
 	Computers.Arity3<RandomAccessibleInterval<I>, Shape, Computers.Arity2<Iterable<I>, I, O>, RandomAccessibleInterval<O>>
 {
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param shape
+	 * @param op
+	 * @param output
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> in1, final Shape in2,
 		final Computers.Arity2<Iterable<I>, I, O> centerAwareOp,

@@ -35,11 +35,9 @@ import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Copies a {@link RandomAccessibleInterval} into another
@@ -49,13 +47,17 @@ import org.scijava.struct.ItemIO;
  * @param <T>
  */
 @Plugin(type = Op.class, name = "copy, copy.rai", priority = 1.0)
-@Parameter(key = "input")
-@Parameter(key = "copy")
 public class CopyRAI<T> implements Computers.Arity1<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> {
 
 	@OpDependency(name = "copy")
 	private Computers.Arity1<T, T> mapComputer;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param copy
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<T> input, final RandomAccessibleInterval<T> output) {
 		if (!Intervals.equalDimensions(input, output))
