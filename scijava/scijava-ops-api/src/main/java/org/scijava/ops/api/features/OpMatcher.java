@@ -43,27 +43,5 @@ public interface OpMatcher {
 
 	OpCandidate match(MatchingConditions conditions, OpEnvironment env);
 
-//	OpCandidate findSingleMatch(OpEnvironment env, OpRef ref);
-//
-//	OpCandidate findSingleMatch(OpEnvironment env, OpRef ref, Hints hints);
-//
-//	MatchingResult findMatch(OpEnvironment env, OpRef ref);
-//
-//	MatchingResult findMatch(OpEnvironment env, OpRef ref, Hints hints);
-//
-//	MatchingResult findMatch(OpEnvironment env, List<OpRef> refs);
-//
-//	MatchingResult findMatch(OpEnvironment env, List<OpRef> refs, Hints hints);
-//
-//	List<OpCandidate> findCandidates(OpEnvironment env, OpRef ref);
-//
-//	List<OpCandidate> findCandidates(OpEnvironment env, OpRef ref, Hints hints);
-//
-//	List<OpCandidate> findCandidates(OpEnvironment env, List<OpRef> refs);
-//
-//	List<OpCandidate> findCandidates(OpEnvironment env, List<OpRef> refs, Hints hints);
-//
-//	List<OpCandidate> filterMatches(List<OpCandidate> candidates);
-//
 	boolean typesMatch(OpCandidate candidate);
 }

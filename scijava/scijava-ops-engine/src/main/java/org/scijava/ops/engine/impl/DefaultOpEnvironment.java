@@ -464,47 +464,7 @@ public class DefaultOpEnvironment implements OpEnvironment {
 
 	private OpCandidate findOpCandidate(OpRef ref, Hints hints) {
 		return matcher.match(MatchingConditions.from(ref, hints), this);
-//		try {
-//			// attempt to find a direct match
-//			return matcher.findSingleMatch(this, ref, hints);
-//		}
-//		catch (OpMatchingException e1) {
-//			// no direct match; find an adapted match
-//			try {
-//				if (hints.containsNone(Adaptation.IN_PROGRESS, Adaptation.FORBIDDEN)) //
-//					return adaptOp(ref, hints);
-//				throw new OpMatchingException("No matching Op for request: " + ref +
-//					"\n(adaptation is disabled)", e1);
-//			}
-//			catch (OpMatchingException e2) {
-//				try {
-//					if (hints.containsNone(Simplification.IN_PROGRESS,
-//						Simplification.FORBIDDEN)) //
-//						return findSimplifiedOp(ref, hints);
-//					throw new OpMatchingException("No matching Op for request: " + ref +
-//						"\n(simplification is disabled)", e1);
-//				}
-//				catch (OpMatchingException e3) {
-//					// NB: It is important that the adaptation and simplification errors
-//					// be
-//					// suppressed here. If a failure occurs in Op matching, it
-//					// is not the fault of our adaptation/simplification process but is
-//					// instead due to the incongruity between the request and the set of
-//					// available Ops. Thus the error stemming from the direct match
-//					// attempt will provide the user with more information on how to fix
-//					// their Op request.
-//					e1.addSuppressed(e2);
-//					e1.addSuppressed(e3);
-//					throw e1;
-//				}
-//			}
-//		}
 	}
-//
-//	private OpCandidate findSimplifiedOp(OpRef ref, Hints hints) {
-//		Hints simplificationHints = hints.plus(Simplification.IN_PROGRESS);
-//		return matcher.findSingleMatch(this, ref, simplificationHints);
-//	}
 
 	/**
 	 * Creates an instance of the Op from the {@link OpCandidate} <b>with its

@@ -51,7 +51,6 @@ public class SimplificationMatchingRoutine extends RuntimeSafeMatchingRoutine {
 				continue;
 			}
 		}
-		// TODO: should this also return suitableInfos (i.e. combine the two)?
 		return simpleInfos;
 	}
 

@@ -21,7 +21,7 @@ public interface MatchingRoutine extends SciJavaPlugin,
 
 	@Override
 	default int compareTo(MatchingRoutine o) {
-		return (int) (o.priority() - priority());
+		return (int) (priority() - o.priority());
 	}
 
 	OpCandidate findMatch(MatchingConditions conditions, OpMatcher matcher,
