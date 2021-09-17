@@ -50,6 +50,7 @@ public abstract class AbstractRichOp<T> implements RichOp<T> {
 		OpExecution e = new OpExecution(this);
 		e.setReporter(new BinaryProgressReporter());
 		ProgressReporters.add(e);
+		metadata.history().addExecution(e);
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public abstract class AbstractRichOp<T> implements RichOp<T> {
 		// Log a new execution
 		OpExecution e = ProgressReporters.remove();
 		e.recordCompletion(output);
-		metadata.history().addExecution(e);
+		metadata.history().logOutput(e, output);
 	}
 
 }

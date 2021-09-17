@@ -29,7 +29,6 @@ public class OpExecution {
 	public void recordCompletion(Object output) {
 		outContainer.complete(output);
 		reporter.reportCompletion();
-		op.metadata().history().logOutput(this, output);
 	}
 
 	public Future<Object> output() {

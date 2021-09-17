@@ -40,7 +40,7 @@ public interface OpHistory {
 	 * 
 	 * @return the {@link Set} of Ops currently running
 	 */
-	Set<OpExecution> currentExections();
+	Set<OpExecution> currentExecutions();
 
 	/**
 	 * Returns the hierarchy of {@link OpInfo}s describing the dependency chain of

@@ -71,6 +71,12 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 	}
 
 	@Override
+	public Set<OpExecution> currentExecutions() {
+		return new HashSet<>(currentExecutions);
+	}
+
+
+	@Override
 	public InfoChain opExecutionChain(Object op) {
 		return dependencyChain.get(op);
 	}
@@ -101,35 +107,12 @@ public class DefaultOpHistory extends AbstractService implements OpHistory {
 
 	@Override
 	public void logOutput(OpExecution e, Object output) {
+		currentExecutions.remove(e);
 		if (!mutationMap.containsKey(output)) updateList(output);
 		resolveExecution(e.op(), output);
 	}
 
 	// -- HELPER METHODS -- //
-
-//	final Consumer<OpExecution> outputRecorder = execution -> {
-//		// When the Hints declare to skip the recording, don't record.
-//		if (execution.op().metadata().hints().contains(History.SKIP_RECORDING))
-//			return;
-//
-//		// create a Thread that blocks until the output has been generated. Then,
-//		// add it to the WeakHashMap.
-//		Thread t = new Thread(() -> {
-//			Object output;
-//			try {
-//				// TODO: Should this be within a synchronized block?
-//				output = execution.output().get();
-//				if (!mutationMap.containsKey(output)) updateList(output);
-//				resolveExecution(execution.op(), output);
-//			}
-//			catch (InterruptedException | ExecutionException exc) {
-//				// TODO: What is the best course of action here?
-//				throw new RuntimeException(exc);
-//			}
-//		});
-//		t.setPriority(1);
-//		t.start();
-//	};
 
 	private void updateList(Object output) {
 		synchronized (mutationMap) {
