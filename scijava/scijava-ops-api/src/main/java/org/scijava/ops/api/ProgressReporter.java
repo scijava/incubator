@@ -1,4 +1,4 @@
-package org.scijava.ops.engine.impl;
+package org.scijava.ops.api;
 
 
 public interface ProgressReporter {
@@ -8,6 +8,8 @@ public interface ProgressReporter {
 	}
 
 	void reportElements(long completedElements);
+
+	void reportCompletion();
 
 	double getProgress();
 

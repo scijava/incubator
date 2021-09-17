@@ -1,9 +1,12 @@
 
-package org.scijava.ops.engine.impl;
+package org.scijava.ops.engine.progress;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+
+import org.scijava.ops.api.OpExecution;
+import org.scijava.ops.api.ProgressReporter;
 
 public final class ProgressReporters {
 
