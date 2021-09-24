@@ -60,13 +60,6 @@ public interface OpHistory {
 	// -- HISTORY MAINTENANCE API -- //
 
 	/**
-	 * Logs an {@link OpExecution} in the history
-	 * 
-	 * @param e the {@link OpExecution}
-	 */
-	void addExecution(OpExecution e);
-
-	/**
 	 * Logs the creation of {@link RichOp}
 	 * 
 	 * @param op the {@link RichOp} containing relevant information
@@ -74,10 +67,10 @@ public interface OpHistory {
 	void logOp(RichOp<?> op);
 
 	/**
-	 * Logs the {@link Object} output of the {@link OpExecution} e.
-	 * @param e the {@link OpExecution} producing {@code output}
+	 * Logs the {@link Object} output of the {@link RichOp} {@code op}.
+	 * @param op the {@link RichOp} producing {@code output}
 	 * @param output the {@link Object} output of {@code e}
 	 */
-	void logOutput(OpExecution e, Object output);
+	void logOutput(RichOp<?> op, Object output);
 
 }
