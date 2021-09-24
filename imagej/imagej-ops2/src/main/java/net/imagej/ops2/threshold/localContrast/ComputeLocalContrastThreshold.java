@@ -36,11 +36,9 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Pair;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * Local threshold method which determines whether a pixel is closer to the
@@ -50,9 +48,6 @@ import org.scijava.struct.ItemIO;
  * @author Stefan Helfrich (University of Konstanz)
  */
 @Plugin(type = Op.class, name = "threshold.localContrast")
-@Parameter(key = "inputNeighborhood")
-@Parameter(key = "inputCenterPixel")
-@Parameter(key = "output")
 public class ComputeLocalContrastThreshold<T extends RealType<T>> implements
 	Computers.Arity2<Iterable<T>, T, BitType>
 {
@@ -60,6 +55,13 @@ public class ComputeLocalContrastThreshold<T extends RealType<T>> implements
 	@OpDependency(name = "stats.minMax")
 	private Function<Iterable<T>, Pair<T, T>> minMaxOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param inputNeighborhood
+	 * @param inputCenterPixel
+	 * @param output
+	 */
 	@Override
 	public void compute(final Iterable<T> inputNeighborhood,
 		final T inputCenterPixel, final BitType output)

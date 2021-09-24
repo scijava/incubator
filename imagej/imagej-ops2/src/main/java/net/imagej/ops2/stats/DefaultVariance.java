@@ -40,11 +40,9 @@ import net.imglib2.util.Util;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the {@code stats.variance} using the
@@ -61,8 +59,6 @@ import org.scijava.struct.ItemIO;
  *      Wikipedia </a>
  */
 @Plugin(type = Op.class, name = "stats.variance", priority = Priority.HIGH)
-@Parameter(key = "raiInput")
-@Parameter(key = "variance")
 public class DefaultVariance<I extends RealType<I>, O extends RealType<O>> implements Computers.Arity1<RandomAccessibleInterval<I>, O> {
 
 	@OpDependency(name = "stats.mean")
@@ -71,6 +67,12 @@ public class DefaultVariance<I extends RealType<I>, O extends RealType<O>> imple
 	@OpDependency(name = "stats.size")
 	private Computers.Arity1<RandomAccessibleInterval<I>, LongType> sizeOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param raiInput
+	 * @param variance
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 

@@ -39,11 +39,9 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.scijava.Priority;
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.ops.core.Op;
-import org.scijava.param.Parameter;
+import org.scijava.ops.spi.Op;
+import org.scijava.ops.spi.OpDependency;
 import org.scijava.plugin.Plugin;
-import org.scijava.struct.ItemIO;
 
 /**
  * {@link Op} to calculate the {@code stats.sumOfLogs}.
@@ -55,8 +53,6 @@ import org.scijava.struct.ItemIO;
  *            output type
  */
 @Plugin(type = Op.class, name = "stats.sumOfLogs", priority = Priority.HIGH)
-@Parameter(key = "raiInput")
-@Parameter(key = "sumOfLogs")
 public class DefaultSumOfLogs<I extends RealType<I>, O extends RealType<O>> implements Computers.Arity1<RandomAccessibleInterval<I>, O> {
 	
 	@OpDependency(name = "create.img")
@@ -68,6 +64,12 @@ public class DefaultSumOfLogs<I extends RealType<I>, O extends RealType<O>> impl
 	@OpDependency(name = "stats.sum")
 	private Computers.Arity1<RandomAccessibleInterval<DoubleType>, O> sumOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param raiInput
+	 * @param sumOfLogs
+	 */
 	@Override
 	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 		RandomAccessibleInterval<DoubleType> logImg = imgCreator.apply(input, new DoubleType());

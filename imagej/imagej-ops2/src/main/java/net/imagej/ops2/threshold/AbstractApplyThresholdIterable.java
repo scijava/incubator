@@ -32,16 +32,12 @@ package net.imagej.ops2.threshold;
 import net.imglib2.type.logic.BitType;
 
 import org.scijava.function.Computers;
-import org.scijava.ops.OpDependency;
-import org.scijava.param.Parameter;
-import org.scijava.struct.ItemIO;
+import org.scijava.ops.spi.OpDependency;
 
 /**
  * @author Curtis Rueden
  * @author Christian Dietz (University of Konstanz)
  */
-@Parameter(key = "input")
-@Parameter(key = "output")
 public abstract class AbstractApplyThresholdIterable<T> implements
 	Computers.Arity1<Iterable<T>, Iterable<BitType>>
 {
@@ -49,6 +45,12 @@ public abstract class AbstractApplyThresholdIterable<T> implements
 	@OpDependency(name = "threshold.apply")
 	private Computers.Arity2<Iterable<T>, T, Iterable<BitType>> applyThresholdOp;
 
+	/**
+	 * TODO
+	 *
+	 * @param input
+	 * @param output
+	 */
 	@Override
 	public void compute(final Iterable<T> input,
 		final Iterable<BitType> output)
