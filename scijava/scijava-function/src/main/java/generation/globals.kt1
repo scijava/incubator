@@ -1,0 +1,85 @@
+package generation
+
+val maxArity = 16
+val numConsumers = maxArity + 1
+
+//fun inplaceSuffix = ```
+//{ arity, num ->
+//    arity == 1 ? '1' :
+//    arity + "_" + num
+//}
+//```
+//simplifiedInplace = ```
+//{ arity, num ->
+//    arity == 1 ? "Arity1" :
+//    "Arity" + inplaceSuffix(arity, num)
+//}
+//```
+//inplaceType = ```
+//{ arity, num ->
+//    "Inplaces." + simplifiedInplace(arity,num)
+//}
+//```
+fun computerArity(arity: Int) = "Computers.Arity$arity"
+
+fun consumerArity(arity: Int) = when (arity) {
+    0 -> "Consumer"
+    1 -> "BiConsumer"
+    else -> "Consumers.Arity${arity + 1}"
+}
+
+fun functionArity(arity: Int) = when (arity) {
+    0 -> "Producer"
+    1 -> "Function"
+    2 -> "BiFunction"
+    else -> "Functions.Arity${arity}"
+}
+
+fun genericParamTypes(arity: Int): List<String> = when (arity) {
+    0 -> emptyList()
+    1 -> listOf("I")
+    else -> (1..arity).map { "I$it" }
+} + "O"
+
+fun generics(arity: Int) = genericParamTypes(arity).joinToString()
+
+fun genericsNamesList(arity: Int): List<String> =
+    genericParamTypes(arity).map {
+        when (it) {
+            "O" -> "out"
+            "I" -> "in"
+            else -> "in${it.drop(1)}"
+        }
+    }
+
+fun nilNames(arity: Int): List<String> = genericsNamesList(arity).map { "${it}Type" }
+
+fun typeArgs(arity: Int) = nilNames(arity).joinToString { "$it.getType()" }
+
+fun typeParamsList(arity: Int): List<String> {
+    val gpt = genericParamTypes(arity)
+    val names = genericsNamesList(arity)
+    return (0..arity).map { "${gpt[it]} ${names[it]}" }
+}
+
+fun typeParamsListWithoutOutput(arity: Int): List<String> {
+    val gpt = genericParamTypes(arity)
+    val names = genericsNamesList(arity)
+    return (0 until arity).map { "${gpt[it]} ${names[it]}" }
+}
+
+fun applyParams(arity: Int) = typeParamsList(arity).dropLast(1).joinToString()
+
+fun applyArgs(arity: Int) = genericsNamesList(arity).dropLast(2).joinToString()
+
+fun computeParams(arity: Int): String {
+    val typeParams = typeParamsList(arity).toMutableList()
+    typeParams[arity] = "@Container ${typeParams[arity]}"
+    return typeParams.joinToString()
+}
+
+fun acceptParams(arity: Int) = typeParamsList(arity).map { "final $it" }
+
+fun computeArgs(arity: Int) = genericsNamesList(arity).joinToString()
+
+fun acceptArgs(arity: Int) = computeArgs(arity)
