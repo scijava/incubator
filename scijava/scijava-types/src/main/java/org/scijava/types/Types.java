@@ -588,11 +588,6 @@ public final class Types {
 		final ParameterizedType param,
 		final HashMap<TypeVariable<?>, TypeVarInfo> typeBounds)
 	{
-		if (arg instanceof Class) {
-			Class<?> paramRaw = Types.raw(param);
-			return Types.isAssignable(arg, paramRaw);
-		}
-
 		// get an array of the destination parameter types
 		Type[] destTypes = param.getActualTypeArguments();
 		Type[] srcTypes = new Type[destTypes.length];
@@ -601,7 +596,7 @@ public final class Types {
 		Type argType = arg;
 		Type superType = Types
 				.getExactSuperType(argType, Types.raw(param));
-		if (!(superType instanceof ParameterizedType)) return false;
+		if (superType == null || !(superType instanceof ParameterizedType)) return false;
 		srcTypes = ((ParameterizedType)superType).getActualTypeArguments();
 		
 		// List to collect the indices of destination parameters that are type vars
