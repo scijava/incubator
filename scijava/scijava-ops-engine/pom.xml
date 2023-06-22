@@ -101,7 +101,7 @@
 
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>SciJava developers.</license.copyrightOwners>
-		<scijava-ops-engine.allowedDuplicateClasses>${scijava.allowedDuplicateClasses},com.github.therapi.runtimejavadoc.repack.com.eclipsesource.json.*</scijava-ops-engine.allowedDuplicateClasses>
+		<scijava-ops-engine.allowedDuplicateClasses>${scijava.allowedDuplicateClasses}</scijava-ops-engine.allowedDuplicateClasses>
 		<allowedDuplicateClasses>${scijava-ops-engine.allowedDuplicateClasses}</allowedDuplicateClasses>
 		<therapi.packages></therapi.packages>
 	</properties>
@@ -140,12 +140,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.scijava</groupId>
-			<artifactId>scijava-discovery-therapi</artifactId>
+			<artifactId>scijava-log2</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.scijava</groupId>
-			<artifactId>scijava-log2</artifactId>
+			<artifactId>scijava-parse2</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -186,7 +186,6 @@
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 		</dependency>
-
 		<!-- Test scope dependencies -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

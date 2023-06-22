@@ -1,10 +1,6 @@
 
 package org.scijava.ops.engine.struct;
 
-import com.github.therapi.runtimejavadoc.MethodJavadoc;
-import com.github.therapi.runtimejavadoc.ParamJavadoc;
-import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,7 +26,7 @@ public class MethodOpDependencyMemberParser implements
 	MemberParser<Method, MethodParameterOpDependencyMember<?>>
 {
 
-	private static final Map<Method, MethodJavadoc> methodDocMap = new ConcurrentHashMap<>();
+//	private static final Map<Method, MethodJavadoc> methodDocMap = new ConcurrentHashMap<>();
 
 	/**
 	 * Parses out the {@link MethodParameterOpDependencyMember}s from {@code
@@ -58,11 +54,6 @@ public class MethodOpDependencyMemberParser implements
 		return items;
 	}
 
-	private static MethodJavadoc getDocData(Method annotatedMethod) {
-		return methodDocMap.computeIfAbsent(annotatedMethod,
-			RuntimeJavadoc::getJavadoc);
-	}
-
 	private static void parseMethodOpDependencies(
 		final List<MethodParameterOpDependencyMember<?>> items,
 		final Method annotatedMethod)
@@ -85,18 +76,10 @@ public class MethodOpDependencyMemberParser implements
 			if (dependency == null) continue;
 
 			final int j = i;
-			Producer<String> nameGenerator = () -> {
-				List<ParamJavadoc> params = getDocData(annotatedMethod).getParams();
-				if (params.size() <= j) return methodParams[j].getName();
-				return getDocData(annotatedMethod).getParams().get(j).getName();
-			};
+			// TODO
+			Producer<String> nameGenerator = () -> "";
+			Producer<String> descriptionGenerator = () -> "";
 
-			Producer<String> descriptionGenerator = () -> {
-				List<ParamJavadoc> params = getDocData(annotatedMethod).getParams();
-				if (params.size() <= j) return "";
-				return getDocData(annotatedMethod).getParams().get(j).getComment()
-					.toString();
-			};
 			final Type methodParamType = methodParams[i].getParameterizedType();
 			final MethodParameterOpDependencyMember<?> item =
 				new MethodParameterOpDependencyMember<>(nameGenerator,

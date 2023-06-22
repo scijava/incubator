@@ -30,8 +30,6 @@
 
 package org.scijava.ops.engine.struct;
 
-import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
-
 import java.lang.reflect.Field;
 
 import org.scijava.function.Producer;
@@ -57,7 +55,8 @@ public class FieldOpDependencyMember<T> extends AnnotatedOpDependencyMember<T>
 	}
 
 	private static Producer<String> getDescription(Field f) {
-		return () -> RuntimeJavadoc.getJavadoc(f).getComment().toString();
+		// TODO
+		return () -> "";
 	}
 
 	// -- ValueAccessible methods --

@@ -9,6 +9,7 @@ import org.scijava.common3.Classes;
 import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
+import org.scijava.ops.engine.hint.DefaultHints;
 import org.scijava.ops.engine.matcher.impl.OpFieldInfo;
 
 /**
@@ -35,7 +36,8 @@ public class JavaFieldYAMLOpInfoCreator extends AbstractYAMLOpInfoCreator {
 		// parse Field
 		String fieldString = identifier.substring(clsIndex + 1);
 		Field field = cls.getDeclaredField(fieldString);
+
 		// Create the OpInfo
-		return new OpFieldInfo(instance, field, version, null, priority, names);
+		return new OpFieldInfo(instance, field, version, new DefaultHints(), priority, names);
 	}
 }
