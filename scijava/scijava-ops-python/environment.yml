@@ -1,0 +1,14 @@
+name: scijava-ops-python
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python >= 3.11
+  - openjdk >= 11
+#  - jep
+  - numpy
+  - pip
+  - pip:
+      - jep
+variables:
+  LD_PRELOAD: /home/gselzer/miniconda3/envs/scijava-ops-python/lib/libpython3.11.so

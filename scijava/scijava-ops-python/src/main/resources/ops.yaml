@@ -1,0 +1,25 @@
+ops:
+  - op:
+      name: create.img
+      priority: 0.0
+      source: pythonFunction:/numpy.zeros/v0.0
+      type: java.util.function.Function
+      parameters:
+        - input: in1
+          type: java.util.List<java.lang.Integer>
+          description: The shape of the output
+        - output: out
+          type: jep.NDArray
+          description: The image
+  - op:
+      name: numpy.linalg.det
+      priority: 0.0
+      source: pythonFunction:/numpy.linalg.det/v0.0
+      type: java.util.function.Function
+      parameters:
+        - input: in1
+          type: jep.AbstractNDArray
+          description: The shape of the output
+        - output: out
+          type: java.lang.Float
+          description: The output
