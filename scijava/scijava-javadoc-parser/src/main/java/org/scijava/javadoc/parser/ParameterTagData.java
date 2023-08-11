@@ -25,14 +25,22 @@ public class ParameterTagData {
 		this(ioType, block, null);
 	}
 
+	public ParameterTagData(IO_TYPE ioType, String block, String type)
+	{
+		this(ioType, block, type, null);
+	}
+
 	public ParameterTagData(IO_TYPE ioType, String block,
-			String type)
+			String type, String paramName)
 	{
 		// Assign io
 		this.ioType = ioType;
 		// Assign name
 		String[] elements = tagElementSeparator.split(block, 2);
-		if (hasName(elements[0])) {
+		if (paramName != null) {
+			this.name = paramName;
+		}
+		else if (hasName(elements[0])) {
 			elements = tagElementSeparator.split(block, 3);
 			this.name = elements[1];
 		}

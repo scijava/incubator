@@ -45,14 +45,18 @@ public class ImplMethodData implements ImplData{
 				case "param":
 					// Ignore type variables
 					if (elements[1].contains("<.*>")) continue;
+					String name;
 					String type;
 					if (paramItr.hasNext()) {
-						type = paramItr.next().asType().toString();
+						var element = paramItr.next();
+						type = element.asType().toString();
+						name = element.getSimpleName().toString();
 					}
 					else {
 						type = null;
+						name = null;
 					}
-					parameterTagData.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT, section, type));
+					parameterTagData.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT, section, type, name));
 					break;
 				case "return":
 					parameterTagData.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT, section, source.getReturnType().toString()));
