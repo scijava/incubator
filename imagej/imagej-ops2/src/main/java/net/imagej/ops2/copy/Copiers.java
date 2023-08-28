@@ -113,27 +113,27 @@ public class Copiers {
     }
 
 
-    /**
-     * Copies an {@link IterableInterval} into another {@link IterableInterval}
-     * TODO: Can we delete this in favor of some lifting operation?
-     *
-     * @author Christian Dietz (University of Konstanz)
-     * @param <T> the element type of the {@link IterableInterval}s
-     * @param copier an Op responsible for copying element types
-     * @param input the {@link IterableInterval} to copy
-     * @param output the destination container of the copy operation
-     * @implNote op names='copy, copy.iterableInterval, copy.img', priority='1.0'
-     */
-    public static <T> void copyIterableInterval( //
-        @OpDependency(name = "copy.type") final Computers.Arity1<T, T> copier, //
-        final IterableInterval<T> input, //
-        final IterableInterval<T> output
-    ) {
-        if (!input.iterationOrder().equals(output.iterationOrder()))
-            throw new IllegalArgumentException("input and output must be of the same dimensions!");
-        Computers.Arity1<Iterable<T>, Iterable<T>> mapped = Maps.ComputerMaps.Iterables.liftBoth(copier);
-        mapped.compute(input, output);
-    }
+//    /**
+//     * Copies an {@link IterableInterval} into another {@link IterableInterval}
+//     * TODO: Can we delete this in favor of some lifting operation?
+//     *
+//     * @author Christian Dietz (University of Konstanz)
+//     * @param <T> the element type of the {@link IterableInterval}s
+//     * @param copier an Op responsible for copying element types
+//     * @param input the {@link IterableInterval} to copy
+//     * @param output the destination container of the copy operation
+//     * @implNote op names='copy, copy.iterableInterval, copy.img', priority='1.0', type='org.scijava.function.Computers$Arity1'
+//     */
+//    public static <T> void copyIterableInterval( //
+//        @OpDependency(name = "copy.type") final Computers.Arity1<T, T> copier, //
+//        final IterableInterval<T> input, //
+//        final IterableInterval<T> output
+//    ) {
+//        if (!input.iterationOrder().equals(output.iterationOrder()))
+//            throw new IllegalArgumentException("input and output must be of the same dimensions!");
+//        Computers.Arity1<Iterable<T>, Iterable<T>> mapped = Maps.ComputerMaps.Iterables.liftBoth(copier);
+//        mapped.compute(input, output);
+//    }
 
     private static void ensureEqualDimensions(Dimensions d1, Dimensions d2) {
         if (!Intervals.equalDimensions(d1, d2))

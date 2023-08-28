@@ -181,8 +181,14 @@ public final class Classes {
 			// Not ClassNotFoundException.
 			// Not NoClassDefFoundError.
 			// Not UnsupportedClassVersionError!
-			if (quietly) return null;
-			throw iae(t, "Cannot load class: " + className);
+			if (className.lastIndexOf('.') > -1) {
+				var lastIndex = className.lastIndexOf('.');
+				return load(className.substring(0, lastIndex) + '$' + className.substring(lastIndex + 1), classLoader, quietly);
+			}
+			else {
+				if (quietly) return null;
+				throw iae(t, "Cannot load class: " + className);
+			}
 		}
 	}
 

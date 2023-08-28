@@ -51,6 +51,9 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
                 throw new IllegalArgumentException("Cannot convert" + tmp + "to a String[]!");
             }
         }
+        for (int i = 0; i < names.length; i++) {
+            names[i] = names[i].trim();
+        }
         // Parse priority
         double priority = 0.0;
         if (tags.containsKey("priority")) {

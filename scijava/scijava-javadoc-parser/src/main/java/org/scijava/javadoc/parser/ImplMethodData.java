@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Types;
 
 public class ImplMethodData implements ImplData{
 	
@@ -90,7 +91,26 @@ public class ImplMethodData implements ImplData{
 
 		}
 
-		this.source = "javaMethod:/" + URLEncoder.encode(source.getEnclosingElement() + "." + source, StandardCharsets.UTF_8);
+		// First, append the class
+		StringBuilder sb = new StringBuilder();
+		sb.append(source.getEnclosingElement());
+		sb.append(".");
+		// Then, append the method
+		sb.append(source.getSimpleName());
+
+		// Then, append the parameters
+		var params = source.getParameters();
+		sb.append("(");
+		for (int i = 0; i < params.size(); i++) {
+			var d = processingEnv.getTypeUtils().erasure(params.get(i).asType());
+			sb.append(d);
+			if (i < params.size() - 1) {
+				sb.append(",");
+			}
+		}
+		sb.append(")");
+
+		this.source = "javaMethod:/" + URLEncoder.encode(sb.toString(), StandardCharsets.UTF_8);
 
 	}
 

@@ -51,9 +51,13 @@ public class JavaMethodYAMLInfoCreator extends AbstractYAMLOpInfoCreator {
 		Method method = src.getMethod(methodString, paramClasses);
 		// parse op type
 		String typeString = (String) yaml.get("type");
-		Class<?> opType = Classes.load(typeString);
+		Class<?> opType;
+		try {
+			opType = Classes.load(typeString, false);
+		} catch (Throwable t) {
+			throw new RuntimeException("Op " + identifier + " could not be loaded: Could not load class " + typeString, t);
+		}
 
-		// create the OpInfo
 		return new OpMethodInfo(method, opType, new DefaultHints(), priority, names);
 	}
 
