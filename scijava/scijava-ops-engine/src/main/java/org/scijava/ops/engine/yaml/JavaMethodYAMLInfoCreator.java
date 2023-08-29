@@ -4,8 +4,6 @@ package org.scijava.ops.engine.yaml;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.scijava.common3.Classes;
 import org.scijava.ops.api.Hints;
@@ -20,8 +18,6 @@ import org.scijava.ops.engine.matcher.impl.OpMethodInfo;
  * @author Gabriel Selzer
  */
 public class JavaMethodYAMLInfoCreator extends AbstractYAMLOpInfoCreator {
-
-	private static final Pattern genericsPattern = Pattern.compile("[<>]");
 
 	@Override
 	public boolean canCreateFrom(URI identifier) {

@@ -49,10 +49,9 @@ public class YAMLOpInfoDiscoverer implements Discoverer {
 				parse(opInfos, opFiles.nextElement());
 			}
 			catch (IOException e) {
-				new IllegalArgumentException( //
+				throw new IllegalArgumentException( //
 					"Could not read Op YAML file " + opFile.toString() + ": ", //
-					e) //
-						.printStackTrace();
+					e);
 			}
 		});
 		return (List<U>) opInfos;

@@ -4,7 +4,6 @@ import static org.scijava.ops.engine.yaml.YAMLUtils.subMap;
 
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -114,7 +113,7 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
 
     abstract OpInfo create(final String identifier, final String[] names, final double priority, final Hints hints, final String version, Map<String, Object> yaml) throws Exception;
 
-    private class RenamedMember<T> implements Member<T> {
+    private static class RenamedMember<T> implements Member<T> {
 
         private final Member<T> src;
         private final String name;
