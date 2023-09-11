@@ -9,7 +9,6 @@ import org.scijava.common3.Classes;
 import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
-import org.scijava.ops.engine.hint.DefaultHints;
 import org.scijava.ops.engine.matcher.impl.OpMethodInfo;
 
 /**
@@ -54,7 +53,7 @@ public class JavaMethodYAMLInfoCreator extends AbstractYAMLOpInfoCreator {
 			throw new RuntimeException("Op " + identifier + " could not be loaded: Could not load class " + typeString, t);
 		}
 
-		return new OpMethodInfo(method, opType, new DefaultHints(), priority, names);
+		return new OpMethodInfo(method, opType, new Hints(), priority, names);
 	}
 
 	private static String sanitizeGenerics(String method) {

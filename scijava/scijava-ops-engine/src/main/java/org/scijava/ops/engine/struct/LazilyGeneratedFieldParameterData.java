@@ -15,10 +15,6 @@ import org.scijava.ops.engine.OpUtils;
 import org.scijava.struct.FunctionalMethodType;
 import org.scijava.types.inference.InterfaceInference;
 
-import com.github.therapi.runtimejavadoc.FieldJavadoc;
-import com.github.therapi.runtimejavadoc.OtherJavadoc;
-import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
-
 /**
  * Lazily generates the parameter data for a {@link List} of
  * {@link FunctionalMethodType}s. <b>If</b> there exists a <b>full</b> set of

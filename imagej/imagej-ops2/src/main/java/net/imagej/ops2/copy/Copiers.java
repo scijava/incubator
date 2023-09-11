@@ -1,5 +1,10 @@
 package net.imagej.ops2.copy;
 
+import java.lang.reflect.Array;
+
+import org.scijava.function.Computers;
+import org.scijava.ops.spi.OpDependency;
+
 import net.imglib2.Dimensions;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessibleInterval;
@@ -13,11 +18,6 @@ import net.imglib2.type.Type;
 import net.imglib2.type.numeric.IntegerType;
 import net.imglib2.util.Intervals;
 import net.imglib2.util.Util;
-import org.scijava.function.Computers;
-import org.scijava.ops.engine.util.Maps;
-import org.scijava.ops.spi.OpDependency;
-
-import java.lang.reflect.Array;
 
 public class Copiers {
 
@@ -113,27 +113,25 @@ public class Copiers {
     }
 
 
-//    /**
-//     * Copies an {@link IterableInterval} into another {@link IterableInterval}
-//     * TODO: Can we delete this in favor of some lifting operation?
-//     *
-//     * @author Christian Dietz (University of Konstanz)
-//     * @param <T> the element type of the {@link IterableInterval}s
-//     * @param copier an Op responsible for copying element types
-//     * @param input the {@link IterableInterval} to copy
-//     * @param output the destination container of the copy operation
-//     * @implNote op names='copy, copy.iterableInterval, copy.img', priority='1.0', type='org.scijava.function.Computers$Arity1'
-//     */
-//    public static <T> void copyIterableInterval( //
-//        @OpDependency(name = "copy.type") final Computers.Arity1<T, T> copier, //
-//        final IterableInterval<T> input, //
-//        final IterableInterval<T> output
-//    ) {
-//        if (!input.iterationOrder().equals(output.iterationOrder()))
-//            throw new IllegalArgumentException("input and output must be of the same dimensions!");
-//        Computers.Arity1<Iterable<T>, Iterable<T>> mapped = Maps.ComputerMaps.Iterables.liftBoth(copier);
-//        mapped.compute(input, output);
-//    }
+    /**
+     * Copies an {@link IterableInterval} into another {@link IterableInterval}
+     *
+     * @author Christian Dietz (University of Konstanz)
+     * @param <T> the element type of the {@link IterableInterval}s
+     * @param copier an Op responsible for copying element types
+     * @param input the {@link IterableInterval} to copy
+     * @param output the destination container of the copy operation
+     * @implNote op names='copy, copy.iterableInterval, copy.img', priority='1.0', type='org.scijava.function.Computers$Arity1'
+     */
+    public static <T> void copyIterableInterval( //
+        @OpDependency(name = "copy.type") final Computers.Arity1<Iterable<T>, Iterable<T>> copier, //
+        final IterableInterval<T> input, //
+        final IterableInterval<T> output
+    ) {
+        if (!input.iterationOrder().equals(output.iterationOrder()))
+            throw new IllegalArgumentException("input and output must be of the same dimensions!");
+        copier.compute(input, output);
+    }
 
     private static void ensureEqualDimensions(Dimensions d1, Dimensions d2) {
         if (!Intervals.equalDimensions(d1, d2))

@@ -8,7 +8,6 @@ import org.scijava.common3.Classes;
 import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
-import org.scijava.ops.engine.hint.DefaultHints;
 import org.scijava.ops.engine.matcher.impl.OpClassInfo;
 
 /**
@@ -31,6 +30,6 @@ public class JavaClassYAMLOpInfoCreator extends AbstractYAMLOpInfoCreator {
 		// parse class
 		Class<?> src = Classes.load(identifier);
 		// Create the OpInfo
-		return new OpClassInfo(src, version, new DefaultHints(), priority, names);
+		return new OpClassInfo(src, version, new Hints(), priority, names);
 	}
 }
