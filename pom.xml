@@ -107,10 +107,7 @@
 
 		<script-maven-plugin.version>1.0.0</script-maven-plugin.version>
 		<jruby.version>9.2.11.1</jruby.version>
-		<therapi.version>0.12.0</therapi.version>
-		<therapi-runtime-javadoc.version>${therapi.version}</therapi-runtime-javadoc.version>
-		<therapi-runtime-javadoc-scribe.version>${therapi.version}</therapi-runtime-javadoc-scribe.version>
-		<therapi.packages>-</therapi.packages>
+		<scijava.parse.javadoc>true</scijava.parse.javadoc>
 	</properties>
 	<build>
 		<plugins>
@@ -127,7 +124,7 @@
 					<fork>true</fork>
 					<showWarnings>true</showWarnings>
 					<compilerArgs>
-						<arg>-Ajavadoc.packages="${therapi.packages}"</arg>
+						<arg>-Ajavadoc.parse="${scijava.parse.javadoc}"</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>

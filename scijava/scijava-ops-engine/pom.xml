@@ -103,7 +103,6 @@
 		<license.copyrightOwners>SciJava developers.</license.copyrightOwners>
 		<scijava-ops-engine.allowedDuplicateClasses>${scijava.allowedDuplicateClasses}</scijava-ops-engine.allowedDuplicateClasses>
 		<allowedDuplicateClasses>${scijava-ops-engine.allowedDuplicateClasses}</allowedDuplicateClasses>
-		<therapi.packages></therapi.packages>
 	</properties>
 
 	<dependencies>

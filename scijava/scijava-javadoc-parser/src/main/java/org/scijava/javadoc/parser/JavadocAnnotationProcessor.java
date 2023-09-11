@@ -45,7 +45,7 @@ import org.yaml.snakeyaml.Yaml;
 
 public class JavadocAnnotationProcessor extends AbstractProcessor {
 
-    private static final String PACKAGES_OPTION = "javadoc.packages";
+    private static final String PACKAGES_OPTION = "javadoc.parse";
 
     private YamlJavadocBuilder yamlJavadocBuilder;
 
@@ -60,17 +60,12 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
 
         final Map<String, String> options = processingEnv.getOptions();
         final String packagesOption = options.get(PACKAGES_OPTION);
+        if ("true".equals(packagesOption)) {
+            // Make sure each element only gets processed once.
+            final Set<Element> alreadyProcessed = new HashSet<>();
 
-        // Retain Javadoc for classes that match this predicate
-        final PackageFilter packageFilter =
-                packagesOption == null ? new PackageFilter() : new PackageFilter(packagesOption);
-
-        // Make sure each element only gets processed once.
-        final Set<Element> alreadyProcessed = new HashSet<>();
-
-        // If retaining Javadoc for all packages, the @RetainJavadoc annotation is redundant.
-        // Otherwise, make sure annotated classes have their Javadoc retained regardless of package.
-        if (!packageFilter.allowAllPackages()) {
+            // If retaining Javadoc for all packages, the @RetainJavadoc annotation is redundant.
+            // Otherwise, make sure annotated classes have their Javadoc retained regardless of package.
             for (TypeElement annotation : annotations) {
                 if (isRetainJavadocAnnotation(annotation)) {
                     for (Element e : roundEnvironment.getElementsAnnotatedWith(annotation)) {
@@ -78,26 +73,26 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
                     }
                 }
             }
-        }
 
-        for (Element e : roundEnvironment.getRootElements()) {
-            if (packageFilter.test(e)) {
+            for (Element e : roundEnvironment.getRootElements()) {
                 generateJavadoc(e, alreadyProcessed);
             }
-        }
 
-        if (!roundEnvironment.getRootElements().isEmpty()) {
-            Element placeHolder = roundEnvironment.getRootElements().iterator().next();
-            for(String key: yamlMap.keySet()) {
-                try {
-                    outputYamlDoc(placeHolder, yaml.dump(yamlMap.get(key)), key);
-                }
-                catch (Exception e) {
-                    throw new RuntimeException(e);
+            if (!roundEnvironment.getRootElements().isEmpty()) {
+                Element placeHolder =
+                    roundEnvironment.getRootElements().iterator().next();
+                for (String key : yamlMap.keySet()) {
+                    try {
+                        outputYamlDoc(placeHolder, yaml.dump(yamlMap.get(key)),
+                            key);
+                    }
+                    catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
-        }
 
+        }
         return false;
     }
 
