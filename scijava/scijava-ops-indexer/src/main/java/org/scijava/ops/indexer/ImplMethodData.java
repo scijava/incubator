@@ -1,7 +1,7 @@
-package org.scijava.javadoc.parser;
+package org.scijava.ops.indexer;
 
-import static org.scijava.javadoc.parser.RuntimeJavadocHelper.blockSeparator;
-import static org.scijava.javadoc.parser.RuntimeJavadocHelper.tagElementSeparator;
+import static org.scijava.ops.indexer.RuntimeJavadocHelper.blockSeparator;
+import static org.scijava.ops.indexer.RuntimeJavadocHelper.tagElementSeparator;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.Types;
 
 public class ImplMethodData implements ImplData{
 	

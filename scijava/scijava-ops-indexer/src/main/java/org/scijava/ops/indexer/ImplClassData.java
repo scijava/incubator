@@ -1,7 +1,7 @@
-package org.scijava.javadoc.parser;
+package org.scijava.ops.indexer;
 
-import static org.scijava.javadoc.parser.RuntimeJavadocHelper.blockSeparator;
-import static org.scijava.javadoc.parser.RuntimeJavadocHelper.tagElementSeparator;
+import static org.scijava.ops.indexer.RuntimeJavadocHelper.blockSeparator;
+import static org.scijava.ops.indexer.RuntimeJavadocHelper.tagElementSeparator;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -12,8 +12,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 
-public class ImplFieldData implements ImplData {
+public class ImplClassData implements ImplData {
 	private final Map<String, Object> implNotes = new HashMap<>();
 
 	private final List<String> authors = new ArrayList<>();
@@ -24,12 +25,11 @@ public class ImplFieldData implements ImplData {
 
 	private final String source;
 
-	private final String type;
 	private String description;
 
 
 
-	public ImplFieldData(Element source, String doc) {
+	public ImplClassData(Element source, String doc) {
 		if (!doc.contains("@implNote")){
 			throw new IllegalArgumentException(source + "'s Javadoc does not contain an '@implNote' tag!");
 		}
@@ -77,10 +77,15 @@ public class ImplFieldData implements ImplData {
 			}
 
 		}
-
-		this.source = "javaField:/" + URLEncoder.encode(source.getEnclosingElement() + "$" + source, StandardCharsets.UTF_8);
-		this.type = source.asType().toString();
-
+		// handle inner classes
+		String srcString = source.toString();
+		Element parent = source.getEnclosingElement();
+		while(parent.getKind() == ElementKind.CLASS) {
+			int badPeriod = srcString.lastIndexOf('.');
+			srcString = srcString.substring(0, badPeriod) + '$' + srcString.substring(badPeriod+1);
+			parent = parent.getEnclosingElement();
+		}
+		this.source = "javaClass:/" + URLEncoder.encode(srcString, StandardCharsets.UTF_8);
 	}
 
 	@Override public String type() {
@@ -95,7 +100,6 @@ public class ImplFieldData implements ImplData {
 		Map<String, Object> map = new HashMap<>();
 		map.put("description", description);
 		map.put("authors", authors);
-		map.put("type", type);
 		map.put("parameters", params.stream().map(ParameterTagData::data).collect(
 				Collectors.toList()));
 		map.putAll(implNotes);

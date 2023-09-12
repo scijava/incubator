@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.scijava.javadoc.parser;
+package org.scijava.ops.indexer;
 
 import static java.util.Collections.unmodifiableList;
 

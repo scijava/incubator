@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.scijava.javadoc.parser;
+package org.scijava.ops.indexer;
 
 import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.lang.model.element.ElementKind.METHOD;
-import static org.scijava.javadoc.parser.RuntimeJavadocHelper.isBlank;
+import static org.scijava.ops.indexer.RuntimeJavadocHelper.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collections;

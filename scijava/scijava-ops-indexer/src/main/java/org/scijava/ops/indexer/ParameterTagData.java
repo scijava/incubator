@@ -1,6 +1,6 @@
-package org.scijava.javadoc.parser;
+package org.scijava.ops.indexer;
 
-import static org.scijava.javadoc.parser.RuntimeJavadocHelper.tagElementSeparator;
+import static org.scijava.ops.indexer.RuntimeJavadocHelper.tagElementSeparator;
 
 import java.util.HashMap;
 import java.util.Map;

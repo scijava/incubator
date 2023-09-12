@@ -1,4 +1,4 @@
-package org.scijava.javadoc.parser;
+package org.scijava.ops.indexer;
 
 import java.util.HashMap;
 import java.util.Map;
