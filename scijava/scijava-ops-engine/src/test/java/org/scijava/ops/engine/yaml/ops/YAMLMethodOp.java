@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 public class YAMLMethodOp {
 
 	/**
+	 * An example Op, implemented by a {@link Method}
 	 *
 	 * @implNote op name=example.sub type=java.util.function.BiFunction
 	 * @param aDouble the first double

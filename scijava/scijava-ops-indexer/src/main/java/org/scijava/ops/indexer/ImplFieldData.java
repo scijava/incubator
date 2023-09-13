@@ -1,19 +1,27 @@
+
 package org.scijava.ops.indexer;
+
+import static org.scijava.ops.indexer.RuntimeJavadocHelper.tagElementSeparator;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.tools.Diagnostic;
 
 public class ImplFieldData implements ImplData {
+
 	private final Map<String, Object> implNotes = new HashMap<>();
 
 	private final List<String> authors = new ArrayList<>();
+
+	private final List<String> names = new ArrayList<>();
 
 	private final List<ParameterTagData> params = new ArrayList<>();
 
@@ -21,43 +29,56 @@ public class ImplFieldData implements ImplData {
 
 	private final String source;
 
+	private double priority = 0.0;
+
 	private final String type;
-	private String description;
+	private String description = "";
 
-
-
-	public ImplFieldData(Element source, String doc) {
-		if (!doc.contains("@implNote")){
-			throw new IllegalArgumentException(source + "'s Javadoc does not contain an '@implNote' tag!");
-		}
+	public ImplFieldData(Element source, String doc, ProcessingEnvironment env) {
 		String[] sections = RuntimeJavadocHelper.blockSeparator.split(doc);
-		for (String section: sections) {
-			String[] elements = RuntimeJavadocHelper.tagElementSeparator.split(section);
-			switch(elements[0]) {
+		for (String section : sections) {
+			String[] elements = tagElementSeparator.split(section,2);
+			switch (elements[0]) {
 				case "input":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT, section));
+					String[] inData = tagElementSeparator.split(elements[1], 2);
+					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT,
+							inData[0], inData[1], null));
 					break;
 				case "output":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT, section));
+					// NB outputs generally don't have names
+					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT,
+							"output", elements[1], null));
 					break;
 				case "container":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.CONTAINER, section));
+					String[] containerData = tagElementSeparator.split(elements[1], 2);
+					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.CONTAINER,
+							containerData[0], containerData[1], null));
 					break;
 				case "mutable":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.MUTABLE, section));
+					String[] mutableData = tagElementSeparator.split(elements[1], 2);
+					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.MUTABLE,
+							mutableData[0], mutableData[1], null));
 					break;
 				case "author":
-					authors.add(RuntimeJavadocHelper.tagElementSeparator.split(section, 2)[1]);
+					authors.add(elements[1]);
 					break;
-				case "implNote" :
-						implType = elements[1];
-						if (elements.length > 2) {
-							for (int i = 2; i < elements.length; i++) {
-								String[] kv = elements[i].split("=", 2);
-								if (kv.length == 2) {
-									String value = kv[1].replaceAll("^[,\"']+|[,\"']+$", "");
+				case "implNote":
+					var implElements = tagElementSeparator.split(elements[1]);
+					implType = implElements[0];
+					if (implElements.length > 1) {
+						for (int i = 1; i < implElements.length; i++) {
+							String[] kv = implElements[i].split("=", 2);
+							if (kv.length == 2) {
+								String value = kv[1].replaceAll("^[,\"']+|[,\"']+$", "");
+								if ("priority".equals(kv[0])) {
+									this.priority = Double.parseDouble(value);
+								}
+								else if ("names".equals(kv[0]) || "name".equals(kv[0])) {
+									names.addAll(Arrays.asList(value.split("\\s*,\\s*")));
+								}
+								else {
 									if (value.contains(",")) {
-										implNotes.put(kv[0], value.split("\\s*,\\s*"));
+										implNotes.put(kv[0], value.split(","));
 									}
 									else {
 										implNotes.put(kv[0], value);
@@ -65,9 +86,10 @@ public class ImplFieldData implements ImplData {
 								}
 							}
 						}
-						break;
+					}
+					break;
 				default:
-					if (description == null) {
+					if (description.isBlank()) {
 						description = section;
 					}
 					break;
@@ -75,28 +97,50 @@ public class ImplFieldData implements ImplData {
 
 		}
 
-		this.source = "javaField:/" + URLEncoder.encode(source.getEnclosingElement() + "$" + source, StandardCharsets.UTF_8);
+		this.source = "javaField:/" + URLEncoder.encode(source
+			.getEnclosingElement() + "$" + source, StandardCharsets.UTF_8);
 		this.type = source.asType().toString();
 
 	}
 
-	@Override public String type() {
+	@Override
+	public String type() {
 		return implType;
 	}
 
-	@Override public String source() {
+	@Override
+	public String source() {
 		return source;
 	}
 
-	@Override public Map<String, Object> tags() {
-		Map<String, Object> map = new HashMap<>();
-		map.put("description", description);
-		map.put("authors", authors);
-		map.put("type", type);
-		map.put("parameters", params.stream().map(ParameterTagData::data).collect(
-				Collectors.toList()));
-		map.putAll(implNotes);
-		return map;
+	@Override
+	public List<String> names() {
+		return names;
+	}
+
+	@Override
+	public String description() {
+		return description;
+	}
+
+	@Override
+	public double priority() {
+		return priority;
+	}
+
+	@Override
+	public List<String> authors() {
+		return authors;
+	}
+
+	@Override
+	public List<ParameterTagData> params() {
+		return params;
+	}
+
+	@Override
+	public Map<String, Object> tags() {
+		return implNotes;
 	}
 
 }

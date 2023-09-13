@@ -18,91 +18,134 @@ package org.scijava.ops.indexer;
 
 import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.lang.model.element.ElementKind.METHOD;
-import static org.scijava.ops.indexer.RuntimeJavadocHelper.isBlank;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
 
 class YamlJavadocBuilder {
 
-    private ProcessingEnvironment processingEnv;
+	private ProcessingEnvironment processingEnv;
 
-    YamlJavadocBuilder(ProcessingEnvironment processingEnv) {
-        this.processingEnv = processingEnv;
-    }
+	YamlJavadocBuilder(ProcessingEnvironment processingEnv) {
+		this.processingEnv = processingEnv;
+	}
 
-    List<ImplData> getClassJavadocAsYamlOrNull(TypeElement classElement) {
-        Map<ElementKind, List<Element>> children = new HashMap<>();
-        for (Element enclosedElement : classElement.getEnclosedElements()) {
-            children.computeIfAbsent(enclosedElement.getKind(), k -> new ArrayList<>())
-                    .add(enclosedElement);
-        }
+	List<ImplData> getClassJavadocAsYamlOrNull(TypeElement classElement) {
+		// Check all enclosed elements
+		List<ImplData> implList = classElement.getEnclosedElements().stream() //
+			// Only check methods and fields, as inner classes will be called
+			// separately
+			.filter(e -> e.getKind() == METHOD || e.getKind() == FIELD) //
+			// Convert each method/field into an ImplData
+			.map(elementToImplData) //
+			// Remove the nulls (i.e. methods/fields w/o an implNote tag)
+			.filter(Objects::nonNull) //
+			.collect(Collectors.toList());
 
-        final List<Element> emptyList = Collections.emptyList();
-        List<Element> enclosedFields = defaultIfNull(children.get(FIELD), emptyList);
-        List<Element> enclosedMethods = defaultIfNull(children.get(METHOD), emptyList);
+		// Finally, check the class itself to see if it is an implNote
+		ImplData clsData = elementToImplData.apply(classElement);
+		if (clsData != null) implList.add(clsData);
 
+		return implList;
+	}
 
-        List<ImplData> implList = new ArrayList<>();
-        implList.addAll(getJavadocsAsJson(Collections.singletonList(classElement), classJavadocAsJson));
-        implList.addAll(getJavadocsAsJson(enclosedFields, fieldJavadocAsJson));
-        implList.addAll(getJavadocsAsJson(enclosedMethods, methodJavadocAsJson));
-        return implList;
-    }
+	private final Function<Element, ImplData> elementToImplData = (element) -> {
+		String javadoc = processingEnv.getElementUtils().getDocComment(element);
+		if (javadoc != null && javadoc.contains("implNote op")) {
+			try {
+				switch (element.getKind()) {
+					case CLASS:
+						var fMethod = findFunctionalMethod(processingEnv,
+							(TypeElement) element);
+						var fMethodDoc = processingEnv.getElementUtils().getDocComment(
+							fMethod);
+						return new ImplClassData(element, fMethod, javadoc, fMethodDoc,
+							processingEnv);
+					case METHOD:
+						return new ImplMethodData(processingEnv,
+							(ExecutableElement) element, javadoc);
+					case FIELD:
+						return new ImplFieldData(element, javadoc, processingEnv);
+					default:
+						return null;
+				}
+			}
+			catch (Exception e) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, sw
+					.toString());
+			}
+		}
+		return null;
+	};
 
-    private static List<ImplData> getJavadocsAsJson(List<Element> elements, Function<Element, ImplData> createDoc) {
-        return elements.stream().map(createDoc).filter(Objects::nonNull).collect(
-            Collectors.toList());
-    }
+	private ExecutableElement findFunctionalMethod(ProcessingEnvironment env,
+		TypeElement source)
+	{
+		// Step 1: Find abstract interface method
+		ExecutableElement fMethod = findAbstractFunctionalMethod(env, source);
+		if (fMethod != null) {
+			for (Element e : env.getElementUtils().getAllMembers(source)) {
+				if (e.getSimpleName().equals(fMethod.getSimpleName())) {
+					return (ExecutableElement) e;
+				}
+			}
+		}
+		throw new IllegalArgumentException("Op " + source +
+			" does not declare a functional method!");
+	}
 
-    private final Function<Element, ImplData> fieldJavadocAsJson = (field) -> {
-        String javadoc = processingEnv.getElementUtils().getDocComment(field);
-        if (isBlank(javadoc)) {
-            return null;
-        }
-        if (javadoc.contains("@implNote")) {
-            return new ImplFieldData(field, javadoc);
-        }
-        return null;
-    };
+	private ExecutableElement findAbstractFunctionalMethod( //
+		ProcessingEnvironment env, //
+		TypeElement source //
+	) {
+		int abstractMethodCount = 0;
+		ExecutableElement firstAbstractMethod = null;
+		for (Element e : source.getEnclosedElements()) {
+			if (e.getKind() == METHOD && e.getModifiers().contains(
+				Modifier.ABSTRACT))
+			{
+				firstAbstractMethod = (ExecutableElement) e;
+				abstractMethodCount++;
 
-    private final Function<Element, ImplData> methodJavadocAsJson = (method) -> {
-        assert method instanceof ExecutableElement;
+			}
+		}
+		if (abstractMethodCount == 1) {
+			return firstAbstractMethod;
+		}
+		else {
+			// First, check the interfaces
+			for (TypeMirror e : source.getInterfaces()) {
+				Element iFace = env.getTypeUtils().asElement(e);
+				if (iFace instanceof TypeElement) {
+					ExecutableElement fMethod = findAbstractFunctionalMethod(env,
+						(TypeElement) iFace);
+					if (fMethod != null) return fMethod;
+				}
+			}
+			// Then, check the superclass
+			Element superCls = env.getTypeUtils().asElement(source.getSuperclass());
+			if (superCls instanceof TypeElement) {
+				ExecutableElement fMethod = findAbstractFunctionalMethod(env,
+					(TypeElement) superCls);
+				return fMethod;
+			}
+			return null;
+		}
+	}
 
-        String javadoc = processingEnv.getElementUtils().getDocComment(method);
-        if (isBlank(javadoc)) {
-            return null;
-        }
-        if (javadoc.contains("@implNote")) {
-            return new ImplMethodData(processingEnv, (ExecutableElement) method, javadoc);
-        }
-        return null;
-    };
-
-    private final Function<Element, ImplData> classJavadocAsJson = (cls) -> {
-        String javadoc = processingEnv.getElementUtils().getDocComment(cls);
-        if (isBlank(javadoc)) {
-            return null;
-        }
-        if (javadoc.contains("@implNote")) {
-            return new ImplClassData(cls, javadoc);
-        }
-        return null;
-    };
-
-    private static <T> T defaultIfNull(T actualValue, T defaultValue) {
-        return actualValue != null ? actualValue : defaultValue;
-    }
 }

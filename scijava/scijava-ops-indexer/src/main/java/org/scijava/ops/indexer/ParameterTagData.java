@@ -1,7 +1,5 @@
 package org.scijava.ops.indexer;
 
-import static org.scijava.ops.indexer.RuntimeJavadocHelper.tagElementSeparator;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,37 +28,23 @@ public class ParameterTagData {
 		this(ioType, block, type, null);
 	}
 
-	public ParameterTagData(IO_TYPE ioType, String block,
-			String type, String paramName)
+	public ParameterTagData(IO_TYPE ioType, String name, String description, String type)
 	{
 		// Assign io
 		this.ioType = ioType;
-		// Assign name
-		String[] elements = tagElementSeparator.split(block, 2);
-		if (paramName != null) {
-			this.name = paramName;
-		}
-		else if (hasName(elements[0])) {
-			elements = tagElementSeparator.split(block, 3);
-			this.name = elements[1];
-		}
-		else {
-			this.name = ioType.toString();
-		}
-		// Assign description
-		this.desc = elements[elements.length - 1];
-		// Assign type
+		this.name = name;
+		this.desc = description;
 		this.type = type;
 	}
 
 	public Map<String, Object> data() {
 		Map<String, Object> map = new HashMap<>();
-		map.put(ioType.toString(), name);
+		map.put("name", name);
+		map.put("parameter type", ioType.toString());
+		map.put("description", desc);
 		if (type != null) {
 			map.put("type", type);
 		}
-		map.put("description", desc);
-
 		return map;
 	}
 

@@ -9,10 +9,6 @@ module org.scijava.ops.engine {
 	exports org.scijava.ops.engine.conversionLoss;
 	exports org.scijava.ops.engine.util;
 
-	opens org.scijava.ops.engine to org.scijava;
-	opens org.scijava.ops.engine.impl to org.scijava;
-	opens org.scijava.ops.engine.matcher.impl to org.scijava;
-
 	requires java.compiler;
 
 	requires org.scijava.common3;

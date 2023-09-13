@@ -45,7 +45,7 @@ public class JavaMethodYAMLInfoCreator extends AbstractYAMLOpInfoCreator {
 		}
 		Method method = src.getMethod(methodString, paramClasses);
 		// parse op type
-		String typeString = (String) yaml.get("type");
+		String typeString = (String) ((Map<String, Object>) yaml.get("tags")).get("type");
 		Class<?> opType;
 		try {
 			opType = Classes.load(typeString, false);

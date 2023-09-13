@@ -1,3 +1,4 @@
+
 package org.scijava.ops.indexer;
 
 import static org.scijava.ops.indexer.RuntimeJavadocHelper.blockSeparator;
@@ -6,61 +7,67 @@ import static org.scijava.ops.indexer.RuntimeJavadocHelper.tagElementSeparator;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.tools.Diagnostic;
 
 public class ImplClassData implements ImplData {
+
 	private final Map<String, Object> implNotes = new HashMap<>();
 
 	private final List<String> authors = new ArrayList<>();
 
-	private final List<ParameterTagData> params = new ArrayList<>();
+	private final List<String> names = new ArrayList<>();
 
-	private String implType;
+	private final List<ParameterTagData> parameterTags = new ArrayList<>();
 
 	private final String source;
 
-	private String description;
+	private String implType;
 
+	private double priority = 0.0;
 
+	private String description = "";
 
-	public ImplClassData(Element source, String doc) {
-		if (!doc.contains("@implNote")){
-			throw new IllegalArgumentException(source + "'s Javadoc does not contain an '@implNote' tag!");
-		}
+	/**
+	 * @param source
+	 * @param doc
+	 */
+	public ImplClassData(Element source, ExecutableElement fMethod, String doc,
+		String fMethodDoc, ProcessingEnvironment env)
+	{
 		String[] sections = blockSeparator.split(doc);
-		for (String section: sections) {
+		for (String section : sections) {
 			String[] elements = tagElementSeparator.split(section);
-			switch(elements[0]) {
-				case "input":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT, section));
-					break;
-				case "output":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT, section));
-					break;
-				case "container":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.CONTAINER, section));
-					break;
-				case "mutable":
-					params.add(new ParameterTagData(ParameterTagData.IO_TYPE.MUTABLE, section));
-					break;
+			switch (elements[0]) {
 				case "author":
-					authors.add(tagElementSeparator.split(section, 2)[1]);
+					addAuthor(tagElementSeparator.split(section, 2)[1]);
 					break;
-				case "implNote" :
-						implType = elements[1];
-						if (elements.length > 2) {
-							for (int i = 2; i < elements.length; i++) {
-								String[] kv = elements[i].split("=", 2);
-								if (kv.length == 2) {
-									String value = kv[1].replaceAll("^[,\"']+|[,\"']+$", "");
+				case "implNote":
+					implType = elements[1];
+					if (elements.length > 2) {
+						for (int i = 2; i < elements.length; i++) {
+							String[] kv = elements[i].split("=", 2);
+							if (kv.length == 2) {
+								String value = kv[1].replaceAll("^[,\"']+|[,\"']+$", "");
+								if ("priority".equals(kv[0])) {
+									this.priority = Double.parseDouble(value);
+								}
+								else if ("names".equals(kv[0]) || "name".equals(kv[0])) {
+									names.addAll(Arrays.asList(value.split("\\s*,\\s*")));
+								}
+								else {
 									if (value.contains(",")) {
-										implNotes.put(kv[0], value.split("\\s*,\\s*"));
+										implNotes.put(kv[0], value.split(","));
 									}
 									else {
 										implNotes.put(kv[0], value);
@@ -68,42 +75,116 @@ public class ImplClassData implements ImplData {
 								}
 							}
 						}
-						break;
+					}
+					break;
 				default:
-					if (description == null) {
+					if (description.isBlank()) {
 						description = section;
 					}
 					break;
 			}
 
 		}
-		// handle inner classes
-		String srcString = source.toString();
-		Element parent = source.getEnclosingElement();
-		while(parent.getKind() == ElementKind.CLASS) {
-			int badPeriod = srcString.lastIndexOf('.');
-			srcString = srcString.substring(0, badPeriod) + '$' + srcString.substring(badPeriod+1);
-			parent = parent.getEnclosingElement();
+		if (this.names.isEmpty()) {
+			throw new IllegalArgumentException("Op " + source +
+				" does not declare any names");
 		}
-		this.source = "javaClass:/" + URLEncoder.encode(srcString, StandardCharsets.UTF_8);
+
+		parseFunctionalMethod(fMethod, fMethodDoc, env);
+		this.source = formulateSource(source);
 	}
 
-	@Override public String type() {
+	private void parseFunctionalMethod(
+		ExecutableElement fMethod, String fMethodDoc, ProcessingEnvironment env)
+	{
+		if (fMethodDoc == null || fMethodDoc.isEmpty())
+			return;
+		String[] sections = blockSeparator.split(fMethodDoc);
+		var paramTypes = fMethod.getParameters().iterator();
+		for (String section : sections) {
+			String[] elements = tagElementSeparator.split(section, 2);
+			if (elements[0].equals("param")) {
+				String[] foo = tagElementSeparator.split(elements[1], 2);
+				String name = foo[0];
+				String description = foo[1];
+				if (paramTypes.hasNext()) {
+					String type = paramTypes.next().asType().toString();
+					parameterTags.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT,
+							name, description, type));
+				}
+				else {
+					var msg = "Skipping param tag " + name + " as it does not have a corresponding parameter in Method " + fMethod;
+					env.getMessager().printMessage(Diagnostic.Kind.WARNING, msg);
+				}
+			}
+			else if (elements[0].equals("return")) {
+				String name = "output";
+				String description = elements[1];
+				String type = fMethod.getReturnType().toString();
+				parameterTags.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT,
+					name, description, type));
+			}
+			else if (elements[0].equals("author")) {
+				addAuthor(tagElementSeparator.split(section, 2)[1]);
+			}
+		}
+	}
+
+	private void addAuthor(String author) {
+		if (!authors.contains(author)) authors.add(author);
+	}
+
+	@Override
+	public String type() {
 		return implType;
 	}
 
-	@Override public String source() {
+	@Override
+	public String source() {
 		return source;
 	}
 
-	@Override public Map<String, Object> tags() {
-		Map<String, Object> map = new HashMap<>();
-		map.put("description", description);
-		map.put("authors", authors);
-		map.put("parameters", params.stream().map(ParameterTagData::data).collect(
-				Collectors.toList()));
-		map.putAll(implNotes);
-		return map;
+	@Override
+	public List<String> names() {
+		return names;
+	}
+
+	@Override
+	public String description() {
+		return description;
+	}
+
+	@Override
+	public double priority() {
+		return priority;
+	}
+
+	@Override
+	public List<String> authors() {
+		return authors;
+	}
+
+	@Override
+	public List<ParameterTagData> params() {
+		return parameterTags;
+	}
+
+	@Override
+	public Map<String, Object> tags() {
+		return implNotes;
+	}
+
+	private String formulateSource(Element source) {
+		var srcString = source.toString();
+		var parent = source.getEnclosingElement();
+		// handle inner classes
+		while (parent.getKind() == ElementKind.CLASS) {
+			int badPeriod = srcString.lastIndexOf('.');
+			srcString = srcString.substring(0, badPeriod) + '$' + srcString.substring(
+				badPeriod + 1);
+			parent = parent.getEnclosingElement();
+		}
+		return "javaClass:/" + URLEncoder.encode(srcString, StandardCharsets.UTF_8);
 	}
 
 }

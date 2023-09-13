@@ -35,6 +35,7 @@ public class RuntimeJavadocHelper {
 
     public static final Pattern tagElementSeparator = Pattern.compile("\\s*,*\\s+(?=(?:[^']*'[^']*')*[^']*$)");
 
+    public static final Pattern implNoteFinder = Pattern.compile("\\s+@implNote\\s+op\\s+");
 
     private RuntimeJavadocHelper() {
         throw new AssertionError("not instantiable");

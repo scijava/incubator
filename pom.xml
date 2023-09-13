@@ -117,7 +117,7 @@
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.scijava</groupId>
-							<artifactId>scijava-javadoc-parser</artifactId>
+							<artifactId>scijava-ops-indexer</artifactId>
 							<version>${project.version}</version>
 						</path>
 					</annotationProcessorPaths>

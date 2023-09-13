@@ -33,13 +33,12 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         // TODO: Parse version
         final String version = "0.0";
 //        final String version = path.substring(path.indexOf('/') + 1);
-        final Map<String, Object> tags = subMap(yaml, "tags");
         // Parse names
         final String[] names;
-        if (tags.containsKey("name")) {
-            names = new String[]{(String) tags.get("name")};
+        if (yaml.containsKey("name")) {
+            names = new String[]{(String) yaml.get("name")};
         } else {
-            var tmp = tags.get("names");
+            var tmp = yaml.get("names");
             if (tmp instanceof List) {
                 names = ((List<String>) tmp).toArray(String[]::new);
             }
@@ -55,8 +54,8 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         }
         // Parse priority
         double priority = 0.0;
-        if (tags.containsKey("priority")) {
-            Object p = tags.get("priority");
+        if (yaml.containsKey("priority")) {
+            Object p = yaml.get("priority");
             if (p instanceof Number) priority = ((Number) p).doubleValue();
             else if (p instanceof String) {
                 priority = Double.parseDouble((String) p);
@@ -67,13 +66,13 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         // Create the OpInfo
         OpInfo info;
         try {
-            info = create(srcString, names, priority, null, version, tags);
+            info = create(srcString, names, priority, null, version, yaml);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if (tags.containsKey("parameters")) {
+        if (yaml.containsKey("parameters")) {
             List<Map<String, Object>> params =
-                (List<Map<String, Object>>) tags.get("parameters");
+                (List<Map<String, Object>>) yaml.get("parameters");
             Iterator<Map<String, Object>> paramItr = params.iterator();
 
             List<Member<?>> members = info.struct().members();

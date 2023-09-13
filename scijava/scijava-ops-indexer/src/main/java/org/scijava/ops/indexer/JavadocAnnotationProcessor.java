@@ -20,6 +20,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -130,8 +132,11 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
             try {
                 generateJavadocForClass(element, alreadyProcessed);
             } catch (Exception ex) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                ex.printStackTrace(pw);
                 processingEnv.getMessager()
-                    .printMessage(Diagnostic.Kind.ERROR, "Javadoc retention failed; " + ex, element);
+                    .printMessage(Diagnostic.Kind.ERROR, "Javadoc retention failed; " + sw, element);
                 throw new RuntimeException("Javadoc retention failed for " + element, ex);
             }
         }
