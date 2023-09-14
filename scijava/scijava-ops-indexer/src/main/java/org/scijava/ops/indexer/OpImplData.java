@@ -2,6 +2,7 @@
 package org.scijava.ops.indexer;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ public interface OpImplData {
 			.collect(Collectors.toList());
 		map.put("parameters", params.toArray(Map[]::new));
 		map.put("tags", tags());
-		return map;
+		return Collections.singletonMap("op", map);
 	}
 
 }

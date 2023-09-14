@@ -7,8 +7,6 @@ import static org.scijava.ops.engine.yaml.YAMLUtils.value;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -73,7 +71,6 @@ public class YAMLOpInfoDiscoverer implements Discoverer {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void parse(List<OpInfo> infos, final URL url)
 			throws IOException
 	{

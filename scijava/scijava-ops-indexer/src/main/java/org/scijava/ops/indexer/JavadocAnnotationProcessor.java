@@ -25,11 +25,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -37,7 +35,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
@@ -53,7 +50,7 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
 
     private final Yaml yaml = new Yaml();
 
-    private final Map<String, List<Map<String, Object>>> yamlMap = new HashMap<>();
+    private final List<Map<String, Object>> opData = new ArrayList<>();
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
@@ -68,7 +65,7 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
             // If retaining Javadoc for all packages, the @RetainJavadoc annotation is redundant.
             // Otherwise, make sure annotated classes have their Javadoc retained regardless of package.
             for (TypeElement annotation : annotations) {
-                if (isRetainJavadocAnnotation(annotation)) {
+                if (isRetainJavadocAnnotation()) {
                     for (Element e : roundEnvironment.getElementsAnnotatedWith(annotation)) {
                         generateJavadoc(e, alreadyProcessed);
                     }
@@ -79,17 +76,12 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
                 generateJavadoc(e, alreadyProcessed);
             }
 
-            if (!roundEnvironment.getRootElements().isEmpty()) {
-                Element placeHolder =
-                    roundEnvironment.getRootElements().iterator().next();
-                for (String key : yamlMap.keySet()) {
-                    try {
-                        outputYamlDoc(placeHolder, yaml.dump(yamlMap.get(key)),
-                            key);
-                    }
-                    catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+            if (!roundEnvironment.getRootElements().isEmpty() && !opData.isEmpty()) {
+                try {
+                    outputYamlDoc(yaml.dump(opData));
+                }
+                catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -97,33 +89,16 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
         return false;
     }
 
-    private static boolean isRetainJavadocAnnotation(TypeElement annotation) {
+    private static boolean isRetainJavadocAnnotation() {
         return true;
     }
 
-    private static <E extends Enum<E>> Optional<E> findValueOf(Class<E> enumClass, String valueName) {
-        try {
-            return Optional.of(Enum.valueOf(enumClass, valueName));
-        } catch (IllegalArgumentException e) {
-            return Optional.empty();
-        }
-    }
-
-    // ElementKind.RECORD was added in Java 16. We want to process records, but also
-    // remain compatible with earlier Java versions.
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    static final Optional<ElementKind> RECORD = findValueOf(ElementKind.class, "RECORD");
-
+    // TODO: Consider adding record
     private static final EnumSet<ElementKind> elementKindsToInspect = EnumSet.of(
             ElementKind.CLASS,
             ElementKind.INTERFACE,
             ElementKind.ENUM
-            // and RECORD, but only if the Java version supports it
     );
-
-    static {
-        RECORD.ifPresent(elementKindsToInspect::add);
-    }
 
     private void generateJavadoc(Element element, Set<Element> alreadyProcessed) {
         ElementKind kind = element.getKind();
@@ -145,36 +120,24 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
         }
     }
 
-    private void generateJavadocForClass(Element element, Set<Element> alreadyProcessed) throws IOException {
+    private void generateJavadocForClass(Element element, Set<Element> alreadyProcessed) {
         if (!alreadyProcessed.add(element)) {
             return;
         }
         TypeElement classElement = (TypeElement) element;
         yamlJavadocBuilder.getClassJavadocAsYamlOrNull(classElement) //
-            .forEach(impl -> {
-                yamlMap.computeIfAbsent(impl.type(), i -> new ArrayList<>()).add(Collections.singletonMap(impl.type(), impl.dumpData()));
-            });
+            .forEach(impl -> opData.add(impl.dumpData()));
     }
 
-    private void outputYamlDoc(Element classElement, String doc, String type) throws IOException {
-        FileObject resource = createYamlResourceFile(classElement, type);
-
-        try (OutputStream os = resource.openOutputStream()) {
-            os.write(doc.getBytes(UTF_8));
+    private void outputYamlDoc(String doc) throws IOException {
+			FileObject resource = processingEnv.getFiler().createResource( //
+				StandardLocation.CLASS_OUTPUT, //
+				"", //
+				"op.yaml" //
+			);
+			try (OutputStream os = resource.openOutputStream()) {
+				os.write(doc.getBytes(UTF_8));
         }
-    }
-
-    private FileObject createYamlResourceFile(Element classElement, String type) throws IOException {
-        String packageName = processingEnv.getElementUtils().getModuleOf(classElement).getQualifiedName().toString();
-        String relativeName = type + ".yaml";
-        return processingEnv.getFiler()
-            .createResource(StandardLocation.CLASS_OUTPUT, "", relativeName);
-    }
-    private static PackageElement getPackageElement(Element element) {
-        if (element instanceof PackageElement) {
-            return (PackageElement) element;
-        }
-        return getPackageElement(element.getEnclosingElement());
     }
 
     @Override
