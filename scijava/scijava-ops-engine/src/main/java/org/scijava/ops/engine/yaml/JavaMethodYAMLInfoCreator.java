@@ -41,20 +41,32 @@ public class JavaMethodYAMLInfoCreator extends AbstractYAMLOpInfoCreator {
 			rawIdentifier.indexOf(')')).split("\\s*,\\s*");
 		Class<?>[] paramClasses = new Class<?>[paramStrings.length];
 		for (int i = 0; i < paramStrings.length; i++) {
-			paramClasses[i] = Classes.load(paramStrings[i]);
+			paramClasses[i] = deriveType(identifier, paramStrings[i]);
 		}
 		Method method = src.getMethod(methodString, paramClasses);
 		// parse op type
 		String typeString = (String) ((Map<String, Object>) yaml.get("tags")).get("type");
-		Class<?> opType;
-		try {
-			opType = Classes.load(typeString, false);
-		} catch (Throwable t) {
-			throw new RuntimeException("Op " + identifier + " could not be loaded: Could not load class " + typeString, t);
-		}
+		Class<?> opType = deriveType(identifier, typeString);
 
 		return new OpMethodInfo(method, opType, new Hints(), priority, names);
 	}
+
+	private Class<?> deriveType(String identifier, String typeString){
+		try {
+			return Classes.load(typeString, false);
+		} catch (Throwable t) {
+			if (typeString.lastIndexOf('.') > -1) {
+				var lastIndex = typeString.lastIndexOf('.');
+				return deriveType(identifier, typeString.substring(0, lastIndex) + '$' + typeString.substring(lastIndex + 1));
+			}
+			else {
+				throw new RuntimeException(
+						"Op " + identifier + " could not be loaded: Could not load class " +
+								typeString, t);
+			}
+		}
+	}
+
 
 	private static String sanitizeGenerics(String method) {
 		int nested = 0;
