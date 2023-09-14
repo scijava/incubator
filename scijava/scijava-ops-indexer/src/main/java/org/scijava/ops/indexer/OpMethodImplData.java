@@ -1,97 +1,59 @@
+
 package org.scijava.ops.indexer;
 
-import static org.scijava.ops.indexer.RuntimeJavadocHelper.blockSeparator;
-import static org.scijava.ops.indexer.RuntimeJavadocHelper.tagElementSeparator;
+import static org.scijava.ops.indexer.Patterns.tagElementSeparator;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 
-public class OpMethodImplData implements OpImplData {
+public class OpMethodImplData extends OpImplData {
 
-	private final Map<String, Object> implNotes = new HashMap<>();
+	private Iterator<? extends VariableElement> paramItr = null;
 
-	private final List<String> authors = new ArrayList<>();
+	public OpMethodImplData(ExecutableElement source, String doc,
+		ProcessingEnvironment env)
+	{
+		super(source, doc, env);
+	}
 
-	private final List<String> names = new ArrayList<>();
-
-	private final List<ParameterTagData> parameterTags = new ArrayList<>();
-
-	private final String source;
-
-	private double priority = 0.0;
-
-	private String description = "";
-
-	public OpMethodImplData(ProcessingEnvironment processingEnv, ExecutableElement source, String doc) {
-		String[] sections = blockSeparator.split(doc);
-		Iterator<? extends VariableElement> paramItr =
-				source.getParameters().iterator();
-		for (String section: sections) {
-			String[] elements = tagElementSeparator.split(section, 2);
-			switch(elements[0]) {
-				case "param":
-					// Ignore type variables
-					if (elements[1].contains("<.*>")) continue;
-					String name = null;
-					String type = null;
-					if (paramItr.hasNext()) {
-						var element = paramItr.next();
-						type = element.asType().toString();
-						name = element.getSimpleName().toString();
-					}
-					String[] paramData = tagElementSeparator.split(elements[1], 2);
-					parameterTags.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT, name, paramData[1], type));
-					break;
-				case "return":
-					parameterTags.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT, "output", elements[1], source.getReturnType().toString()));
-					break;
-				case "author":
-					authors.add(elements[1]);
-					break;
-				case "implNote" :
-					var implElements = tagElementSeparator.split(elements[1]);
-					if (implElements.length > 2) {
-							for (int i = 1; i < implElements.length; i++) {
-								String[] kv = implElements[i].split("=", 2);
-								if (kv.length == 2) {
-									String value = kv[1].replaceAll("^[,\"']+|[,\"']+$", "");
-									if ("priority".equals(kv[0])) {
-										this.priority = Double.parseDouble(value);
-									}
-									else if ("names".equals(kv[0]) || "name".equals(kv[0])) {
-										names.addAll(Arrays.asList(value.split("\\s*,\\s*")));
-									}
-									else {
-										if (value.contains(",")) {
-											implNotes.put(kv[0], value.split(","));
-										}
-										else {
-											implNotes.put(kv[0], value);
-										}
-									}
-								}
-							}
-						}
-						break;
-				default:
-					if (description.isBlank()) {
-						description = section;
-					}
-					break;
+	@Override
+	void parseTag(Element source, String tagType, String doc) {
+		if ("@param".equals(tagType)) {
+			// First, Ignore type variables
+			if (doc.contains("<.*>")) return;
+			// Then, get a handle on the parameters if needed
+			if (paramItr == null) {
+				paramItr = ((ExecutableElement) source).getParameters().iterator();
 			}
-
+			String name = null;
+			String type = null;
+			if (paramItr.hasNext()) {
+				var element = paramItr.next();
+				type = element.asType().toString();
+				name = element.getSimpleName().toString();
+			}
+			String[] paramData = tagElementSeparator.split(doc, 1);
+			params.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT, name,
+				paramData[0], type));
 		}
+		else if ("@return".equals(tagType)) {
+			var returnType = ((ExecutableElement) source);
+			params.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT, "output",
+				doc, returnType.toString()));
+		}
+		else if (description.isBlank()) {
+			description = tagType + " " + doc;
+		}
+	}
 
+	protected String formulateSource(Element source) {
+		ExecutableElement exSource = (ExecutableElement) source;
 		// First, append the class
 		StringBuilder sb = new StringBuilder();
 		sb.append(source.getEnclosingElement());
@@ -100,10 +62,10 @@ public class OpMethodImplData implements OpImplData {
 		sb.append(source.getSimpleName());
 
 		// Then, append the parameters
-		var params = source.getParameters();
+		var params = exSource.getParameters();
 		sb.append("(");
 		for (int i = 0; i < params.size(); i++) {
-			var d = processingEnv.getTypeUtils().erasure(params.get(i).asType());
+			var d = env.getTypeUtils().erasure(params.get(i).asType());
 			sb.append(d);
 			if (i < params.size() - 1) {
 				sb.append(",");
@@ -111,38 +73,7 @@ public class OpMethodImplData implements OpImplData {
 		}
 		sb.append(")");
 
-		this.source = "javaMethod:/" + URLEncoder.encode(sb.toString(), StandardCharsets.UTF_8);
-
+		return "javaMethod:/" + URLEncoder.encode(sb.toString(),
+			StandardCharsets.UTF_8);
 	}
-
-	@Override
-	public Map<String, Object> tags() {
-		return implNotes;
-	}
-
-	@Override
-	public String source() {
-		return source;
-	}
-
-	@Override public List<String> names() {
-		return names;
-	}
-
-	@Override public String description() {
-		return description;
-	}
-
-	@Override public double priority() {
-		return priority;
-	}
-
-	@Override public List<String> authors() {
-		return authors;
-	}
-
-	@Override public List<ParameterTagData> params() {
-		return parameterTags;
-	}
-
 }

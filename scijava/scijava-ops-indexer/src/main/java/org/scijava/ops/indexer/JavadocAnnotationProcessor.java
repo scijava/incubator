@@ -20,8 +20,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -65,10 +63,8 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
             // If retaining Javadoc for all packages, the @RetainJavadoc annotation is redundant.
             // Otherwise, make sure annotated classes have their Javadoc retained regardless of package.
             for (TypeElement annotation : annotations) {
-                if (isRetainJavadocAnnotation()) {
-                    for (Element e : roundEnvironment.getElementsAnnotatedWith(annotation)) {
-                        generateJavadoc(e, alreadyProcessed);
-                    }
+                for (Element e : roundEnvironment.getElementsAnnotatedWith(annotation)) {
+                    generateJavadoc(e, alreadyProcessed);
                 }
             }
 
@@ -89,10 +85,6 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
         return false;
     }
 
-    private static boolean isRetainJavadocAnnotation() {
-        return true;
-    }
-
     // TODO: Consider adding record
     private static final EnumSet<ElementKind> elementKindsToInspect = EnumSet.of(
             ElementKind.CLASS,
@@ -101,32 +93,14 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
     );
 
     private void generateJavadoc(Element element, Set<Element> alreadyProcessed) {
-        ElementKind kind = element.getKind();
-        if (elementKindsToInspect.contains(kind)) {
-            try {
-                generateJavadocForClass(element, alreadyProcessed);
-            } catch (Exception ex) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                ex.printStackTrace(pw);
-                processingEnv.getMessager()
-                    .printMessage(Diagnostic.Kind.ERROR, "Javadoc retention failed; " + sw, element);
-                throw new RuntimeException("Javadoc retention failed for " + element, ex);
-            }
-        }
-
-        for (Element enclosed : element.getEnclosedElements()) {
-            generateJavadoc(enclosed, alreadyProcessed);
-        }
-    }
-
-    private void generateJavadocForClass(Element element, Set<Element> alreadyProcessed) {
         if (!alreadyProcessed.add(element)) {
             return;
         }
-        TypeElement classElement = (TypeElement) element;
-        yamlJavadocBuilder.getClassJavadocAsYamlOrNull(classElement) //
-            .forEach(impl -> opData.add(impl.dumpData()));
+        if (elementKindsToInspect.contains(element.getKind())) {
+            TypeElement classElement = (TypeElement) element;
+            yamlJavadocBuilder.getClassJavadocAsYamlOrNull(classElement) //
+                .forEach(impl -> opData.add(impl.dumpData()));
+        }
     }
 
     private void outputYamlDoc(String doc) throws IOException {

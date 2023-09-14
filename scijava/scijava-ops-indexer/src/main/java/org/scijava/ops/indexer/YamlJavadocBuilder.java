@@ -16,18 +16,21 @@
 
 package org.scijava.ops.indexer;
 
+import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.lang.model.element.ElementKind.METHOD;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -36,6 +39,14 @@ import javax.tools.Diagnostic;
 
 class YamlJavadocBuilder {
 
+
+	// TODO: Consider adding record
+	private static final EnumSet<ElementKind> elementKindsToInspect = EnumSet.of(
+			ElementKind.CLASS,
+			ElementKind.FIELD,
+			ElementKind.METHOD
+	);
+
 	private ProcessingEnvironment processingEnv;
 
 	YamlJavadocBuilder(ProcessingEnvironment processingEnv) {
@@ -43,55 +54,62 @@ class YamlJavadocBuilder {
 	}
 
 	List<OpImplData> getClassJavadocAsYamlOrNull(TypeElement classElement) {
+		List<OpImplData> implList = new ArrayList<>();
 		// Check all enclosed elements
-		List<OpImplData> implList = classElement.getEnclosedElements().stream() //
-			// Only check methods and fields, as inner classes will be called
-			// separately
-			.filter(e -> e.getKind() == METHOD || e.getKind() == FIELD) //
-			// Convert each method/field into an ImplData
-			.map(elementToImplData) //
-			// Remove the nulls (i.e. methods/fields w/o an implNote tag)
-			.filter(Objects::nonNull) //
-			.collect(Collectors.toList());
+		for (Element e : classElement.getEnclosedElements()) {
+			// Only check fields and methods - inner classes will get checked
+			// on their own
+			if (elementKindsToInspect.contains(e.getKind())) {
+				var optionalImpl = elementToImplData.apply(e);
+				optionalImpl.ifPresent(implList::add);
+			}
+		}
 
 		// Finally, check the class itself to see if it is an implNote
-		OpImplData clsData = elementToImplData.apply(classElement);
-		if (clsData != null) implList.add(clsData);
+		Optional<OpImplData> clsData = elementToImplData.apply(classElement);
+		clsData.ifPresent(implList::add);
 
 		return implList;
 	}
 
-	private final Function<Element, OpImplData> elementToImplData = (element) -> {
+	private final Function<Element, Optional<OpImplData>> elementToImplData = (element) -> {
 		String javadoc = processingEnv.getElementUtils().getDocComment(element);
 		if (javadoc != null && javadoc.contains("implNote op")) {
 			try {
-				switch (element.getKind()) {
-					case CLASS:
-						var fMethod = findFunctionalMethod(processingEnv,
-							(TypeElement) element);
-						var fMethodDoc = processingEnv.getElementUtils().getDocComment(
-							fMethod);
-						return new OpClassImplData(element, fMethod, javadoc, fMethodDoc,
-							processingEnv);
-					case METHOD:
-						return new OpMethodImplData(processingEnv,
-							(ExecutableElement) element, javadoc);
-					case FIELD:
-						return new OpFieldImplData(element, javadoc, processingEnv);
-					default:
-						return null;
+				if (element.getKind() == CLASS) {
+					var fMethod = findFunctionalMethod(processingEnv,
+						(TypeElement) element);
+					var fMethodDoc = processingEnv.getElementUtils().getDocComment(
+						fMethod);
+					return Optional.of(new OpClassImplData(element, fMethod, javadoc,
+						fMethodDoc, processingEnv));
+				}
+				else if (element.getKind() == METHOD) {
+					return Optional.of(new OpMethodImplData((ExecutableElement) element,
+						javadoc, processingEnv));
+				}
+				else if (element.getKind() == FIELD) {
+					return Optional.of(new OpFieldImplData(element, javadoc,
+						processingEnv));
 				}
 			}
+			// NB we catch the exception here so poorly formatted fields, methods and
+			// inner classes don't prevent properly formatted fields, methods and
+			// classes from being discovered
 			catch (Exception e) {
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, sw
-					.toString());
+				printProcessingException(e, processingEnv);
 			}
 		}
-		return null;
+		return Optional.empty();
 	};
+	
+	private static void printProcessingException(Throwable t, ProcessingEnvironment env) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		t.printStackTrace(pw);
+		env.getMessager().printMessage(Diagnostic.Kind.ERROR, sw
+				.toString());
+	}
 
 	private ExecutableElement findFunctionalMethod(ProcessingEnvironment env,
 		TypeElement source)
@@ -140,9 +158,8 @@ class YamlJavadocBuilder {
 			// Then, check the superclass
 			Element superCls = env.getTypeUtils().asElement(source.getSuperclass());
 			if (superCls instanceof TypeElement) {
-				ExecutableElement fMethod = findAbstractFunctionalMethod(env,
+				return findAbstractFunctionalMethod(env,
 					(TypeElement) superCls);
-				return fMethod;
 			}
 			return null;
 		}
