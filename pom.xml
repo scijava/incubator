@@ -107,7 +107,7 @@
 
 		<script-maven-plugin.version>1.0.0</script-maven-plugin.version>
 		<jruby.version>9.2.11.1</jruby.version>
-		<scijava.parse.javadoc>true</scijava.parse.javadoc>
+		<scijava.parse.ops>true</scijava.parse.ops>
 	</properties>
 	<build>
 		<plugins>
@@ -124,7 +124,7 @@
 					<fork>true</fork>
 					<showWarnings>true</showWarnings>
 					<compilerArgs>
-						<arg>-Ajavadoc.parse="${scijava.parse.javadoc}"</arg>
+						<arg>-Aparse.ops="${scijava.parse.ops}"</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>

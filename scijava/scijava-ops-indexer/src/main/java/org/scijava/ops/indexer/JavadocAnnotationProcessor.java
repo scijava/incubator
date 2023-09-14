@@ -47,7 +47,7 @@ import org.yaml.snakeyaml.Yaml;
 
 public class JavadocAnnotationProcessor extends AbstractProcessor {
 
-    private static final String PACKAGES_OPTION = "javadoc.parse";
+    private static final String PARSE_OPS = "parse.ops";
 
     private YamlJavadocBuilder yamlJavadocBuilder;
 
@@ -61,8 +61,7 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
         this.yamlJavadocBuilder = new YamlJavadocBuilder(processingEnv);
 
         final Map<String, String> options = processingEnv.getOptions();
-        final String packagesOption = options.get(PACKAGES_OPTION);
-        if ("true".equals(packagesOption)) {
+        if ("true".equals(options.get(PARSE_OPS))) {
             // Make sure each element only gets processed once.
             final Set<Element> alreadyProcessed = new HashSet<>();
 
@@ -190,6 +189,6 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedOptions() {
-        return Collections.singleton(PACKAGES_OPTION);
+        return Collections.singleton(PARSE_OPS);
     }
 }
