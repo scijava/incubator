@@ -13,9 +13,8 @@ import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
-import javax.tools.Diagnostic;
 
-public class ImplFieldData implements ImplData {
+public class OpFieldImplData implements OpImplData {
 
 	private final Map<String, Object> implNotes = new HashMap<>();
 
@@ -25,8 +24,6 @@ public class ImplFieldData implements ImplData {
 
 	private final List<ParameterTagData> params = new ArrayList<>();
 
-	private String implType;
-
 	private final String source;
 
 	private double priority = 0.0;
@@ -34,7 +31,7 @@ public class ImplFieldData implements ImplData {
 	private final String type;
 	private String description = "";
 
-	public ImplFieldData(Element source, String doc, ProcessingEnvironment env) {
+	public OpFieldImplData(Element source, String doc, ProcessingEnvironment env) {
 		String[] sections = RuntimeJavadocHelper.blockSeparator.split(doc);
 		for (String section : sections) {
 			String[] elements = tagElementSeparator.split(section,2);
@@ -64,7 +61,6 @@ public class ImplFieldData implements ImplData {
 					break;
 				case "implNote":
 					var implElements = tagElementSeparator.split(elements[1]);
-					implType = implElements[0];
 					if (implElements.length > 1) {
 						for (int i = 1; i < implElements.length; i++) {
 							String[] kv = implElements[i].split("=", 2);
@@ -101,11 +97,6 @@ public class ImplFieldData implements ImplData {
 			.getEnclosingElement() + "$" + source, StandardCharsets.UTF_8);
 		this.type = source.asType().toString();
 
-	}
-
-	@Override
-	public String type() {
-		return implType;
 	}
 
 	@Override

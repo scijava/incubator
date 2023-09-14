@@ -42,9 +42,9 @@ class YamlJavadocBuilder {
 		this.processingEnv = processingEnv;
 	}
 
-	List<ImplData> getClassJavadocAsYamlOrNull(TypeElement classElement) {
+	List<OpImplData> getClassJavadocAsYamlOrNull(TypeElement classElement) {
 		// Check all enclosed elements
-		List<ImplData> implList = classElement.getEnclosedElements().stream() //
+		List<OpImplData> implList = classElement.getEnclosedElements().stream() //
 			// Only check methods and fields, as inner classes will be called
 			// separately
 			.filter(e -> e.getKind() == METHOD || e.getKind() == FIELD) //
@@ -55,13 +55,13 @@ class YamlJavadocBuilder {
 			.collect(Collectors.toList());
 
 		// Finally, check the class itself to see if it is an implNote
-		ImplData clsData = elementToImplData.apply(classElement);
+		OpImplData clsData = elementToImplData.apply(classElement);
 		if (clsData != null) implList.add(clsData);
 
 		return implList;
 	}
 
-	private final Function<Element, ImplData> elementToImplData = (element) -> {
+	private final Function<Element, OpImplData> elementToImplData = (element) -> {
 		String javadoc = processingEnv.getElementUtils().getDocComment(element);
 		if (javadoc != null && javadoc.contains("implNote op")) {
 			try {
@@ -71,13 +71,13 @@ class YamlJavadocBuilder {
 							(TypeElement) element);
 						var fMethodDoc = processingEnv.getElementUtils().getDocComment(
 							fMethod);
-						return new ImplClassData(element, fMethod, javadoc, fMethodDoc,
+						return new OpClassImplData(element, fMethod, javadoc, fMethodDoc,
 							processingEnv);
 					case METHOD:
-						return new ImplMethodData(processingEnv,
+						return new OpMethodImplData(processingEnv,
 							(ExecutableElement) element, javadoc);
 					case FIELD:
-						return new ImplFieldData(element, javadoc, processingEnv);
+						return new OpFieldImplData(element, javadoc, processingEnv);
 					default:
 						return null;
 				}

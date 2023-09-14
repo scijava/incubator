@@ -11,13 +11,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 
-public class ImplMethodData implements ImplData{
+public class OpMethodImplData implements OpImplData {
 
 	private final Map<String, Object> implNotes = new HashMap<>();
 
@@ -29,13 +28,11 @@ public class ImplMethodData implements ImplData{
 
 	private final String source;
 
-	private String implType;
-
 	private double priority = 0.0;
 
 	private String description = "";
 
-	public ImplMethodData(ProcessingEnvironment processingEnv, ExecutableElement source, String doc) {
+	public OpMethodImplData(ProcessingEnvironment processingEnv, ExecutableElement source, String doc) {
 		String[] sections = blockSeparator.split(doc);
 		Iterator<? extends VariableElement> paramItr =
 				source.getParameters().iterator();
@@ -63,7 +60,6 @@ public class ImplMethodData implements ImplData{
 					break;
 				case "implNote" :
 					var implElements = tagElementSeparator.split(elements[1]);
-					implType = implElements[0];
 					if (implElements.length > 2) {
 							for (int i = 1; i < implElements.length; i++) {
 								String[] kv = implElements[i].split("=", 2);
@@ -122,11 +118,6 @@ public class ImplMethodData implements ImplData{
 	@Override
 	public Map<String, Object> tags() {
 		return implNotes;
-	}
-
-	@Override
-	public String type() {
-		return implType;
 	}
 
 	@Override

@@ -8,11 +8,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -20,7 +18,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.tools.Diagnostic;
 
-public class ImplClassData implements ImplData {
+public class OpClassImplData implements OpImplData {
 
 	private final Map<String, Object> implNotes = new HashMap<>();
 
@@ -32,8 +30,6 @@ public class ImplClassData implements ImplData {
 
 	private final String source;
 
-	private String implType;
-
 	private double priority = 0.0;
 
 	private String description = "";
@@ -42,7 +38,7 @@ public class ImplClassData implements ImplData {
 	 * @param source
 	 * @param doc
 	 */
-	public ImplClassData(Element source, ExecutableElement fMethod, String doc,
+	public OpClassImplData(Element source, ExecutableElement fMethod, String doc,
 		String fMethodDoc, ProcessingEnvironment env)
 	{
 		String[] sections = blockSeparator.split(doc);
@@ -53,7 +49,6 @@ public class ImplClassData implements ImplData {
 					addAuthor(tagElementSeparator.split(section, 2)[1]);
 					break;
 				case "implNote":
-					implType = elements[1];
 					if (elements.length > 2) {
 						for (int i = 2; i < elements.length; i++) {
 							String[] kv = elements[i].split("=", 2);
@@ -132,11 +127,6 @@ public class ImplClassData implements ImplData {
 
 	private void addAuthor(String author) {
 		if (!authors.contains(author)) authors.add(author);
-	}
-
-	@Override
-	public String type() {
-		return implType;
 	}
 
 	@Override
