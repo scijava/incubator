@@ -6,10 +6,13 @@ import java.net.URI;
 import java.util.Map;
 
 import org.scijava.common3.Classes;
+import org.scijava.function.Computers;
+import org.scijava.function.Functions;
 import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
 import org.scijava.ops.engine.matcher.impl.OpMethodInfo;
+import org.scijava.ops.spi.OpDependency;
 
 /**
  * A {@link YAMLOpInfoCreator} specialized for Java {@link Method}s.
@@ -45,10 +48,38 @@ public class JavaMethodYAMLInfoCreator extends AbstractYAMLOpInfoCreator {
 		}
 		Method method = src.getMethod(methodString, paramClasses);
 		// parse op type
-		String typeString = (String) ((Map<String, Object>) yaml.get("tags")).get("type");
-		Class<?> opType = deriveType(identifier, typeString);
+		Class<?> opType;
+		Map<String, Object> tags = ((Map<String, Object>) yaml.get("tags"));
+		if (tags.containsKey("type")) {
+			String typeString = (String) tags.get("type");
+			opType = deriveType(identifier, typeString);
+		}
+		else {
+			opType = inferOpMethod(method);
+		}
 
 		return new OpMethodInfo(method, opType, new Hints(), priority, names);
+	}
+
+	/**
+	 * If the Op author does not specify an Op type, we assume that it is either
+	 * a Function (if it has an output) or a Computer (if the output is void).
+	 * @param method the {@link Method} annotated as an Op
+	 * @return the inferred {@link FunctionalInterface} of the Op
+	 */
+	private Class<?> inferOpMethod(Method method) {
+		// Find all non-OpDependency parameters
+		int paramCount = method.getParameterCount();
+		for (var p : method.getParameters()) {
+			if (p.isAnnotationPresent(OpDependency.class)) {
+				paramCount--;
+			}
+		}
+		if (method.getReturnType() != void.class) {
+			return Functions.functionOfArity(paramCount);
+		}
+		// NB the last input of a computer is the preallocated output
+		return Computers.computerOfArity(paramCount - 1);
 	}
 
 	private Class<?> deriveType(String identifier, String typeString){
