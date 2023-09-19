@@ -3,6 +3,7 @@ package org.scijava.ops.indexer;
 
 import static org.scijava.ops.indexer.Patterns.tagElementSeparator;
 
+import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -12,6 +13,12 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 
+/**
+ * {@link OpImplData} implementation handling {@link Method}s annotated with
+ * "implNote op"
+ *
+ * @author Gabriel Selzer
+ */
 public class OpMethodImplData extends OpImplData {
 
 	private Iterator<? extends VariableElement> paramItr = null;
@@ -22,6 +29,14 @@ public class OpMethodImplData extends OpImplData {
 		super(source, doc, env);
 	}
 
+	/**
+	 * Parse javadoc tags pertaining exclusively to {@link Method}s
+	 * 
+	 * @param source the {@link Element} representing the {@link Method}. In
+	 *          practice, this will always be an {@link ExecutableElement}
+	 * @param tagType the tag type e.g. @author or @param
+	 * @param doc the text following the tag type
+	 */
 	@Override
 	void parseTag(Element source, String tagType, String doc) {
 		if ("@param".equals(tagType)) {
@@ -39,13 +54,13 @@ public class OpMethodImplData extends OpImplData {
 				name = element.getSimpleName().toString();
 			}
 			String[] paramData = tagElementSeparator.split(doc, 1);
-			params.add(new ParameterTagData(ParameterTagData.IO_TYPE.INPUT, name,
-				paramData[0], type));
+			params.add(new OpParameter(name, type, OpParameter.IO_TYPE.INPUT,
+					paramData[0]));
 		}
 		else if ("@return".equals(tagType)) {
 			var returnType = ((ExecutableElement) source);
-			params.add(new ParameterTagData(ParameterTagData.IO_TYPE.OUTPUT, "output",
-				doc, returnType.toString()));
+			params.add(new OpParameter("output", returnType.toString(), OpParameter.IO_TYPE.OUTPUT,
+					doc));
 		}
 		else if (description.isBlank()) {
 			description = tagType + " " + doc;

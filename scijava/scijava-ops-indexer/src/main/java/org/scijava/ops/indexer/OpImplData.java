@@ -39,10 +39,10 @@ public abstract class OpImplData {
 	protected final List<String> names = new ArrayList<>();
 
 	/**
-	 * A {@link List} of {@link ParameterTagData}, describing the input and output
+	 * A {@link List} of {@link OpParameter}, describing the input and output
 	 * parameters of this Op.
 	 */
-	protected final List<ParameterTagData> params = new ArrayList<>();
+	protected final List<OpParameter> params = new ArrayList<>();
 
 	/**
 	 * A {@link URI} identifying the code providing an Op's functionality. In this
@@ -153,7 +153,7 @@ public abstract class OpImplData {
 		map.put("priority", priority);
 		map.put("authors", authors.toArray(String[]::new));
 		List<Map<String, Object>> foo = params.stream() //
-			.map(ParameterTagData::data) //
+			.map(OpParameter::data) //
 			.collect(Collectors.toList());
 		map.put("parameters", foo.toArray(Map[]::new));
 		map.put("tags", tags);

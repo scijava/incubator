@@ -77,11 +77,11 @@ class YamlJavadocBuilder {
 		if (javadoc != null && javadoc.contains("implNote op")) {
 			try {
 				if (element.getKind() == CLASS) {
-					var fMethod = findFunctionalMethod(processingEnv,
-						(TypeElement) element);
+					TypeElement typeElement = (TypeElement) element;
+					var fMethod = findFunctionalMethod(processingEnv, typeElement);
 					var fMethodDoc = processingEnv.getElementUtils().getDocComment(
 						fMethod);
-					return Optional.of(new OpClassImplData(element, fMethod, javadoc,
+					return Optional.of(new OpClassImplData(typeElement, fMethod, javadoc,
 						fMethodDoc, processingEnv));
 				}
 				else if (element.getKind() == METHOD) {
@@ -93,9 +93,9 @@ class YamlJavadocBuilder {
 						processingEnv));
 				}
 			}
-			// NB we catch the exception here so poorly formatted fields, methods and
-			// inner classes don't prevent properly formatted fields, methods and
-			// classes from being discovered
+			catch (InvalidOpJavadocException e) {
+				throw e;
+			}
 			catch (Exception e) {
 				printProcessingException(e, processingEnv);
 			}
