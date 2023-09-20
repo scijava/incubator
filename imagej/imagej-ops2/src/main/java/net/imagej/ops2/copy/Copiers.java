@@ -39,6 +39,7 @@ public class Copiers {
      * {@link RandomAccessibleInterval}
      *
      * @param <T> the element type of each image
+     * @param copier a {@link Computers.Arity1} that knows how to copy each pixel.
      * @param input the {@link RandomAccessibleInterval} whose data will be copied
      * @param copy  the {@link RandomAccessibleInterval} that will be filled with the contents of {@code input}
      * @author Christian Dietz (University of Konstanz)

@@ -6,6 +6,7 @@ import static org.scijava.ops.indexer.Patterns.tagElementSeparator;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -13,7 +14,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.NoType;
-import javax.tools.Diagnostic;
 
 /**
  * {@link OpImplData} implementation handling {@link Class}es annotated with
@@ -34,11 +34,11 @@ public class OpClassImplData extends OpImplData {
 		String doc, String fMethodDoc, ProcessingEnvironment env)
 	{
 		super(source, doc, env);
-		parseFunctionalMethod(fMethod, fMethodDoc, env);
+		parseFunctionalMethod(fMethod, fMethodDoc);
 	}
 
 	private void parseFunctionalMethod(ExecutableElement fMethod,
-		String fMethodDoc, ProcessingEnvironment env)
+		String fMethodDoc)
 	{
 		if (fMethodDoc == null || fMethodDoc.isEmpty()) return;
 		String[] sections = blockSeparator.split(fMethodDoc);
@@ -59,10 +59,12 @@ public class OpClassImplData extends OpImplData {
 					if (paramTypes.hasNext()) {
 						String type = paramTypes.next().asType().toString();
 						params.add(new OpParameter(name, type, OpParameter.IO_TYPE.INPUT,
-								description));
+							description));
 					}
 					else {
-						throw new IllegalArgumentException("Op " + this.source + " has " + noParams + " @param tags, but the functional method only has " + expNoParams + " parameters!");
+						throw new IllegalArgumentException("Op " + this.source + " has " +
+							noParams + " @param tags, but the functional method only has " +
+							expNoParams + " parameters!");
 					}
 					break;
 				}
@@ -72,7 +74,7 @@ public class OpClassImplData extends OpImplData {
 					String description = elements[1];
 					String type = fMethod.getReturnType().toString();
 					params.add(new OpParameter(name, type, OpParameter.IO_TYPE.OUTPUT,
-							description));
+						description));
 					break;
 				}
 				case "@author":
@@ -81,11 +83,14 @@ public class OpClassImplData extends OpImplData {
 			}
 		}
 		if (noParams != expNoParams) {
-			throw new IllegalArgumentException("Op " + this.source + " has " + noParams + " @param tags, but the functional method " + fMethod + " only has " + expNoParams + " parameters!");
+			throw new IllegalArgumentException("Op " + this.source + " has " +
+				noParams + " @param tags, but the functional method " + fMethod +
+				" only has " + expNoParams + " parameters!");
 		}
 		if (noReturns != expNoReturns) {
-			throw new IllegalArgumentException("Op " + this.source + " has " + noReturns + " @return tags, but the functional method only has " + expNoReturns + " returns!");
-
+			throw new IllegalArgumentException("Op " + this.source + " has " +
+				noReturns + " @return tags, but the functional method only has " +
+				expNoReturns + " returns!");
 		}
 	}
 
@@ -93,11 +98,10 @@ public class OpClassImplData extends OpImplData {
 	 * Parse javadoc tags pertaining exclusively to {@link Class}es
 	 *
 	 * @param source the {@link Element} representing the {@link Class}.
-	 * @param tagType the tag type e.g. @author or @param
-	 * @param doc the text following the tag type
+	 * @param additionalTags the tags that pertain particularly to {@link Class}es
 	 */
 	@Override
-	void parseTag(Element source, String tagType, String doc) {}
+	void parseAdditionalTags(Element source, List<String[]> additionalTags) {}
 
 	protected String formulateSource(Element source) {
 		var srcString = source.toString();

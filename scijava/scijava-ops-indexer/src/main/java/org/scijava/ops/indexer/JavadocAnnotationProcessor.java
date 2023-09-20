@@ -17,9 +17,12 @@
 package org.scijava.ops.indexer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.lang.model.element.ElementKind.METHOD;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -29,11 +32,15 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
@@ -128,4 +135,67 @@ public class JavadocAnnotationProcessor extends AbstractProcessor {
     public Set<String> getSupportedOptions() {
         return Collections.singleton(PARSE_OPS);
     }
+
+    public static void printProcessingException(Element source, Throwable t, ProcessingEnvironment env) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        env.getMessager().printMessage(Diagnostic.Kind.ERROR, "Exception parsing source + " + source +  ": " + sw
+            .toString());
+    }
+
+    public static ExecutableElement findFunctionalMethod(ProcessingEnvironment env,
+        TypeElement source)
+    {
+        // Step 1: Find abstract interface method
+        ExecutableElement fMethod = findAbstractFunctionalMethod(env, source);
+        if (fMethod != null) {
+            for (Element e : env.getElementUtils().getAllMembers(source)) {
+                if (e.getSimpleName().equals(fMethod.getSimpleName())) {
+                    return (ExecutableElement) e;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Op " + source +
+            " does not declare a functional method!");
+    }
+
+    public static ExecutableElement findAbstractFunctionalMethod( //
+        ProcessingEnvironment env, //
+        TypeElement source //
+    ) {
+        int abstractMethodCount = 0;
+        ExecutableElement firstAbstractMethod = null;
+        for (Element e : source.getEnclosedElements()) {
+            if (e.getKind() == METHOD && e.getModifiers().contains(
+                Modifier.ABSTRACT))
+            {
+                firstAbstractMethod = (ExecutableElement) e;
+                abstractMethodCount++;
+
+            }
+        }
+        if (abstractMethodCount == 1) {
+            return firstAbstractMethod;
+        }
+        else {
+            // First, check the interfaces
+            for (TypeMirror e : source.getInterfaces()) {
+                Element iFace = env.getTypeUtils().asElement(e);
+                if (iFace instanceof TypeElement) {
+                    ExecutableElement fMethod = findAbstractFunctionalMethod(env,
+                        (TypeElement) iFace);
+                    if (fMethod != null) return fMethod;
+                }
+            }
+            // Then, check the superclass
+            Element superCls = env.getTypeUtils().asElement(source.getSuperclass());
+            if (superCls instanceof TypeElement) {
+                return findAbstractFunctionalMethod(env,
+                    (TypeElement) superCls);
+            }
+            return null;
+        }
+    }
+
 }

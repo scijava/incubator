@@ -19,6 +19,8 @@ package org.scijava.ops.indexer;
 import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.lang.model.element.ElementKind.METHOD;
+import static org.scijava.ops.indexer.JavadocAnnotationProcessor.findFunctionalMethod;
+import static org.scijava.ops.indexer.JavadocAnnotationProcessor.printProcessingException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -97,72 +99,10 @@ class YamlJavadocBuilder {
 				throw e;
 			}
 			catch (Exception e) {
-				printProcessingException(e, processingEnv);
+				printProcessingException(element, e, processingEnv);
 			}
 		}
 		return Optional.empty();
 	};
 	
-	private static void printProcessingException(Throwable t, ProcessingEnvironment env) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		t.printStackTrace(pw);
-		env.getMessager().printMessage(Diagnostic.Kind.ERROR, sw
-				.toString());
-	}
-
-	private ExecutableElement findFunctionalMethod(ProcessingEnvironment env,
-		TypeElement source)
-	{
-		// Step 1: Find abstract interface method
-		ExecutableElement fMethod = findAbstractFunctionalMethod(env, source);
-		if (fMethod != null) {
-			for (Element e : env.getElementUtils().getAllMembers(source)) {
-				if (e.getSimpleName().equals(fMethod.getSimpleName())) {
-					return (ExecutableElement) e;
-				}
-			}
-		}
-		throw new IllegalArgumentException("Op " + source +
-			" does not declare a functional method!");
-	}
-
-	private ExecutableElement findAbstractFunctionalMethod( //
-		ProcessingEnvironment env, //
-		TypeElement source //
-	) {
-		int abstractMethodCount = 0;
-		ExecutableElement firstAbstractMethod = null;
-		for (Element e : source.getEnclosedElements()) {
-			if (e.getKind() == METHOD && e.getModifiers().contains(
-				Modifier.ABSTRACT))
-			{
-				firstAbstractMethod = (ExecutableElement) e;
-				abstractMethodCount++;
-
-			}
-		}
-		if (abstractMethodCount == 1) {
-			return firstAbstractMethod;
-		}
-		else {
-			// First, check the interfaces
-			for (TypeMirror e : source.getInterfaces()) {
-				Element iFace = env.getTypeUtils().asElement(e);
-				if (iFace instanceof TypeElement) {
-					ExecutableElement fMethod = findAbstractFunctionalMethod(env,
-						(TypeElement) iFace);
-					if (fMethod != null) return fMethod;
-				}
-			}
-			// Then, check the superclass
-			Element superCls = env.getTypeUtils().asElement(source.getSuperclass());
-			if (superCls instanceof TypeElement) {
-				return findAbstractFunctionalMethod(env,
-					(TypeElement) superCls);
-			}
-			return null;
-		}
-	}
-
 }

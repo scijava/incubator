@@ -5,6 +5,7 @@ module org.scijava.javadoc.parser {
 
 	requires java.compiler;
 	requires org.yaml.snakeyaml;
+	requires org.scijava.ops.spi;
 
 	provides javax.annotation.processing.Processor with JavadocAnnotationProcessor;
 }

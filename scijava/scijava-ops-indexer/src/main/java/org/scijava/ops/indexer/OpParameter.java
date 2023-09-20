@@ -17,11 +17,11 @@ public class OpParameter {
 			INPUT, OUTPUT, MUTABLE, CONTAINER
 	}
 
-	private final IO_TYPE ioType;
-	private final String name;
-	private final String type;
+	protected final IO_TYPE ioType;
+	protected final String name;
+	protected final String type;
 
-	private final String desc;
+	protected final String desc;
 
 	/**
 	 * Default constructor

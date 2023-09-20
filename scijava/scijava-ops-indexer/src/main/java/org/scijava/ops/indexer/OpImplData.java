@@ -4,8 +4,6 @@ package org.scijava.ops.indexer;
 import static org.scijava.ops.indexer.Patterns.blockSeparator;
 import static org.scijava.ops.indexer.Patterns.tagElementSeparator;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +15,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
-import javax.tools.Diagnostic;
 
 /**
  * A data structure containing all the metadata needed to define an Op
@@ -77,36 +74,39 @@ public abstract class OpImplData {
 	 */
 	public OpImplData(Element source, String doc, ProcessingEnvironment env) {
 		this.env = env;
-		try {
-			this.source = formulateSource(source);
-			String[] sections = blockSeparator.split(doc);
-			for (String section : sections) {
-				String[] elements = tagElementSeparator.split(section, 2);
-				// Parse descriptions
-				if (!section.startsWith("@")) {
-					if (description.isBlank()) this.description = section;
-				}
-				// Parse universal Javadoc tags
-				else if (elements[0].equals("@author")) {
-					addAuthor(elements[1]);
-				}
-				else if (elements[0].equals("@implNote")) {
-					parseImplNote(elements[1]);
-				}
-				// Parse implementation-specific tags
-				else if (elements.length == 2) {
-					parseTag(source, elements[0], elements[1]);
-				}
-			}
-		}catch (Throwable t) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			t.printStackTrace(pw);
-			env.getMessager().printMessage(Diagnostic.Kind.WARNING, "Caught error parsing Element " + source.toString() + ": " + sw);
+		this.source = formulateSource(source);
+		List<String[]> tags = blockSeparator.splitAsStream(doc) //
+		 .map(section -> tagElementSeparator.split(section, 2)) //
+		 .collect( Collectors.toList());
+		List<String[]> remaining = parseUniversalTags(tags);
+		if (!remaining.isEmpty()) {
+			parseAdditionalTags(source, remaining);
 		}
 	}
 
-	abstract void parseTag(Element source, String tagType, String doc);
+	private List<String[]> parseUniversalTags(List<String[]> tags) {
+		List<String[]> remainingTags = new ArrayList<>();
+		for (String[] tag : tags) {
+			// Parse descriptions
+			if (!tag[0].startsWith("@")) {
+				if (description.isBlank()) this.description = String.join(" ", tag);
+			}
+			// Parse universal Javadoc tags
+			else if (tag[0].equals("@author")) {
+				addAuthor(tag[1]);
+			}
+			else if (tag[0].equals("@implNote")) {
+				parseImplNote(tag[1]);
+			}
+			else {
+				remainingTags.add(tag);
+			}
+		}
+
+		return remainingTags;
+	}
+
+	abstract void parseAdditionalTags(Element source, List<String[]> additionalTags);
 
 	abstract String formulateSource(Element source);
 

@@ -1,17 +1,22 @@
 
 package org.scijava.ops.indexer;
 
-import static org.scijava.ops.indexer.Patterns.tagElementSeparator;
-
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.NoType;
+import javax.tools.Diagnostic;
+
+import org.scijava.ops.spi.OpDependency;
 
 /**
  * {@link OpImplData} implementation handling {@link Method}s annotated with
@@ -20,8 +25,6 @@ import javax.lang.model.element.VariableElement;
  * @author Gabriel Selzer
  */
 public class OpMethodImplData extends OpImplData {
-
-	private Iterator<? extends VariableElement> paramItr = null;
 
 	public OpMethodImplData(ExecutableElement source, String doc,
 		ProcessingEnvironment env)
@@ -34,37 +37,89 @@ public class OpMethodImplData extends OpImplData {
 	 * 
 	 * @param source the {@link Element} representing the {@link Method}. In
 	 *          practice, this will always be an {@link ExecutableElement}
-	 * @param tagType the tag type e.g. @author or @param
-	 * @param doc the text following the tag type
+	 * @param additionalTags the tags pertaining exclusively to {@link Method}s.
 	 */
 	@Override
-	void parseTag(Element source, String tagType, String doc) {
-		if ("@param".equals(tagType)) {
-			// First, Ignore type variables
-			if (doc.contains("<.*>")) return;
-			// Then, get a handle on the parameters if needed
-			if (paramItr == null) {
-				paramItr = ((ExecutableElement) source).getParameters().iterator();
+	void parseAdditionalTags(Element source, List<String[]> additionalTags) {
+		ExecutableElement exSource = (ExecutableElement) source;
+		// First, parse parameters
+		List<VariableElement> opDependencies = new ArrayList<>();
+		List<String[]> functionalParams = new ArrayList<>();
+		List<VariableElement> fParams = new ArrayList<>();
+		var paramItr = exSource.getParameters().iterator();
+		for (String[] tag : additionalTags) {
+			if (!"@param".equals(tag[0])) continue;
+			if (paramIsTypeVariable(tag[1])) {
+				// Ignore type variables
+				continue;
 			}
-			String name = null;
-			String type = null;
-			if (paramItr.hasNext()) {
-				var element = paramItr.next();
-				type = element.asType().toString();
-				name = element.getSimpleName().toString();
+			VariableElement param = paramItr.next();
+			if (param.getAnnotation(OpDependency.class) != null) {
+				opDependencies.add(param);
 			}
-			String[] paramData = tagElementSeparator.split(doc, 1);
+			else {
+				functionalParams.add(tag);
+				fParams.add(param);
+			}
+		}
+
+		for (int i = 0; i < functionalParams.size(); i++) {
+			String name = fParams.get(i).getSimpleName().toString();
+			String type = fParams.get(i).asType().toString();
+			String remainder = functionalParams.get(i)[1];
+			String description;
+			if (remainder.contains(" ")) {
+				description = remainder.substring(remainder.indexOf(" "));
+			}
+			else {
+				description = "";
+			}
 			params.add(new OpParameter(name, type, OpParameter.IO_TYPE.INPUT,
-					paramData[0]));
+				description));
 		}
-		else if ("@return".equals(tagType)) {
-			var returnType = ((ExecutableElement) source);
-			params.add(new OpParameter("output", returnType.toString(), OpParameter.IO_TYPE.OUTPUT,
-					doc));
+
+		// Finally, parse the return
+		Optional<String[]> returnTag = additionalTags.stream() //
+			.filter(t -> t[0].equals("@return")).findFirst();
+		if (returnTag.isPresent()) {
+			String returnType = exSource.getReturnType().toString();
+			params.add(new OpParameter( //
+				"output", //
+				returnType, //
+				OpParameter.IO_TYPE.OUTPUT, //
+				returnTag.get()[1] //
+			));
 		}
-		else if (description.isBlank()) {
-			description = tagType + " " + doc;
+
+		if (opDependencies.size() + functionalParams.size() != exSource
+			.getParameters().size())
+		{
+			env.getMessager().printMessage(Diagnostic.Kind.ERROR,
+				"The number of @param tags on " + exSource +
+					" does not match the number of parameters!");
 		}
+		if (!(exSource.getReturnType() instanceof NoType) && returnTag.isEmpty()) {
+			env.getMessager().printMessage(Diagnostic.Kind.ERROR, exSource +
+				" has a return, but no @return parameter");
+		}
+	}
+
+	/**
+	 * HACK to find type variable param tags
+	 * For a parameter tag, returns {@code true} iff the following tag is a type variable tag.
+	 * Type variable tags start with a greater than sign, and then has a string of letters, and then a less than sign.
+	 * @param tag the string following an param tag
+	 * @return true iff the tag is an param tag
+	 */
+	private boolean paramIsTypeVariable(String tag) {
+		// TODO: Why doesn't Pattern.matches(".*<\\p{L}>.*", tag) work??
+		if (tag.charAt(0) != '<') return false;
+		for(int i = 1; i < tag.length(); i++) {
+			char c = tag.charAt(i);
+			if (Character.isLetter(c)) continue;
+			return c == '>';
+		}
+		return false;
 	}
 
 	protected String formulateSource(Element source) {
