@@ -78,8 +78,7 @@ public abstract class OpImplData {
 		this.env = env;
 		this.source = formulateSource(source);
 		this.version = env.getOptions().getOrDefault(JavadocAnnotationProcessor.OP_VERSION, "UNKNOWN");
-
-		List<String[]> tags = blockSeparator.splitAsStream(doc) //
+				List<String[]> tags = blockSeparator.splitAsStream(doc) //
 		 .map(section -> tagElementSeparator.split(section, 2)) //
 		 .collect( Collectors.toList());
 		List<String[]> remaining = parseUniversalTags(tags);
