@@ -64,7 +64,7 @@ public class OpFieldImplData extends OpImplData {
 		}
 		Element fieldType = env.getTypeUtils().asElement(source.asType());
 		if (fieldType instanceof TypeElement) {
-			ExecutableElement fMethod = JavadocAnnotationProcessor
+			ExecutableElement fMethod = OpImplNoteParser
 				.findFunctionalMethod(env, (TypeElement) fieldType);
 			int numReturns = 0;
 			for (OpParameter p : params) {

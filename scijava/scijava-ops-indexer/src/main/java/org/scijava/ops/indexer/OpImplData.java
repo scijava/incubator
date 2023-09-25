@@ -77,7 +77,7 @@ public abstract class OpImplData {
 	public OpImplData(Element source, String doc, ProcessingEnvironment env) {
 		this.env = env;
 		this.source = formulateSource(source);
-		this.version = env.getOptions().getOrDefault(JavadocAnnotationProcessor.OP_VERSION, "UNKNOWN");
+		this.version = env.getOptions().getOrDefault(OpImplNoteParser.OP_VERSION, "UNKNOWN");
 				List<String[]> tags = blockSeparator.splitAsStream(doc) //
 		 .map(section -> tagElementSeparator.split(section, 2)) //
 		 .collect( Collectors.toList());

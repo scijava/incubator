@@ -19,11 +19,9 @@ package org.scijava.ops.indexer;
 import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.lang.model.element.ElementKind.METHOD;
-import static org.scijava.ops.indexer.JavadocAnnotationProcessor.findFunctionalMethod;
-import static org.scijava.ops.indexer.JavadocAnnotationProcessor.printProcessingException;
+import static org.scijava.ops.indexer.OpImplNoteParser.findFunctionalMethod;
+import static org.scijava.ops.indexer.OpImplNoteParser.printProcessingException;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -34,10 +32,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
 
 class YamlJavadocBuilder {
 
