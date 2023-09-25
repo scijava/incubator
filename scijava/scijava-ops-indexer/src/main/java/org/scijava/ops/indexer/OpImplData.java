@@ -49,6 +49,8 @@ public abstract class OpImplData {
 	 */
 	protected String source;
 
+	protected String version;
+
 	/**
 	 * The priority of this Op.
 	 */
@@ -75,6 +77,8 @@ public abstract class OpImplData {
 	public OpImplData(Element source, String doc, ProcessingEnvironment env) {
 		this.env = env;
 		this.source = formulateSource(source);
+		this.version = env.getOptions().getOrDefault(JavadocAnnotationProcessor.OP_VERSION, "UNKNOWN");
+
 		List<String[]> tags = blockSeparator.splitAsStream(doc) //
 		 .map(section -> tagElementSeparator.split(section, 2)) //
 		 .collect( Collectors.toList());
@@ -148,6 +152,7 @@ public abstract class OpImplData {
 	public Map<String, Object> dumpData() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("source", source);
+		map.put("version", version);
 		map.put("names", names.toArray(String[]::new));
 		map.put("description", description);
 		map.put("priority", priority);

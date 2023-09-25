@@ -1,7 +1,5 @@
 package org.scijava.ops.engine.yaml;
 
-import static org.scijava.ops.engine.yaml.YAMLUtils.subMap;
-
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashSet;
@@ -14,6 +12,7 @@ import java.util.function.BiFunction;
 import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
+import org.scijava.priority.Priority;
 import org.scijava.struct.ItemIO;
 import org.scijava.struct.Member;
 import org.scijava.struct.MemberInstance;
@@ -26,12 +25,15 @@ import org.scijava.struct.Struct;
  */
 public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
 
+    static final Set<String> outputKeys = new HashSet<>(
+        List.of("OUTPUT, CONTAINER, MUTABLE"));
+
     @Override
     public OpInfo create(final URI identifier, final Map<String, Object> yaml) {
         // Parse source - start after the leading slash
         final String srcString = identifier.getPath().substring(1);
         // TODO: Parse version
-        final String version = "0.0";
+        final String version = yaml.get("version").toString();
 //        final String version = path.substring(path.indexOf('/') + 1);
         // Parse names
         final String[] names;
@@ -52,21 +54,10 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         for (int i = 0; i < names.length; i++) {
             names[i] = names[i].trim();
         }
-        // Parse priority
-        double priority = 0.0;
-        if (yaml.containsKey("priority")) {
-            Object p = yaml.get("priority");
-            if (p instanceof Number) priority = ((Number) p).doubleValue();
-            else if (p instanceof String) {
-                priority = Double.parseDouble((String) p);
-            } else {
-                throw new IllegalArgumentException("Op priority not parsable");
-            }
-        }
         // Create the OpInfo
         OpInfo info;
         try {
-            info = create(srcString, names, priority, null, version, yaml);
+            info = create(srcString, names, parsePriority(yaml), null, version, yaml);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -89,8 +80,25 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         return info;
     }
 
-    static final Set<String> outputKeys = new HashSet<>(
-        List.of("OUTPUT, CONTAINER, MUTABLE"));
+    /**
+     * Parses the priority out of the YAML
+     * @param yaml the YAML, stored in a {@link Map}
+     * @return the priority stored in the YAML, or otherwise {@link Priority#NORMAL}
+     */
+    private double parsePriority(Map<String, Object> yaml) {
+        // Parse priority
+        if (yaml.containsKey("priority")) {
+            Object p = yaml.get("priority");
+            if (p instanceof Number) return ((Number) p).doubleValue();
+            else if (p instanceof String) {
+                return Double.parseDouble((String) p);
+            } else {
+                throw new IllegalArgumentException("Op priority " + p + " not parsable");
+            }
+        }
+        // Return default priority
+        return Priority.NORMAL;
+    }
 
     private final BiFunction<Member<?>, Map<String, Object>, Member<?>>
         wrapMember = (member, map) -> {

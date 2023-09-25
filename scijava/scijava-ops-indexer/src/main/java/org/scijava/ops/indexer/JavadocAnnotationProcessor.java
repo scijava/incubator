@@ -49,6 +49,7 @@ import org.yaml.snakeyaml.Yaml;
 
 public class JavadocAnnotationProcessor extends AbstractProcessor {
 
+    public static final String OP_VERSION = "op.version";
     private static final String PARSE_OPS = "parse.ops";
 
     private YamlJavadocBuilder yamlJavadocBuilder;
