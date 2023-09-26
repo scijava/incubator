@@ -17,6 +17,8 @@
 package org.scijava.ops.indexer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.lang.model.element.ElementKind.CLASS;
+import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.lang.model.element.ElementKind.METHOD;
 
 import java.io.IOException;
@@ -29,7 +31,9 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -58,8 +62,6 @@ public class OpImplNoteParser extends AbstractProcessor {
 	public static final String OP_VERSION = "op.version";
 	private static final String PARSE_OPS = "parse.ops";
 
-	private YamlJavadocBuilder yamlJavadocBuilder;
-
 	private final Yaml yaml = new Yaml();
 
 	private final List<Map<String, Object>> opData = new ArrayList<>();
@@ -70,8 +72,6 @@ public class OpImplNoteParser extends AbstractProcessor {
 	{
 		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE,
 			"Processing Ops written using the implNote syntax...");
-		this.yamlJavadocBuilder = new YamlJavadocBuilder(processingEnv);
-
 		final Map<String, String> options = processingEnv.getOptions();
 		if ("true".equals(options.get(PARSE_OPS))) {
 			// Make sure each element only gets processed once.
@@ -118,7 +118,7 @@ public class OpImplNoteParser extends AbstractProcessor {
 		}
 		if (elementKindsToInspect.contains(element.getKind())) {
 			TypeElement classElement = (TypeElement) element;
-			yamlJavadocBuilder.getClassJavadocAsYamlOrNull(classElement) //
+			getClassJavadocAsYamlOrNull(classElement) //
 				.forEach(impl -> opData.add(impl.dumpData()));
 		}
 	}
@@ -156,7 +156,7 @@ public class OpImplNoteParser extends AbstractProcessor {
 		PrintWriter pw = new PrintWriter(sw);
 		t.printStackTrace(pw);
 		env.getMessager().printMessage(Diagnostic.Kind.ERROR,
-			"Exception parsing source + " + source + ": " + sw.toString());
+			"Exception parsing source + " + source + ": " + sw);
 	}
 
 	public static ExecutableElement findFunctionalMethod(
@@ -211,5 +211,63 @@ public class OpImplNoteParser extends AbstractProcessor {
 			return null;
 		}
 	}
+
+
+	// TODO: Consider adding record
+	private static final EnumSet<ElementKind> javadocKindsToInspect = EnumSet.of(
+			ElementKind.CLASS, ElementKind.METHOD, ElementKind.FIELD);
+
+	private List<OpImplData> getClassJavadocAsYamlOrNull(
+		TypeElement classElement)
+	{
+		List<OpImplData> implList = new ArrayList<>();
+		// Check all enclosed elements
+		for (Element e : classElement.getEnclosedElements()) {
+			// Only check fields and methods - inner classes will get checked
+			// on their own
+			if (javadocKindsToInspect.contains(e.getKind())) {
+				var optionalImpl = elementToImplData.apply(e);
+				optionalImpl.ifPresent(implList::add);
+			}
+		}
+
+		// Finally, check the class itself to see if it is an implNote
+		Optional<OpImplData> clsData = elementToImplData.apply(classElement);
+		clsData.ifPresent(implList::add);
+
+		return implList;
+	}
+
+	private final Function<Element, Optional<OpImplData>> elementToImplData = (
+		element) -> {
+		String javadoc = processingEnv.getElementUtils().getDocComment(element);
+		if (javadoc != null && javadoc.contains("implNote op")) {
+			try {
+				if (element.getKind() == CLASS) {
+					TypeElement typeElement = (TypeElement) element;
+					var fMethod = findFunctionalMethod(processingEnv, typeElement);
+					var fMethodDoc = processingEnv.getElementUtils().getDocComment(
+						fMethod);
+					return Optional.of(new OpClassImplData(typeElement, fMethod, javadoc,
+						fMethodDoc, processingEnv));
+				}
+				else if (element.getKind() == METHOD) {
+					return Optional.of(new OpMethodImplData((ExecutableElement) element,
+						javadoc, processingEnv));
+				}
+				else if (element.getKind() == FIELD) {
+					return Optional.of(new OpFieldImplData(element, javadoc,
+						processingEnv));
+				}
+			}
+			catch (InvalidOpJavadocException e) {
+				throw e;
+			}
+			catch (Exception e) {
+				printProcessingException(element, e, processingEnv);
+			}
+		}
+		return Optional.empty();
+	};
 
 }
