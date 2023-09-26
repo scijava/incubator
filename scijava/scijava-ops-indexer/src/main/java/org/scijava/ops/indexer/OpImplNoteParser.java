@@ -103,6 +103,8 @@ public class OpImplNoteParser extends AbstractProcessor {
 			}
 
 		}
+		// This annotation processor only looks at Javadoc - it doesn't look at, and
+		// thus doesn't claim any annotations
 		return false;
 	}
 
