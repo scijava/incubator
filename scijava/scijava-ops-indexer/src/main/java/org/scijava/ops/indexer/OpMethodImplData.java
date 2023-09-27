@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -15,8 +14,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.NoType;
 import javax.tools.Diagnostic;
-
-import org.scijava.ops.spi.OpDependency;
 
 /**
  * {@link OpImplData} implementation handling {@link Method}s annotated with
@@ -54,9 +51,13 @@ public class OpMethodImplData extends OpImplData {
 				continue;
 			}
 			VariableElement param = paramItr.next();
-			if (param.getAnnotation(OpDependency.class) != null) {
+			// HACK A dependency on SciJava Ops SPI is really tricky - creates a
+			// circular dependency so this is the easiest way to check for an
+			// OpDependency
+			boolean isOpDep = param.getAnnotationMirrors().stream() //
+					.anyMatch(a -> a.toString().contains("OpDependency"));
+			if (isOpDep)
 				opDependencies.add(param);
-			}
 			else {
 				functionalParams.add(tag);
 				fParams.add(param);

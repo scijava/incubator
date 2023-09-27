@@ -28,8 +28,6 @@ import static javax.lang.model.element.ElementKind.METHOD;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -39,17 +37,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
@@ -69,8 +65,6 @@ public class OpImplNoteParser extends AbstractProcessor {
 
 	private final Yaml yaml = new Yaml();
 
-	private final List<Map<String, Object>> opData = new ArrayList<>();
-
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations,
 		RoundEnvironment roundEnvironment)
@@ -79,28 +73,29 @@ public class OpImplNoteParser extends AbstractProcessor {
 			"Processing Ops written using the implNote syntax...");
 		final Map<String, String> options = processingEnv.getOptions();
 		if ("true".equals(options.get(PARSE_OPS))) {
+			final List<OpImplData> data = new ArrayList<>();
+
 			// Make sure each element only gets processed once.
 			final Set<Element> alreadyProcessed = new HashSet<>();
 
 			// If retaining Javadoc for all packages, the @RetainJavadoc annotation is
-			// redundant.
-			// Otherwise, make sure annotated classes have their Javadoc retained
-			// regardless of package.
+			// redundant. Otherwise, make sure annotated classes have their Javadoc
+			// retained regardless of package.
 			for (TypeElement annotation : annotations) {
 				for (Element e : roundEnvironment.getElementsAnnotatedWith(
 					annotation))
 				{
-					generateJavadoc(e, alreadyProcessed);
+					generateJavadoc(e, data, alreadyProcessed);
 				}
 			}
 
 			for (Element e : roundEnvironment.getRootElements()) {
-				generateJavadoc(e, alreadyProcessed);
+				generateJavadoc(e, data, alreadyProcessed);
 			}
 
-			if (!roundEnvironment.getRootElements().isEmpty() && !opData.isEmpty()) {
+			if (!roundEnvironment.getRootElements().isEmpty() && !data.isEmpty()) {
 				try {
-					outputYamlDoc(yaml.dump(opData));
+					outputYamlDoc(data);
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
@@ -117,18 +112,37 @@ public class OpImplNoteParser extends AbstractProcessor {
 	private static final EnumSet<ElementKind> elementKindsToInspect = EnumSet.of(
 		ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM);
 
-	private void generateJavadoc(Element element, Set<Element> alreadyProcessed) {
+	private void generateJavadoc(
+			Element element,
+			List<OpImplData> data,
+			Set<Element> alreadyProcessed
+	) {
+		// Ignore elements that have been parsed already
 		if (!alreadyProcessed.add(element)) {
 			return;
 		}
-		if (elementKindsToInspect.contains(element.getKind())) {
-			TypeElement classElement = (TypeElement) element;
-			getClassJavadocAsYamlOrNull(classElement) //
-				.forEach(impl -> opData.add(impl.dumpData()));
+		// Ignore elements that we don't care to parse
+		if (!elementKindsToInspect.contains(element.getKind())) {
+			return;
 		}
+
+		// Start by checking the element itself
+		TypeElement classElement = (TypeElement) element;
+		Optional<OpImplData> clsData = elementToImplData.apply(classElement);
+		clsData.ifPresent(data::add);
+		
+		// Then check contained elements
+		for (Element e : classElement.getEnclosedElements()) {
+			var optionalImpl = elementToImplData.apply(e);
+			optionalImpl.ifPresent(data::add);
+		}
+
 	}
 
-	private void outputYamlDoc(String doc) throws IOException {
+	private void outputYamlDoc(List<OpImplData> collectedData) throws IOException {
+		var data = collectedData.stream().map(OpImplData::dumpData).collect(
+				Collectors.toList());
+		String doc = yaml.dump(data);
 		FileObject resource = processingEnv.getFiler().createResource( //
 			StandardLocation.CLASS_OUTPUT, //
 			"", //
@@ -154,95 +168,6 @@ public class OpImplNoteParser extends AbstractProcessor {
 		return Collections.singleton(PARSE_OPS);
 	}
 
-	public static void printProcessingException(Element source, Throwable t,
-		ProcessingEnvironment env)
-	{
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		t.printStackTrace(pw);
-		env.getMessager().printMessage(Diagnostic.Kind.ERROR,
-			"Exception parsing source + " + source + ": " + sw);
-	}
-
-	public static ExecutableElement findFunctionalMethod(
-		ProcessingEnvironment env, TypeElement source)
-	{
-		// Step 1: Find abstract interface method
-		ExecutableElement fMethod = findAbstractFunctionalMethod(env, source);
-		if (fMethod != null) {
-			for (Element e : env.getElementUtils().getAllMembers(source)) {
-				if (e.getSimpleName().equals(fMethod.getSimpleName())) {
-					return (ExecutableElement) e;
-				}
-			}
-		}
-		throw new IllegalArgumentException("Op " + source +
-			" does not declare a functional method!");
-	}
-
-	public static ExecutableElement findAbstractFunctionalMethod( //
-		ProcessingEnvironment env, //
-		TypeElement source //
-	) {
-		int abstractMethodCount = 0;
-		ExecutableElement firstAbstractMethod = null;
-		for (Element e : source.getEnclosedElements()) {
-			if (e.getKind() == METHOD && e.getModifiers().contains(
-				Modifier.ABSTRACT))
-			{
-				firstAbstractMethod = (ExecutableElement) e;
-				abstractMethodCount++;
-
-			}
-		}
-		if (abstractMethodCount == 1) {
-			return firstAbstractMethod;
-		}
-		else {
-			// First, check the interfaces
-			for (TypeMirror e : source.getInterfaces()) {
-				Element iFace = env.getTypeUtils().asElement(e);
-				if (iFace instanceof TypeElement) {
-					ExecutableElement fMethod = findAbstractFunctionalMethod(env,
-						(TypeElement) iFace);
-					if (fMethod != null) return fMethod;
-				}
-			}
-			// Then, check the superclass
-			Element superCls = env.getTypeUtils().asElement(source.getSuperclass());
-			if (superCls instanceof TypeElement) {
-				return findAbstractFunctionalMethod(env, (TypeElement) superCls);
-			}
-			return null;
-		}
-	}
-
-
-	// TODO: Consider adding record
-	private static final EnumSet<ElementKind> javadocKindsToInspect = EnumSet.of(
-			ElementKind.CLASS, ElementKind.METHOD, ElementKind.FIELD);
-
-	private List<OpImplData> getClassJavadocAsYamlOrNull(
-		TypeElement classElement)
-	{
-		List<OpImplData> implList = new ArrayList<>();
-		// Check all enclosed elements
-		for (Element e : classElement.getEnclosedElements()) {
-			// Only check fields and methods - inner classes will get checked
-			// on their own
-			if (javadocKindsToInspect.contains(e.getKind())) {
-				var optionalImpl = elementToImplData.apply(e);
-				optionalImpl.ifPresent(implList::add);
-			}
-		}
-
-		// Finally, check the class itself to see if it is an implNote
-		Optional<OpImplData> clsData = elementToImplData.apply(classElement);
-		clsData.ifPresent(implList::add);
-
-		return implList;
-	}
-
 	private final Function<Element, Optional<OpImplData>> elementToImplData = (
 		element) -> {
 		String javadoc = processingEnv.getElementUtils().getDocComment(element);
@@ -250,7 +175,7 @@ public class OpImplNoteParser extends AbstractProcessor {
 			try {
 				if (element.getKind() == CLASS) {
 					TypeElement typeElement = (TypeElement) element;
-					var fMethod = findFunctionalMethod(processingEnv, typeElement);
+					var fMethod = ProcessingUtils.findFunctionalMethod(processingEnv, typeElement);
 					var fMethodDoc = processingEnv.getElementUtils().getDocComment(
 						fMethod);
 					return Optional.of(new OpClassImplData(typeElement, fMethod, javadoc,
@@ -266,7 +191,7 @@ public class OpImplNoteParser extends AbstractProcessor {
 				}
 			}
 			catch (Exception e) {
-				printProcessingException(element, e, processingEnv);
+				ProcessingUtils.printProcessingException(element, e, processingEnv);
 			}
 		}
 		return Optional.empty();

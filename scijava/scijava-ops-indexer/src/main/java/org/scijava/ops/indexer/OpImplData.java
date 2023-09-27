@@ -1,8 +1,8 @@
 
 package org.scijava.ops.indexer;
 
-import static org.scijava.ops.indexer.Patterns.blockSeparator;
-import static org.scijava.ops.indexer.Patterns.tagElementSeparator;
+import static org.scijava.ops.indexer.ProcessingUtils.blockSeparator;
+import static org.scijava.ops.indexer.ProcessingUtils.tagElementSeparator;
 
 import java.net.URI;
 import java.util.ArrayList;

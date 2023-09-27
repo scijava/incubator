@@ -1,7 +1,7 @@
 
 package org.scijava.ops.indexer;
 
-import static org.scijava.ops.indexer.Patterns.tagElementSeparator;
+import static org.scijava.ops.indexer.ProcessingUtils.tagElementSeparator;
 
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
@@ -64,7 +64,7 @@ public class OpFieldImplData extends OpImplData {
 		}
 		Element fieldType = env.getTypeUtils().asElement(source.asType());
 		if (fieldType instanceof TypeElement) {
-			ExecutableElement fMethod = OpImplNoteParser
+			ExecutableElement fMethod = ProcessingUtils
 				.findFunctionalMethod(env, (TypeElement) fieldType);
 			int numReturns = 0;
 			for (OpParameter p : params) {
