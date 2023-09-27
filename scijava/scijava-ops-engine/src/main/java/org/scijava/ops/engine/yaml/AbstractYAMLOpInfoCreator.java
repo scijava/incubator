@@ -32,9 +32,8 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
     public OpInfo create(final URI identifier, final Map<String, Object> yaml) {
         // Parse source - start after the leading slash
         final String srcString = identifier.getPath().substring(1);
-        // TODO: Parse version
+        // Parse version
         final String version = yaml.get("version").toString();
-//        final String version = path.substring(path.indexOf('/') + 1);
         // Parse names
         final String[] names;
         if (yaml.containsKey("name")) {
