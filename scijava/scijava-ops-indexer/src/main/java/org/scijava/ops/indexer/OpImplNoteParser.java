@@ -265,9 +265,6 @@ public class OpImplNoteParser extends AbstractProcessor {
 						processingEnv));
 				}
 			}
-			catch (InvalidOpJavadocException e) {
-				throw e;
-			}
 			catch (Exception e) {
 				printProcessingException(element, e, processingEnv);
 			}
