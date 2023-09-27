@@ -92,8 +92,6 @@ public class YAMLOpInfoDiscoverer implements Discoverer {
 				// See https://github.com/scijava/scijava/issues/106 for discussion
 				// and progress
 				throw new IllegalArgumentException(e);
-//				System.out.println("Could not add op " + identifier + ":");
-//				e.printStackTrace();
 			}
 		}
 	}
