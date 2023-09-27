@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+// This class was adapted from the
+// com.github.therapi.runtimejavadoc.scribe.JavadocAnnotationProcessor class
+// of Therapi Runtime Javadoc 0.13.0, which is distributed
+// under the Apache 2 license.
+
 package org.scijava.ops.indexer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
