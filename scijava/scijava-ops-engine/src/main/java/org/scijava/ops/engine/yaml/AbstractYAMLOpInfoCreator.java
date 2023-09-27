@@ -38,7 +38,7 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         final String[] names;
         if (yaml.containsKey("name")) {
             names = new String[]{(String) yaml.get("name")};
-        } else {
+        } else if (yaml.containsKey("names")){
             var tmp = yaml.get("names");
             if (tmp instanceof List) {
                 names = ((List<String>) tmp).toArray(String[]::new);
@@ -49,6 +49,9 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
             else {
                 throw new IllegalArgumentException("Cannot convert" + tmp + "to a String[]!");
             }
+        }
+        else {
+            throw new IllegalArgumentException("Op " + identifier + " declares no names!");
         }
         for (int i = 0; i < names.length; i++) {
             names[i] = names[i].trim();
