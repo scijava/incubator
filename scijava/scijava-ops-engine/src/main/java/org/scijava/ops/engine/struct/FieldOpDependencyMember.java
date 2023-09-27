@@ -49,14 +49,13 @@ public class FieldOpDependencyMember<T> extends AnnotatedOpDependencyMember<T>
 	private final Field field;
 
 	public FieldOpDependencyMember(final Field field, final Class<?> structType) {
-		super(() -> field.getName(), getDescription(field), Types.fieldType(field, structType), field
-			.getAnnotation(OpDependency.class));
+		super( //
+			field.getName(), //
+			"", //
+			Types.fieldType(field, structType), //
+			field.getAnnotation(OpDependency.class) //
+		);
 		this.field = field;
-	}
-
-	private static Producer<String> getDescription(Field f) {
-		// TODO
-		return () -> "";
 	}
 
 	// -- ValueAccessible methods --
