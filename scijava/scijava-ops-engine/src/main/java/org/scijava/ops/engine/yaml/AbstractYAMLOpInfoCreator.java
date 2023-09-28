@@ -34,28 +34,8 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         final String srcString = identifier.getPath().substring(1);
         // Parse version
         final String version = yaml.get("version").toString();
-        // Parse names
-        final String[] names;
-        if (yaml.containsKey("name")) {
-            names = new String[]{(String) yaml.get("name")};
-        } else if (yaml.containsKey("names")){
-            var tmp = yaml.get("names");
-            if (tmp instanceof List) {
-                names = ((List<String>) tmp).toArray(String[]::new);
-            }
-            else if (tmp instanceof String) {
-                names = new String[] {(String) tmp};
-            }
-            else {
-                throw new IllegalArgumentException("Cannot convert" + tmp + "to a String[]!");
-            }
-        }
-        else {
-            throw new IllegalArgumentException("Op " + identifier + " declares no names!");
-        }
-        for (int i = 0; i < names.length; i++) {
-            names[i] = names[i].trim();
-        }
+        // Parase names
+        final String[] names = parseNames(yaml, identifier);
         // Create the OpInfo
         OpInfo info;
         try {
@@ -80,6 +60,42 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         }
 
         return info;
+    }
+
+    /**
+     * Parses the names out of the YAML
+     *
+     * @param yaml       the YAML, stored in a {@link Map}
+     * @param identifier the {@link URI} identifying the source code for the Op
+     * @return the names stored in the YAML
+     * @throws IllegalArgumentException if there are no names in the YAML, or if the names element is not a (collection of) String.
+     */
+    private String[] parseNames(Map<String, Object> yaml, URI identifier) {
+        final String[] names;
+        // Construct names
+        if (yaml.containsKey("name")) {
+            names = new String[]{(String) yaml.get("name")};
+        } else if (yaml.containsKey("names")){
+            var tmp = yaml.get("names");
+            if (tmp instanceof List) {
+                names = ((List<String>) tmp).toArray(String[]::new);
+            }
+            else if (tmp instanceof String) {
+                names = new String[] {(String) tmp};
+            }
+            else {
+                throw new IllegalArgumentException("Cannot convert" + tmp + "to a String[]!");
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Op " + identifier + " declares no names!");
+        }
+        // Trim names
+        for (int i = 0; i < names.length; i++) {
+            names[i] = names[i].trim();
+        }
+        // Return names
+        return names;
     }
 
     /**
