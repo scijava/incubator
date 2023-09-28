@@ -17,7 +17,6 @@ module org.scijava.ops.engine {
 	requires org.scijava.function;
 	requires org.scijava.log2;
 	requires org.scijava.meta;
-	requires org.scijava.parse2;
 	requires org.scijava.priority;
 	requires org.scijava.progress;
 	requires org.scijava.struct;
@@ -40,8 +39,6 @@ module org.scijava.ops.engine {
 	uses org.scijava.ops.engine.matcher.reduce.InfoReducer;
 	uses org.scijava.ops.spi.Op;
 	uses org.scijava.ops.spi.OpCollection;
-	uses org.scijava.parse2.Parser;
-	uses org.scijava.types.TypeReifier;
 	uses org.scijava.types.TypeExtractor;
 
 	provides org.scijava.discovery.Discoverer with
