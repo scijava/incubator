@@ -8,7 +8,6 @@ import java.util.Map;
 import org.scijava.common3.Classes;
 import org.scijava.function.Computers;
 import org.scijava.function.Functions;
-import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
 import org.scijava.ops.engine.matcher.impl.OpMethodInfo;
@@ -27,8 +26,8 @@ public class JavaMethodYAMLInfoCreator extends AbstractYAMLOpInfoCreator {
 	}
 
 	@Override
-	OpInfo create(String identifier, String[] names, double priority, Hints hints,
-		String version, Map<String, Object> yaml) throws Exception
+	OpInfo create(String identifier, String[] names, double priority,
+				  String version, Map<String, Object> yaml) throws Exception
 	{
 		// first, remove generics
 		String rawIdentifier = sanitizeGenerics(identifier);

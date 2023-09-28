@@ -7,9 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 
-import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
 import org.scijava.priority.Priority;
@@ -39,10 +37,11 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         // Create the OpInfo
         OpInfo info;
         try {
-            info = create(srcString, names, parsePriority(yaml), null, version, yaml);
+            info = create(srcString, names, parsePriority(yaml), version, yaml);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        // If we have parameter information, bake it in.
         if (yaml.containsKey("parameters")) {
             List<Map<String, Object>> params =
                 (List<Map<String, Object>>) yaml.get("parameters");
@@ -54,7 +53,7 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
                 if (m.isInput() || m.isOutput()) {
                     if (!paramItr.hasNext()) break;
                     Map<String, Object> paramMap = paramItr.next();
-                    members.set(i, wrapMember.apply(m, paramMap));
+                    members.set(i, wrapMember(m, paramMap));
                 }
             }
         }
@@ -118,8 +117,7 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         return Priority.NORMAL;
     }
 
-    private final BiFunction<Member<?>, Map<String, Object>, Member<?>>
-        wrapMember = (member, map) -> {
+    private Member<?> wrapMember(final Member<?> member, final Map<String, Object> map) {
         String name = member.getKey();
         if (member.isInput() && !member.isOutput()) {
             name = (String) map.get("INPUT");
@@ -134,9 +132,9 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         }
         String desc = ((String) map.getOrDefault("description", "")).trim();
         return new RenamedMember<>(member, name, desc);
-    };
+    }
 
-    abstract OpInfo create(final String identifier, final String[] names, final double priority, final Hints hints, final String version, Map<String, Object> yaml) throws Exception;
+    abstract OpInfo create(final String identifier, final String[] names, final double priority, final String version, Map<String, Object> yaml) throws Exception;
 
     private static class RenamedMember<T> implements Member<T> {
 

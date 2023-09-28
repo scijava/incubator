@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.Map;
 
 import org.scijava.common3.Classes;
-import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.features.YAMLOpInfoCreator;
 import org.scijava.ops.engine.matcher.impl.OpClassInfo;
@@ -24,8 +23,8 @@ public class JavaClassYAMLOpInfoCreator extends AbstractYAMLOpInfoCreator {
 
 	@Override
 	public OpInfo create(final String identifier, final String[] names,
-		final double priority, final Hints hints, String version,
-		Map<String, Object> yaml) throws Exception
+						 final double priority, String version,
+						 Map<String, Object> yaml) throws Exception
 	{
 		// parse class
 		Class<?> src = Classes.load(identifier);
