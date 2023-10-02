@@ -21,23 +21,7 @@
 
 package org.scijava.ops.indexer;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static javax.lang.model.element.ElementKind.CLASS;
-import static javax.lang.model.element.ElementKind.FIELD;
-import static javax.lang.model.element.ElementKind.METHOD;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -49,8 +33,20 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.yaml.snakeyaml.Yaml;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.lang.model.element.ElementKind.*;
 
 /**
  * {@link javax.annotation.processing.Processor} used to find code blocks
@@ -128,13 +124,12 @@ public class OpImplNoteParser extends AbstractProcessor {
 
 		// Start by checking the element itself
 		TypeElement classElement = (TypeElement) element;
-		Optional<OpImplData> clsData = elementToImplData.apply(classElement);
+		Optional<OpImplData> clsData = elementToImplData(classElement);
 		clsData.ifPresent(data::add);
 		
 		// Then check contained elements
 		for (Element e : classElement.getEnclosedElements()) {
-			var optionalImpl = elementToImplData.apply(e);
-			optionalImpl.ifPresent(data::add);
+			elementToImplData(e).ifPresent(data::add);
 		}
 
 	}
@@ -168,8 +163,7 @@ public class OpImplNoteParser extends AbstractProcessor {
 		return Collections.singleton(PARSE_OPS);
 	}
 
-	private final Function<Element, Optional<OpImplData>> elementToImplData = (
-		element) -> {
+	private Optional<OpImplData> elementToImplData (final Element element) {
 		String javadoc = processingEnv.getElementUtils().getDocComment(element);
 		if (javadoc != null && javadoc.contains("implNote op")) {
 			try {
@@ -195,6 +189,6 @@ public class OpImplNoteParser extends AbstractProcessor {
 			}
 		}
 		return Optional.empty();
-	};
+	}
 
 }
