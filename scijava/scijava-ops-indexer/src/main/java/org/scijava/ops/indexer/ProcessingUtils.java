@@ -47,6 +47,12 @@ public class ProcessingUtils {
 		throw new AssertionError("not instantiable");
 	}
 
+	/**
+	 * Logs a {@link Throwable} parsing an {@link Element}
+	 * @param source the {@link Element} whose parsing was erroneous
+	 * @param t the {@link Throwable} thrown during the parsing
+	 * @param env the {@link ProcessingEnvironment} able to log the {@link Throwable}
+	 */
 	public static void printProcessingException(Element source, Throwable t,
 		ProcessingEnvironment env)
 	{
@@ -57,11 +63,19 @@ public class ProcessingUtils {
 			"Exception parsing source + " + source + ": " + sw);
 	}
 
+	/**
+	 * Finds the functional method of {@code source}, returning it as an {@link ExecutableElement}
+	 *
+	 * @param env    the {@link ProcessingEnvironment} with the knowledge to reason about {@code source}
+	 * @param source the {@link TypeElement} that represents a {@link FunctionalInterface}, whose functional method we want to find
+	 * @return the functional method of {@code source}, as an {@link ExecutableElement}
+	 */
 	public static ExecutableElement findFunctionalMethod(
 		ProcessingEnvironment env, TypeElement source)
 	{
-		// Step 1: Find abstract interface method
+		// Step 1: Find abstract interface method somewhere in the hierarchy
 		ExecutableElement fMethod = findAbstractFunctionalMethod(env, source);
+		// Step 2: Find the member of source that matches that abstract interface method
 		if (fMethod != null) {
 			for (Element e : env.getElementUtils().getAllMembers(source)) {
 				if (e.getSimpleName().equals(fMethod.getSimpleName())) {
@@ -77,6 +91,7 @@ public class ProcessingUtils {
 		ProcessingEnvironment env, //
 		TypeElement source //
 	) {
+		// First check source itself for the abstract method
 		int abstractMethodCount = 0;
 		ExecutableElement firstAbstractMethod = null;
 		for (Element e : source.getEnclosedElements()) {
@@ -91,6 +106,7 @@ public class ProcessingUtils {
 		if (abstractMethodCount == 1) {
 			return firstAbstractMethod;
 		}
+		// Otherwise, check up the class hierarchy
 		else {
 			// First, check the interfaces
 			for (TypeMirror e : source.getInterfaces()) {
