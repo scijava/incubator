@@ -109,6 +109,12 @@ public abstract class OpImplData {
 		return remainingTags;
 	}
 
+	/**
+	 * Abstract method used to parse tags specific to the {@link OpImplData} subclass.
+	 *
+	 * @param source         the {@link Element} that is identified as an Op.
+	 * @param additionalTags the remaining tags that are not universal across all Op implementation types.
+	 */
 	abstract void parseAdditionalTags(Element source, List<String[]> additionalTags);
 
 	abstract String formulateSource(Element source);
