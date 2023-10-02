@@ -1,67 +1,101 @@
-# SciJava Discovery Therapi: A Discoverer implementation backed by Therapi
+# SciJava Ops Indexer: Ops declaration within Javadoc
 
-This module provides the `TherapiDiscover`, a `Discoverer` implementation that uses [`therapi-runtime-javadoc`](https://github.com/dnault/therapi-runtime-javadoc) to discover tagged elements through javadoc tags.
+This module provides an annotation processor that can write Op YAML, based on Op descriptions written purely in Javadoc!
 
-`TherapiDiscoverer` **only** implements `Discoverer.elementsTaggedWith(String tag)`.
+## Configuring the annotation processor
 
-To make tags discoverable via `TherapiDiscoverer`, one must first enable therapi's annotation processor.
+To enable Op YAML generation in your build process, add the following to your `pom.xml`:
 
-```java
+```xml
 <properties>
-	<therapi.version>0.12.0</therapi.version>
-	<therapi-runtime-javadoc-scribe.version>${therapi.version}</therapi-runtime-javadoc-scribe.version>
-	<therapi.packages></therapi.packages>
+    <scijava.parse.ops>true</scijava.parse.ops>
 </properties>
 ```
 
-This sets the therapi version, and denotes the packages (using the `<therapi.packages>` tag) that should be processed. This can be left blank to indicate all packages, or can be a comma-delimited list to process **only** those packages.
+**NOTE**: Until this repository is moved out of the SciJava Incubator and the following is added to pom-scijava, the following must also be added to your POM:
 
-```java
+```xml
 <build>
-	<plugins>
-		<plugin>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<configuration>
-				<annotationProcessorPaths>
-					<path>
-						<groupId>com.github.therapi</groupId>
-						<artifactId>therapi-runtime-javadoc-scribe</artifactId>
-						<version>${therapi-runtime-javadoc-scribe.version}</version>
-					</path>
-				</annotationProcessorPaths>
-				<fork>true</fork>
-				<compilerArgs>
-					<arg>-Ajavadoc.packages="${therapi.packages}"</arg>
-				</compilerArgs>
-			</configuration>
-		</plugin>
-	</plugins>
+    <plugins>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.scijava</groupId>
+                        <artifactId>scijava-ops-indexer</artifactId>
+                        <version>${project.version}</version>
+                    </path>
+                </annotationProcessorPaths>
+                <fork>true</fork>
+                <showWarnings>true</showWarnings>
+                <compilerArgs>
+                    <arg>-Aparse.ops="${scijava.parse.ops}"</arg>
+                    <arg>-Aop.version="${project.version}"</arg>
+                </compilerArgs>
+            </configuration>
+        </plugin>
+    </plugins>
 </build>
 ```
 
-These elements already live in `scijava-incubator`, and will be moved upstream to `pom-scijava` at a later date. This means that all incubator projects (and later all SciJava projects) will have therapi capabilities for free. This behavior is **opt-in**; to enable therapi's annotation processor (and thus any functionality from `TherapiDiscoverer`) one must add `<therapi.packages></therapi.packages>` to the `properties` section of their POM.
+## Declaring Ops Within Javadoc
 
-## Tag Structure
-
-To add a tag to any [`AnnotatedElement`](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/reflect/AnnotatedElement.html), one can simply insert the [`@implNote`](https://nipafx.dev/javadoc-tags-apiNote-implSpec-implNote/) tag into the javadoc of that `AnnotatedElement`. Tags should be structured as
+To add a tag to any [`AnnotatedElement`](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/reflect/AnnotatedElement.html) as an Op, one can simply insert the following tag into its Javadoc:
 
 ```java
-@implNote <tagType> <tagBody>
+@implNote op names='<comma-separated list of names>'
 ```
 
-Where `tagType` is the `String` under which this `AnnotatedElement` should be discovered, and `tagBody` is any set of options relevant for the `tagType`. **TODO: `tagBody` structure**
-
-An example might look like
+For example, if you insert the `@implNote op` tag into the following static method
 
 ```java
 
 /**
- * @implNote foo 
+ * Some example Op
+ *
+ * @param d1 the first {@link Double}
+ * @param d2 the second {@link Double}
+ * @return the sum
+ * @author Gabriel Selzer
+ * @implNote op names='math.add' 
  */
-public void taggedMethod(...) {
-  ...
+public static Double add(final Double d1, final Double d2) {
+  return d1 + d2;
 }
 ```
 
-Assuming therapi processes the package containing `taggedMethod`, `taggedMethod` can then be retrieved using `TherapiDiscoverer.elementsTaggedWith("foo")`.
+This annotation processor might create the following file `op.yaml` within the JAR build by Maven:
+
+```yaml
+- op:
+    names: [math.add]
+    description: |2
+       Some example Op
+    source: javaMethod:/com.example.foo.Bar.add%28java.lang.Double%2Cjava.lang.Double%29
+    priority: 0.0
+    version: 1.2.3
+    parameters:
+      - parameter type: INPUT
+        name: d1
+        description: |
+          the first {@link Double}
+        type: java.lang.Double
+      - parameter type: INPUT
+        name: d2
+        description: |
+          the second {@link Double}
+        type: java.lang.Double
+      - parameter type: OUTPUT
+        name: output
+        description: |
+          the sum
+        type: java.lang.Double
+    authors:
+      - |
+        Gabriel Selzer
+    tags: {}
+```
+
+This YAML file can then be ingested by the SciJava Ops Engine (add link), and your Ops will automatically become available in any environment including your JAR!
 
