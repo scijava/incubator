@@ -37,6 +37,7 @@ public class OpFieldImplData extends OpImplData {
 	 */
 	@Override
 	void parseAdditionalTags(Element source, List<String[]> additionalTags) {
+		// Create the list of Op parameters by checking for @input, @container, @mutable, @output tags
 		for (String[] tag : additionalTags) {
 			switch (tag[0]) {
 				case "@input":
@@ -62,24 +63,28 @@ public class OpFieldImplData extends OpImplData {
 			}
 
 		}
+
+		// With the number of inputs and outputs collected, validate that we have the correct number of eaach
 		Element fieldType = env.getTypeUtils().asElement(source.asType());
 		if (fieldType instanceof TypeElement) {
+			// Find functional method of the Op type
 			ExecutableElement fMethod = ProcessingUtils
 				.findFunctionalMethod(env, (TypeElement) fieldType);
+			// Determine number of outputs (in practice, always 0 or 1)
 			int numReturns = 0;
 			for (OpParameter p : params) {
 				if (p.ioType == OpParameter.IO_TYPE.OUTPUT) {
 					numReturns++;
 				}
 			}
-
+			// Compare number of outputs with the number of @output tags
 			int expNumReturns = fMethod.getReturnType() instanceof NoType ? 0 : 1;
 			if (expNumReturns != numReturns) {
 				env.getMessager().printMessage(Diagnostic.Kind.ERROR, this.source +
 					" has " + numReturns + " @output tag(s) when it should have " +
 					expNumReturns);
 			}
-
+			// Compare number of inputs with the number of @input, @container, @mutable tags
 			int numParams = params.size() - numReturns;
 			int expNumParams = fMethod.getParameters().size();
 			if (numParams != expNumParams) {
