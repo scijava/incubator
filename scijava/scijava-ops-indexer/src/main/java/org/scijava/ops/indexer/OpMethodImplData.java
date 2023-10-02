@@ -1,19 +1,18 @@
 
 package org.scijava.ops.indexer;
 
-import java.lang.reflect.Method;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.NoType;
 import javax.tools.Diagnostic;
+import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link OpImplData} implementation handling {@link Method}s annotated with
@@ -41,8 +40,6 @@ public class OpMethodImplData extends OpImplData {
 		ExecutableElement exSource = (ExecutableElement) source;
 		// First, parse parameters
 		List<VariableElement> opDependencies = new ArrayList<>();
-		List<String[]> functionalParams = new ArrayList<>();
-		List<VariableElement> fParams = new ArrayList<>();
 		var paramItr = exSource.getParameters().iterator();
 		for (String[] tag : additionalTags) {
 			if (!"@param".equals(tag[0])) continue;
@@ -59,24 +56,28 @@ public class OpMethodImplData extends OpImplData {
 			if (isOpDep)
 				opDependencies.add(param);
 			else {
-				functionalParams.add(tag);
-				fParams.add(param);
+				// Coerce @param tag + VariableElement into an OpParameter
+				String name = param.getSimpleName().toString();
+				String type = param.asType().toString();
+				String remainder = tag[1];
+				String description;
+				if (remainder.contains(" ")) {
+					description = remainder.substring(remainder.indexOf(" "));
+				}
+				else {
+					description = "";
+				}
+				params.add(new OpParameter(name, type, OpParameter.IO_TYPE.INPUT,
+						description));
 			}
 		}
-
-		for (int i = 0; i < functionalParams.size(); i++) {
-			String name = fParams.get(i).getSimpleName().toString();
-			String type = fParams.get(i).asType().toString();
-			String remainder = functionalParams.get(i)[1];
-			String description;
-			if (remainder.contains(" ")) {
-				description = remainder.substring(remainder.indexOf(" "));
-			}
-			else {
-				description = "";
-			}
-			params.add(new OpParameter(name, type, OpParameter.IO_TYPE.INPUT,
-				description));
+		// Validate number of inputs
+		if (opDependencies.size() + params.size() != exSource
+				.getParameters().size())
+		{
+			env.getMessager().printMessage(Diagnostic.Kind.ERROR,
+					"The number of @param tags on " + exSource +
+							" does not match the number of parameters!");
 		}
 
 		// Finally, parse the return
@@ -91,14 +92,7 @@ public class OpMethodImplData extends OpImplData {
 				returnTag.get()[1] //
 			));
 		}
-
-		if (opDependencies.size() + functionalParams.size() != exSource
-			.getParameters().size())
-		{
-			env.getMessager().printMessage(Diagnostic.Kind.ERROR,
-				"The number of @param tags on " + exSource +
-					" does not match the number of parameters!");
-		}
+		// Validate number of outputs
 		if (!(exSource.getReturnType() instanceof NoType) && returnTag.isEmpty()) {
 			env.getMessager().printMessage(Diagnostic.Kind.ERROR, exSource +
 				" has a return, but no @return parameter");
