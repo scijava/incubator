@@ -41,7 +41,7 @@ public class ProcessingUtils {
 	 * tags.
 	 */
 	public static final Pattern tagElementSeparator = Pattern.compile(
-		"\\s*,*\\s+(?=(?:[^']*'[^']*')*[^']*$)");
+		"\\s*[,\\s]+(?=(?:[^']*'[^']*')*[^']*$)");
 
 	private ProcessingUtils() {
 		throw new AssertionError("not instantiable");
