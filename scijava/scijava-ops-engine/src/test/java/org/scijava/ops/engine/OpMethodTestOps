@@ -147,7 +147,7 @@ public class OpMethodTestOps implements OpCollection {
 	}
 
 	// -- Computers -- //
-	
+
 	@OpMethod(names = "test.doubleList", type = Computers.Arity0.class)
 	public static void doublesToList0(List<Double> output) {
 		output.clear();

@@ -48,7 +48,7 @@ public class OpBuilderTestOps implements OpCollection {
 
 	/*
 	 * -- FUNCTIONS --
-	 * 
+	 *
 	 * The general procedure for these Ops: Given a set of inputs in1, in2, ...,
 	 * inN, The output will be sum(in1, in2, ..., inN).
 	 */
@@ -141,10 +141,10 @@ public class OpBuilderTestOps implements OpCollection {
 
 	/*
 	 * -- INPLACES --
-	 * 
+	 *
 	 * The general procedure for these Ops: Given a set of inputs in1, in2, ... ,
 	 * io, ..., inN, the output will be io = in1 * in2 * ... * io * ... * inN.
-	 * N.B. We do this in arrays since the doubles themselves are immutable. 
+	 * N.B. We do this in arrays since the doubles themselves are immutable.
 	 */
 	// ARITY 1
 	@OpField(names = "test.mulArrays1_1")
@@ -2597,7 +2597,7 @@ public class OpBuilderTestOps implements OpCollection {
 
 	/*
 	 * -- COMPUTERS --
-	 * 
+	 *
 	 * The general procedure: given a set of inputs in1, in2, ... , inN, the output
 	 * is given as in1 * in2 * ... * inN. N.B. we use arrays here since the doubles
 	 * themselves are immutable

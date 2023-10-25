@@ -932,7 +932,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link org.scijava.function.Producer} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link org.scijava.function.Producer}
 	 * @param f the {@link org.scijava.function.Producer} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link org.scijava.function.Producer}
@@ -955,7 +955,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link java.util.function.Function} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link java.util.function.Function}
 	 * @param f the {@link java.util.function.Function} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link java.util.function.Function}
@@ -983,7 +983,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link java.util.function.BiFunction} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link java.util.function.BiFunction}
 	 * @param f the {@link java.util.function.BiFunction} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link java.util.function.BiFunction}
@@ -1011,7 +1011,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity3} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity3}
 	 * @param f the {@link Arity3} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity3}
@@ -1039,7 +1039,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity4} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity4}
 	 * @param f the {@link Arity4} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity4}
@@ -1067,7 +1067,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity5} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity5}
 	 * @param f the {@link Arity5} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity5}
@@ -1095,7 +1095,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity6} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity6}
 	 * @param f the {@link Arity6} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity6}
@@ -1123,7 +1123,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity7} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity7}
 	 * @param f the {@link Arity7} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity7}
@@ -1151,7 +1151,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity8} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity8}
 	 * @param f the {@link Arity8} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity8}
@@ -1179,7 +1179,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity9} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity9}
 	 * @param f the {@link Arity9} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity9}
@@ -1207,7 +1207,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity10} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity10}
 	 * @param f the {@link Arity10} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity10}
@@ -1235,7 +1235,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity11} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity11}
 	 * @param f the {@link Arity11} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity11}
@@ -1263,7 +1263,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity12} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity12}
 	 * @param f the {@link Arity12} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity12}
@@ -1291,7 +1291,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity13} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity13}
 	 * @param f the {@link Arity13} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity13}
@@ -1319,7 +1319,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity14} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity14}
 	 * @param f the {@link Arity14} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity14}
@@ -1347,7 +1347,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity15} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity15}
 	 * @param f the {@link Arity15} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity15}
@@ -1375,7 +1375,7 @@ public final class Functions {
 
 	/**
 	 * Converts a {@link Arity16} to a {@link ArityN}.
-	 * 
+	 *
 	 * @param <O> the type variable linked the output of the {@link Arity16}
 	 * @param f the {@link Arity16} to be converted into a {@link ArityN}
 	 * @return a {@link ArityN} created from the {@link Arity16}

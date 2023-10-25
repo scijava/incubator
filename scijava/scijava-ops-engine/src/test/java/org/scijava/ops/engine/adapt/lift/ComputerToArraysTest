@@ -79,7 +79,7 @@ public class ComputerToArraysTest extends AbstractTestEnvironment implements OpC
 			return number;
 		}
 	}
-	
+
 	@OpField(names = "test.liftArrayC")
 	public final Computers.Arity0<NumericalThing> alterThing0 = (out) -> {out.setNumber(0);};
 
