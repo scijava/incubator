@@ -10,10 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.imagej.ops.OpService;
-import net.imagej.ops.Ops;
-import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
 import org.scijava.Context;
-import org.scijava.plugin.Plugin;
 import org.scijava.ops.api.OpEnvironment;
 
 /**
