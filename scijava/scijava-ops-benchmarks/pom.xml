@@ -79,6 +79,33 @@
 			<archive>https://forum.image.sc/tag/scijava</archive>
 		</mailingList>
 	</mailingLists>
+<build>
+	<plugins>
+		<plugin>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<configuration>
+				<annotationProcessorPaths>
+					<path>
+						<groupId>org.scijava</groupId>
+						<artifactId>scijava-ops-indexer</artifactId>
+						<version>${project.version}</version>
+					</path>
+					<path>
+						<groupId>org.scijava</groupId>
+						<artifactId>scijava-common</artifactId>
+						<version>${scijava-common.version}</version>
+					</path>
+				</annotationProcessorPaths>
+				<fork>true</fork>
+				<showWarnings>true</showWarnings>
+				<compilerArgs>
+					<arg>-Aparse.ops="${scijava.parse.ops}"</arg>
+					<arg>-Aop.version="${project.version}"</arg>
+				</compilerArgs>
+			</configuration>
+		</plugin>
+	</plugins>
+</build>
 
 	<scm>
 		<connection>scm:git:git://github.com/scijava/incubator</connection>
@@ -104,8 +131,24 @@
 		<scijava-ops-benchmarks.allowedDuplicateClasses>${scijava.allowedDuplicateClasses},com.github.therapi.runtimejavadoc.repack.com.eclipsesource.json.*</scijava-ops-benchmarks.allowedDuplicateClasses>
 		<allowedDuplicateClasses>${scijava-ops-benchmarks.allowedDuplicateClasses}</allowedDuplicateClasses>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-ops</artifactId>
+		</dependency>
 		<!-- SciJava dependencies -->
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scijava-common</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-ops-api</artifactId>

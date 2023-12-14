@@ -9,6 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
+import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
+import org.scijava.Context;
+import org.scijava.plugin.Plugin;
 import org.scijava.ops.api.OpEnvironment;
 
 /**
@@ -23,9 +28,11 @@ public class PerformanceBenchmark {
 
 	private static final String METHOD_RAW = "Raw";
 	private static final String METHOD_SCIJAVA_OPS = "SciJava Ops";
+	private static final String METHOD_IMAGEJ_OPS = "ImageJ Ops";
 	private final int width, height;
 	private final byte[] rawData;
-	private final byte[] opData;
+	private final byte[] scijavaOpsData;
+	private final byte[] imageJOpsData;
 
 	/**
 	 * List of timing results.
@@ -36,6 +43,8 @@ public class PerformanceBenchmark {
 	 */
 	private final List< Map< String, Long > > results = new ArrayList<>();
 	private final OpEnvironment env = OpEnvironment.getEnvironment();
+
+	private final OpService ops;
 
 	public static void main(final String[] args) throws IOException {
 		final int iterations = 10;
@@ -49,6 +58,9 @@ public class PerformanceBenchmark {
 
 	/** Creates objects and measures memory usage. */
 	public PerformanceBenchmark(final int imageSize) {
+		Context ctx = new Context(OpService.class);
+		ops = ctx.getService(OpService.class);
+
 		width = height = imageSize;
 		System.out.println();
 		System.out.println("===== " + width + " x " + height + " =====");
@@ -57,8 +69,9 @@ public class PerformanceBenchmark {
 		memUsage.add(getMemUsage());
 		rawData = createRawData(width, height);
 		memUsage.add(getMemUsage());
-		// TODO: Change?
-		opData = rawData.clone();
+		scijavaOpsData = rawData.clone();
+		memUsage.add(getMemUsage());
+		imageJOpsData = rawData.clone();
 		memUsage.add(getMemUsage());
 
 		reportMemoryUsage(memUsage);
@@ -149,7 +162,9 @@ public class PerformanceBenchmark {
 			times.add(System.currentTimeMillis());
 			invertRaw(rawData);
 			times.add(System.currentTimeMillis());
-			invertUsingOps(opData);
+			invertUsingSciJavaOps(scijavaOpsData);
+			times.add(System.currentTimeMillis());
+			invertUsingImageJOps(imageJOpsData);
 			times.add(System.currentTimeMillis());
 			logTimePerformance(i, times);
 		}
@@ -166,7 +181,9 @@ public class PerformanceBenchmark {
 			times.add(System.currentTimeMillis());
 			randomizeRaw(rawData);
 			times.add(System.currentTimeMillis());
-			randomizeUsingOps(opData);
+			randomizeUsingSciJavaOps(scijavaOpsData);
+			times.add(System.currentTimeMillis());
+			randomizeUsingImageJOps(imageJOpsData);
 			times.add(System.currentTimeMillis());
 			logTimePerformance(i, times);
 		}
@@ -181,23 +198,28 @@ public class PerformanceBenchmark {
 
 	private void reportMemoryUsage(final List<Long> memUsage) {
 		final long rawMem = computeDifference(memUsage);
-		final long ipMem = computeDifference(memUsage);
+		final long sjMem = computeDifference(memUsage);
+		final long ijMem = computeDifference(memUsage);
 		System.out.println();
 		System.out.println("-- MEMORY OVERHEAD --");
 		System.out.println(METHOD_RAW + ": " + rawMem + " bytes");
-		System.out.println(METHOD_SCIJAVA_OPS + ": " + ipMem + " bytes");
+		System.out.println(METHOD_SCIJAVA_OPS + ": " + sjMem + " bytes");
+		System.out.println(METHOD_IMAGEJ_OPS + ": " + ijMem + " bytes");
 	}
 
 	private void logTimePerformance(final int iter, final List<Long> times) {
 		final long rawTime = computeDifference(times);
-		final long ipTime = computeDifference(times);
+		final long sjTime = computeDifference(times);
+		final long ijTime = computeDifference(times);
 
 		final Map<String, Long> entry = results.get(iter);
 		entry.put(METHOD_RAW, rawTime);
-		entry.put(METHOD_SCIJAVA_OPS, ipTime);
+		entry.put(METHOD_SCIJAVA_OPS, sjTime);
+		entry.put(METHOD_IMAGEJ_OPS, ijTime);
 
-		reportTime(METHOD_RAW, rawTime, rawTime, ipTime);
-		reportTime(METHOD_SCIJAVA_OPS, ipTime, rawTime, ipTime);
+		reportTime(METHOD_RAW, rawTime, rawTime, sjTime);
+		reportTime(METHOD_SCIJAVA_OPS, sjTime, rawTime, sjTime);
+		reportTime(METHOD_IMAGEJ_OPS, ijTime, rawTime, sjTime);
 	}
 
 	private long computeDifference(final List<Long> list) {
@@ -250,8 +272,12 @@ public class PerformanceBenchmark {
 		}
 	}
 
-	private void invertUsingOps(final byte[] data) {
+	private void invertUsingSciJavaOps(final byte[] data) {
 		env.unary("invert").input(data).mutate();
+	}
+
+	private void invertUsingImageJOps(final byte[] data) {
+		ops.run("image.invert", new Object[] {data});
 	}
 
 	// -- Randomization methods --
@@ -268,8 +294,12 @@ public class PerformanceBenchmark {
 		}
 	}
 
-	private void randomizeUsingOps(final byte[] data) {
+	private void randomizeUsingSciJavaOps(final byte[] data) {
 		env.unary("randomize").input(data).mutate();
+	}
+
+	private void randomizeUsingImageJOps(final byte[] data) {
+		ops.run("math.randomUniform", new Object[] {data});
 	}
 
 	private static double expensiveOperation(final int value) {
