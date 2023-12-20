@@ -1,10 +1,33 @@
 # SciJava Ops Benchmarks
 
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/dygraphs@2.1.0/dist/dygraph.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dygraphs@2.1.0/dist/dygraph.min.css" />
-
 ## Cheap operation results
 
+<div>
+<div class="dygraph" id="cheapIterationVsTime1" style="width: 50%; float:left"></div>
+<div class="dygraph" id="cheapIterationVsTime25" style="width: 50%"></div>
+</div>
+
+<div>
+<div class="dygraph" id="cheapResolutionVsTime1" style="width: 50%; float:left"></div>
+<div class="dygraph" id="cheapResolutionVsTime10" style="width: 50%"></div>
+</div>
+
+## Expensive operation results
+
+<div>
+<div class="dygraph" id="expensiveIterationVsTime1" style="width: 50%; float:left"></div>
+<div class="dygraph" id="expensiveIterationVsTime25" style="width: 50%"></div>
+</div>
+
+<div>
+<div class="dygraph" id="expensiveResolutionVsTime1" style="width: 50%; float:left"></div>
+<div class="dygraph" id="expensiveResolutionVsTime10" style="width: 50%"></div>
+</div>
+
+<!-- Populate graphs -->
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/dygraphs@2.1.0/dist/dygraph.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dygraphs@2.1.0/dist/dygraph.min.css" />
 <style type="text/css">
   .dygraph {
     display: inline-block;
@@ -25,27 +48,6 @@
   .dygraph-legend > span.highlight { display: inline; }
 </style>
 
-<div>
-<div class="dygraph" id="cheapIterationVsTime1"></div>
-<div class="dygraph" id="cheapIterationVsTime25"></div>
-</div>
-
-<div>
-<div class="dygraph" id="cheapResolutionVsTime1"></div>
-<div class="dygraph" id="cheapResolutionVsTime10"></div>
-</div>
-
-## Expensive operation results
-
-<div>
-<div class="dygraph" id="expensiveIterationVsTime1"></div>
-<div class="dygraph" id="expensiveIterationVsTime25"></div>
-</div>
-
-<div>
-<div class="dygraph" id="expensiveResolutionVsTime1"></div>
-<div class="dygraph" id="expensiveResolutionVsTime10"></div>
-</div>
 
 <script type="text/javascript">
   function plot(id, title, xlabel, data) {
@@ -68,103 +70,106 @@
       }
     });
   }
-  plot("cheapIterationVsTime1", "Iteration x Time (ms) at 1 Mpx", "Iteration",
-    "Iteration,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1,9,15,15,12,12,4\n" +
-    "2,5,5,9,8,5,0\n" +
-    "3,0,0,2,1,0,0\n" +
-    "4,0,0,3,0,0,0\n" +
-    "5,0,0,3,0,0,0\n" +
-    "6,0,0,3,0,0,0\n" +
-    "7,0,0,3,0,0,0\n" +
-    "8,0,0,2,0,1,0\n" +
-    "9,0,0,3,0,0,0\n" +
-    "10,0,0,2,0,0,1");
 
-  plot("cheapIterationVsTime25", "Iteration x Time (ms) at 25 Mpx", "Iteration",
-    "Iteration,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1,10,42,92,39,40,7\n" +
-    "2,5,35,78,33,30,5\n" +
-    "3,2,2,79,2,3,3\n" +
-    "4,2,2,78,2,3,3\n" +
-    "5,2,2,78,2,2,3\n" +
-    "6,1,2,79,3,3,3\n" +
-    "7,2,1,75,2,2,4\n" +
-    "8,1,2,79,2,3,3\n" +
-    "9,2,2,78,4,2,3\n" +
-    "10,1,3,83,3,3,4");
+<!--Begin Pasting Benchmark Data-->
+plot("cheapIterationVsTime1", "Iteration x Time (ms) at 1 Mpx", "Iteration",
+	"Iteration,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,119,11,79\n" +
+	"1,15,1,0\n" +
+	"2,11,0,0\n" +
+	"3,10,1,0\n" +
+	"4,10,0,1\n" +
+	"5,13,1,0\n" +
+	"6,10,0,2\n" +
+	"7,7,0,1\n" +
+	"8,7,0,0\n" +
+	"9,7,0,0");
 
-  plot("cheapResolutionVsTime1", "Resolution x Time (ms) at iteration #1", "Mpx",
-    "Mpx,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1 Mpx,9,15,15,12,12,4\n" +
-    "4 Mpx,8,16,25,14,15,5\n" +
-    "7 Mpx,9,18,36,17,17,5\n" +
-    "10 Mpx,9,25,38,23,21,5\n" +
-    "13 Mpx,9,28,49,24,23,6\n" +
-    "16 Mpx,9,31,60,28,27,6\n" +
-    "19 Mpx,9,36,66,31,31,6\n" +
-    "22 Mpx,10,37,74,35,33,7\n" +
-    "25 Mpx,10,42,92,39,40,7");
+plot("cheapIterationVsTime25", "Iteration x Time (ms) at 25 Mpx", "Iteration",
+	"Iteration,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,129,76,84\n" +
+	"1,21,4,4\n" +
+	"2,22,4,4\n" +
+	"3,25,7,6\n" +
+	"4,12,9,4\n" +
+	"5,10,4,4\n" +
+	"6,14,4,3\n" +
+	"7,12,4,6\n" +
+	"8,20,5,6\n" +
+	"9,13,5,6");
 
-  plot("cheapResolutionVsTime10", "Resolution x Time (ms) at iteration #10", "Mpx",
-    "Mpx,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1 Mpx,0,0,2,0,0,1\n" +
-    "4 Mpx,0,0,15,1,0,1\n" +
-    "7 Mpx,1,0,21,2,0,0\n" +
-    "10 Mpx,1,0,30,1,1,1\n" +
-    "13 Mpx,1,1,39,1,2,1\n" +
-    "16 Mpx,1,1,52,1,2,2\n" +
-    "19 Mpx,1,1,65,1,2,2\n" +
-    "22 Mpx,2,1,70,2,2,2\n" +
-    "25 Mpx,1,3,83,3,3,4");
+plot("cheapResolutionVsTime1", "Resolution x Time (ms) at iteration #1", "Mpx",
+	"Mpx,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,119,11,79\n" +
+	"1,118,20,67\n" +
+	"2,122,34,100\n" +
+	"3,122,14,67\n" +
+	"4,118,60,58\n" +
+	"5,118,26,85\n" +
+	"6,116,100,59\n" +
+	"7,113,23,66\n" +
+	"8,129,76,84");
 
-  plot("expensiveIterationVsTime1", "Iteration x Time (ms) at 1 Mpx", "Iteration",
-    "Iteration,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1,61,61,68,58,56,58\n" +
-    "2,43,44,55,52,49,50\n" +
-    "3,39,41,50,43,43,41\n" +
-    "4,42,44,47,42,39,40\n" +
-    "5,40,43,41,39,41,43\n" +
-    "6,38,43,44,43,44,40\n" +
-    "7,40,44,41,42,41,41\n" +
-    "8,39,38,40,42,40,41\n" +
-    "9,45,39,43,43,47,43\n" +
-    "10,38,43,47,43,46,40");
+plot("cheapResolutionVsTime10", "Resolution x Time (ms) at iteration #10", "Mpx",
+	"Mpx,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,7,0,0\n" +
+	"1,7,1,1\n" +
+	"2,11,1,2\n" +
+	"3,8,3,3\n" +
+	"4,11,3,2\n" +
+	"5,10,3,3\n" +
+	"6,8,3,4\n" +
+	"7,11,5,7\n" +
+	"8,13,5,6");
 
-  plot("expensiveIterationVsTime25", "Iteration x Time (ms) at 25 Mpx", "Iteration",
-    "Iteration,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1,1161,1171,1332,1126,1162,1277\n" +
-    "2,1052,1062,1210,1066,1069,1024\n" +
-    "3,1037,1044,1174,1030,1033,1000\n" +
-    "4,1008,1038,1137,1033,1026,978\n" +
-    "5,1027,1041,1137,1037,1037,997\n" +
-    "6,1017,1034,1096,1031,1058,984\n" +
-    "7,978,1049,1079,1060,1042,983\n" +
-    "8,999,1040,1072,1046,1030,989\n" +
-    "9,993,1071,1100,1047,1042,983\n" +
-    "10,989,1037,1061,1030,1041,973");
+plot("expensiveIterationVsTime1", "Iteration x Time (ms) at 1 Mpx", "Iteration",
+	"Iteration,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,61,60,50\n" +
+	"1,40,41,33\n" +
+	"2,39,33,34\n" +
+	"3,37,33,32\n" +
+	"4,34,30,29\n" +
+	"5,33,29,27\n" +
+	"6,30,26,26\n" +
+	"7,29,25,23\n" +
+	"8,27,23,23\n" +
+	"9,27,23,22");
 
-  plot("expensiveResolutionVsTime1", "Resolution x Time (ms) at iteration #1", "Mpx",
-    "Mpx,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1 Mpx,61,61,68,58,56,58\n" +
-    "4 Mpx,185,196,232,202,190,222\n" +
-    "7 Mpx,323,338,379,336,324,365\n" +
-    "10 Mpx,477,485,595,457,458,508\n" +
-    "13 Mpx,608,615,692,601,614,667\n" +
-    "16 Mpx,747,766,944,723,750,831\n" +
-    "19 Mpx,871,884,1019,849,878,1075\n" +
-    "22 Mpx,1013,1045,1170,973,1013,1090\n" +
-    "25 Mpx,1161,1171,1332,1126,1162,1277");
+plot("expensiveIterationVsTime25", "Iteration x Time (ms) at 25 Mpx", "Iteration",
+	"Iteration,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,798,837,783\n" +
+	"1,790,784,781\n" +
+	"2,785,780,774\n" +
+	"3,761,756,757\n" +
+	"4,731,730,731\n" +
+	"5,699,694,693\n" +
+	"6,649,645,640\n" +
+	"7,599,590,594\n" +
+	"8,570,566,566\n" +
+	"9,557,551,550");
 
-  plot("expensiveResolutionVsTime10", "Resolution x Time (ms) at iteration #10", "Mpx",
-    "Mpx,ImageJ,ImgLib2 Array,ImgLib2 Cell,ImgLib2 ImagePlus,ImgLib2 Planar,Raw\n" +
-    "1 Mpx,38,43,47,43,46,40\n" +
-    "4 Mpx,165,169,173,157,180,167\n" +
-    "7 Mpx,286,292,298,284,299,279\n" +
-    "10 Mpx,390,435,423,412,420,397\n" +
-    "13 Mpx,518,589,529,535,547,512\n" +
-    "16 Mpx,646,655,668,652,661,636\n" +
-    "19 Mpx,764,779,799,775,774,745\n" +
-    "22 Mpx,866,913,922,911,909,859\n" +
-    "25 Mpx,989,1037,1061,1030,1041,973");
+plot("expensiveResolutionVsTime1", "Resolution x Time (ms) at iteration #1", "Mpx",
+	"Mpx,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,61,60,50\n" +
+	"1,139,205,124\n" +
+	"2,235,304,221\n" +
+	"3,331,368,307\n" +
+	"4,424,466,407\n" +
+	"5,513,557,488\n" +
+	"6,596,601,592\n" +
+	"7,700,743,674\n" +
+	"8,798,837,783");
+
+plot("expensiveResolutionVsTime10", "Resolution x Time (ms) at iteration #10", "Mpx",
+	"Mpx,ImageJ Ops,Raw,SciJava Ops\n" +
+	"0,27,23,22\n" +
+	"1,92,87,87\n" +
+	"2,160,156,154\n" +
+	"3,222,217,218\n" +
+	"4,293,287,286\n" +
+	"5,358,352,346\n" +
+	"6,424,420,416\n" +
+	"7,480,478,478\n" +
+	"8,557,551,550");
+<!--End Pasting Benchmark Data-->
 </script>

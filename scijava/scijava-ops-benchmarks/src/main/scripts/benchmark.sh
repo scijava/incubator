@@ -33,37 +33,37 @@
 
 DIR="$(dirname "$0")"
 TARGET="$DIR/../../../target"
-#
-#CP=\
-#$TARGET'/dependency/*':\
-#$TARGET/classes:
-#
-#JAVA=java
-#MEM=512m
-#MAIN_CLASS=org.scijava.ops.benchmarks.PerformanceBenchmark
-#
-## copy dependent JARs first
-#cd "$DIR/../../.."
-#mvn -DskipTests package dependency:copy-dependencies
-#cd -
-#
-## 1 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 1000
-## 4 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 2000
-## 7 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 2646
-## 10 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 3162
-## 13 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 3606
-## 16 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 4000
-## 19 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 4359
-## 22 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 4690
-## 25 million
-#$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 5000
 
-python "$DIR/chart-gen.py" > pchart-data.wiki
+CP=\
+$TARGET'/dependency/*':\
+$TARGET/classes:
+
+JAVA=java
+MEM=512m
+MAIN_CLASS=org.scijava.ops.benchmarks.PerformanceBenchmark
+
+# copy dependent JARs first
+cd "$DIR/../../.."
+mvn -DskipTests package dependency:copy-dependencies
+cd -
+
+# 1 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 1000
+# 4 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 2000
+# 7 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 2646
+# 10 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 3162
+# 13 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 3606
+# 16 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 4000
+# 19 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 4359
+# 22 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 4690
+# 25 million
+$JAVA -mx$MEM -cp "$CP" $MAIN_CLASS 5000
+
+python "$DIR/chart-gen.py" > copyme.txt
