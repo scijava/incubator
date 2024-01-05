@@ -53,7 +53,8 @@ public class JavaFieldYAMLOpInfoCreator extends AbstractYAMLOpInfoCreator {
 	}
 
 	@Override
-	protected OpInfo create(String identifier, String[] names, double priority, String version, Map<String, Object> yaml) throws Exception
+	protected OpInfo create(String identifier, String[] names, double priority, String version,
+			Hints hints, Map<String, Object> yaml) throws Exception
 	{
 		// parse class
 		int clsIndex = identifier.indexOf('$');
@@ -63,8 +64,7 @@ public class JavaFieldYAMLOpInfoCreator extends AbstractYAMLOpInfoCreator {
 		// parse Field
 		String fieldString = identifier.substring(clsIndex + 1);
 		Field field = cls.getDeclaredField(fieldString);
-
 		// Create the OpInfo
-		return new OpFieldInfo(instance, field, version, new Hints(), priority, names);
+		return new OpFieldInfo(instance, field, version, hints, priority, names);
 	}
 }

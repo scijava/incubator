@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.scijava.ops.api.Hints;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.priority.Priority;
 import org.scijava.struct.ItemIO;
@@ -59,12 +60,15 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         final String srcString = identifier.getPath().substring(1);
         // Parse version
         final String version = yaml.get("version").toString();
-        // Parase names
+        // Parse names
         final String[] names = parseNames(yaml, identifier);
+        // Parse hints
+        final Hints hints = parseHints(yaml);
+
         // Create the OpInfo
         OpInfo info;
         try {
-            info = create(srcString, names, parsePriority(yaml), version, yaml);
+            info = create(srcString, names, parsePriority(yaml), version, hints, yaml);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -124,6 +128,18 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         return names;
     }
 
+    private Hints parseHints(Map<String, Object> yaml) {
+        if (!yaml.containsKey("tags"))
+            return new Hints();
+        Map<String, ?> tags = (Map<String, ?>) yaml.get("tags");
+        if (!tags.containsKey("hints")) {
+            return new Hints();
+        }
+        String hintsList = (String) tags.get("hints");
+        String[] arr = hintsList.split("\\s*,\\s*");
+        return new Hints(arr);
+    }
+
     /**
      * Parses the priority out of the YAML
      * @param yaml the YAML, stored in a {@link Map}
@@ -164,7 +180,8 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
         return new RenamedMember<>(member, name, desc);
     }
 
-    protected abstract OpInfo create(final String identifier, final String[] names, final double priority, final String version, Map<String, Object> yaml) throws Exception;
+    protected abstract OpInfo create(final String identifier, final String[] names, final double priority, final String version,
+        Hints hints, Map<String, Object> yaml) throws Exception;
 
     private static class RenamedMember<T> implements Member<T> {
 
