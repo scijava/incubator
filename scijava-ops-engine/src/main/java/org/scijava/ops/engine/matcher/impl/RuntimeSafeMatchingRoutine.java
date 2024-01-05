@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedSet;
 import java.util.function.Predicate;
 
 import org.scijava.ops.api.OpEnvironment;
@@ -71,16 +72,26 @@ public class RuntimeSafeMatchingRoutine implements MatchingRoutine {
 		OpEnvironment env)
 	{
 		final ArrayList<OpCandidate> candidates = new ArrayList<>();
-		
+
+		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
+		// NB we iterate over the infos with decreasing priority
 		for (final OpInfo info : getInfos(env, conditions)) {
-			Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
+			// Once we find a match, only check remaining Ops with the same priority
+			if (!candidates.isEmpty() && info.priority() < candidates.get(0).priority()) {
+				break;
+			}
+			// Check info for a match with the request
 			if (typesMatch(info.opType(), conditions.request().getType(),
 				typeVarAssigns))
 			{
-				OpCandidate candidate = new OpCandidate(env, conditions.request(), info,
-					typeVarAssigns);
-				candidates.add(candidate);
+				candidates.add(new OpCandidate( //
+						env, //
+						conditions.request(), //
+						info, //
+						new HashMap<>(typeVarAssigns) //
+				));
 			}
+			typeVarAssigns.clear();
 		}
 		List<OpRequest> reqs = Collections.singletonList(conditions.request());
 		if (candidates.isEmpty()) {
@@ -164,7 +175,7 @@ public class RuntimeSafeMatchingRoutine implements MatchingRoutine {
 		return matches;
 	}
 
-	private Iterable<OpInfo> getInfos(OpEnvironment env,
+	private SortedSet<OpInfo> getInfos(OpEnvironment env,
 		MatchingConditions conditions)
 	{
 		return env.infos(conditions.request().getName(), conditions.hints());
