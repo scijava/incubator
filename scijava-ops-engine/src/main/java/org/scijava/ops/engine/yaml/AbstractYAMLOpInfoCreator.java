@@ -130,10 +130,10 @@ public abstract class AbstractYAMLOpInfoCreator implements YAMLOpInfoCreator {
 
     private Hints parseHints(Map<String, Object> yaml) {
         if (!yaml.containsKey("tags"))
-            return new Hints();
+            return Hints.empty();
         Map<String, ?> tags = (Map<String, ?>) yaml.get("tags");
         if (!tags.containsKey("hints")) {
-            return new Hints();
+            return Hints.empty();
         }
         String hintsList = (String) tags.get("hints");
         String[] arr = hintsList.split("\\s*,\\s*");

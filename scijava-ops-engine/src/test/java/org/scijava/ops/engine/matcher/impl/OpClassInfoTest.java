@@ -57,7 +57,7 @@ public class OpClassInfoTest {
 		Assertions.assertThrows(FinalOpDependencyFieldException.class, () -> //
 		new OpClassInfo( //
 			FinalOpDependency.class, //
-			new Hints(), //
+			Hints.empty(), //
 			"finalDependency" //
 		));
 	}
@@ -73,7 +73,7 @@ public class OpClassInfoTest {
 		Assertions.assertThrows(FunctionalTypeOpException.class, () ->
 			new OpClassInfo( //
 					ImmutableOutput.class, //
-					new Hints(), //
+					Hints.empty(), //
 					"finalDependency" //
 			));
 	}

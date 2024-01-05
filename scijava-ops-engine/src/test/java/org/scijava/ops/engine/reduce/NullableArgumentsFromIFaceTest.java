@@ -140,7 +140,7 @@ public class NullableArgumentsFromIFaceTest extends AbstractTestEnvironment
 			new OpMethodInfo(//
 				m, //
 				BiFunctionWithNullable.class, //
-				new Hints(), //
+				Hints.empty(), //
 				"test.optionalOnIFaceAndOp" //
 			));
 	}
@@ -165,7 +165,7 @@ public class NullableArgumentsFromIFaceTest extends AbstractTestEnvironment
 			() -> new OpFieldInfo(//
 				this, //
 				f, //
-				new Hints(), //
+				Hints.empty(), //
 				"test.optionalOnIFaceAndOp" //
 			));
 	}

@@ -160,4 +160,17 @@ public class Hints {
 		Hints thatHints = (Hints) that;
 		return hints.equals(thatHints.hints);
 	}
+
+	// Single instantation for situations where empty hints are useful.
+	private static final Hints empty = new Hints();
+
+	/**
+	 * Returns an empty {@link Hints} object
+	 * @return an empty {@link Hints} object
+	 */
+	public static Hints empty() {
+		// NB since Hints are immutable, we can share one empty hints object
+		// across all use cases where we just need an empty hints.
+		return empty;
+	}
 }

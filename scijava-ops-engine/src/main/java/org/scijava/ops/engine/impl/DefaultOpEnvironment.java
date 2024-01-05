@@ -309,7 +309,7 @@ public class DefaultOpEnvironment implements OpEnvironment {
 	public OpInfo opify(final Class<?> opClass, final double priority,
 		String... names)
 	{
-		return new OpClassInfo(opClass, Versions.getVersion(opClass), new Hints(), priority,
+		return new OpClassInfo(opClass, Versions.getVersion(opClass), Hints.empty(), priority,
 			names);
 	}
 
@@ -783,7 +783,7 @@ public class DefaultOpEnvironment implements OpEnvironment {
 	@Override
 	public Hints getDefaultHints() {
 		if (environmentHints != null) return environmentHints.copy();
-		return new Hints();
+		return Hints.empty();
 	}
 
 	@Override

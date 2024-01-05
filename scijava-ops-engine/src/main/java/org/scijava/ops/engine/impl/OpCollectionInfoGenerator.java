@@ -53,7 +53,7 @@ import org.scijava.ops.spi.OpMethod;
 public class OpCollectionInfoGenerator implements OpInfoGenerator {
 
 	private Hints formHints(OpHints h) {
-		if (h == null) return new Hints();
+		if (h == null) return Hints.empty();
 		return new Hints(h.hints());
 	}
 

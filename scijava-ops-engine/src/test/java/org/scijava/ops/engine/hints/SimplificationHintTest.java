@@ -63,7 +63,7 @@ public class SimplificationHintTest extends AbstractTestEnvironment implements O
 	@Test
 	public void testSimplification() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		ops.setDefaultHints(hints);
 		@SuppressWarnings("unused")
 		Function<Integer[], Integer[]> adaptable = ops.op(
@@ -86,7 +86,7 @@ public class SimplificationHintTest extends AbstractTestEnvironment implements O
 	@Test
 	public void testSimplificationPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		@SuppressWarnings("unused")
 		Function<Integer[], Integer[]> adaptable = ops.op(
 			"test.simplification.hints", hints).arity1().inType(Integer[].class).outType(
@@ -112,7 +112,7 @@ public class SimplificationHintTest extends AbstractTestEnvironment implements O
 	@Test
 	public void testUnsimplifiableOp() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		ops.setDefaultHints(hints);
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
@@ -135,7 +135,7 @@ public class SimplificationHintTest extends AbstractTestEnvironment implements O
 	@Test
 	public void testUnsimplifiableOpPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
 			"test.simplification.unsimplifiable", hints).arity1().inType(Double[].class).outType(

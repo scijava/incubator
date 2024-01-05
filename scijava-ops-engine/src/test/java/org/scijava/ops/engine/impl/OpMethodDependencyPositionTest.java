@@ -67,7 +67,7 @@ public class OpMethodDependencyPositionTest extends AbstractTestEnvironment
 		var info = new OpMethodInfo( //
 				m, //
 				Computers.Arity1.class, //
-				new Hints(), //
+				Hints.empty(), //
 				"test.dependencyBeforeInput" //
 		);
 	}
@@ -124,7 +124,7 @@ public class OpMethodDependencyPositionTest extends AbstractTestEnvironment
 			() -> new OpMethodInfo( //
 				m, //
 				arity, //
-				new Hints(), //
+				Hints.empty(), //
 				names));
 	}
 }

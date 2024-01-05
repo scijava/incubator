@@ -73,7 +73,7 @@ public class SimplifiedOpInfoTest extends AbstractTestEnvironment implements
 	}
 
 	private SimplifiedOpInfo createSimpleInfo() {
-		OpClassInfo info = new OpClassInfo(SimpleOp.class, new Hints(),
+		OpClassInfo info = new OpClassInfo(SimpleOp.class, Hints.empty(),
 				"test.simplifiedDescription");
 		return SimplificationUtils.simplifyInfo(ops, info);
 	}

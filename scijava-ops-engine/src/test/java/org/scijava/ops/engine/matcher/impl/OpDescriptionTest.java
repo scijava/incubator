@@ -54,7 +54,7 @@ public class OpDescriptionTest extends AbstractTestEnvironment {
 
 	@Test
 	public void testOpClassDescription() {
-		OpClassInfo info = new OpClassInfo(ClassOp.class, new Hints(),
+		OpClassInfo info = new OpClassInfo(ClassOp.class, Hints.empty(),
 			"test.classDescription");
 
 		String expected = "test.classDescription(\n\t " //
@@ -73,7 +73,7 @@ public class OpDescriptionTest extends AbstractTestEnvironment {
 		Method method = OpDescriptionTest.class.getMethod("methodOp", Double.class,
 			Double.class);
 		OpMethodInfo info = new OpMethodInfo(method, BiFunction.class,
-			new Hints(), "test.methodDescription");
+			Hints.empty(), "test.methodDescription");
 		String expected = "test.methodDescription(\n\t " //
 			+ "Inputs:\n\t\tjava.lang.Double input1\n\t\tjava.lang.Double input2\n\t " //
 			+ "Outputs:\n\t\tjava.lang.Double output1\n)\n";
@@ -86,7 +86,7 @@ public class OpDescriptionTest extends AbstractTestEnvironment {
 	@Test
 	public void testOpFieldDescription() throws NoSuchFieldException {
 		Field field = OpDescriptionTest.class.getDeclaredField("fieldOp");
-		OpFieldInfo info = new OpFieldInfo(this, field, new Hints(),
+		OpFieldInfo info = new OpFieldInfo(this, field, Hints.empty(),
 			"test.fieldDescription");
 		String expected = "test.fieldDescription(\n\t " //
 			+ "Inputs:\n\t\tjava.lang.Double input1\n\t\tjava.lang.Double input2\n\t " //
@@ -97,7 +97,7 @@ public class OpDescriptionTest extends AbstractTestEnvironment {
 
 	@Test
 	public void testReducedDescription() {
-		OpClassInfo info = new OpClassInfo(ClassOp.class, new Hints(),
+		OpClassInfo info = new OpClassInfo(ClassOp.class, Hints.empty(),
 			"test.reductionDescription");
 
 		Type opType = Types.parameterize(Function.class, new Type[] { Double.class,
@@ -112,7 +112,7 @@ public class OpDescriptionTest extends AbstractTestEnvironment {
 
 	@Test
 	public void testMultiNameOp() {
-		OpClassInfo info = new OpClassInfo(ClassOp.class, new Hints(),
+		OpClassInfo info = new OpClassInfo(ClassOp.class, Hints.empty(),
 			"test.classDescription", "test.otherName");
 
 		String expected = "test.classDescription(\n\t " //

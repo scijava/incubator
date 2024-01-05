@@ -59,7 +59,7 @@ public class OpAdaptationInfoTest extends AbstractTestEnvironment {
 
 	@Test
 	public void testAdaptedDescription() {
-		OpClassInfo info = new OpClassInfo(ClassOp.class, new Hints(),
+		OpClassInfo info = new OpClassInfo(ClassOp.class, Hints.empty(),
 				"test.adaptationDescription");
 		Type opType = Types.parameterize(Computers.Arity2.class, new Type[] {
 				Double.class, Double.class, Double.class });

@@ -60,7 +60,7 @@ public class AdaptationHintTest extends AbstractTestEnvironment implements OpCol
 	@Test
 	public void testAdaptation() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		ops.setDefaultHints(hints);
 		@SuppressWarnings("unused")
 		Computers.Arity1<Double[], Double[]> adaptable = ops.op(
@@ -80,7 +80,7 @@ public class AdaptationHintTest extends AbstractTestEnvironment implements OpCol
 	@Test
 	public void testAdaptationPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		@SuppressWarnings("unused")
 		Computers.Arity1<Double[], Double[]> adaptable = ops.op(
 			"test.adaptation.hints", hints).arity1().inType(Double[].class).outType(Double[].class)
@@ -102,7 +102,7 @@ public class AdaptationHintTest extends AbstractTestEnvironment implements OpCol
 	@Test
 	public void testNonAdaptableOp() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		ops.setDefaultHints(hints);
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
@@ -122,7 +122,7 @@ public class AdaptationHintTest extends AbstractTestEnvironment implements OpCol
 	@Test
 	public void testNonAdaptableOpPerCallHints() {
 		// make sure we can find the Op when adaptation is allowed
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		@SuppressWarnings("unused")
 		Function<Double[], Double[]> adaptable = ops.op(
 			"test.adaptation.unadaptable", hints).arity1().inType(Double[].class).outType(Double[].class)

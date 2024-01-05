@@ -53,7 +53,7 @@ public class OpMethodInfoTest {
 			() -> new OpMethodInfo( //
 				m, //
 				Producer.class, //
-				new Hints(), //
+				Hints.empty(), //
 				"privateOp"));
 	}
 
@@ -68,7 +68,7 @@ public class OpMethodInfoTest {
 			() -> new OpMethodInfo( //
 				m, //
 				Producer.class, //
-				new Hints(), //
+				Hints.empty(), //
 				"instanceOp"));
 	}
 
@@ -83,7 +83,7 @@ public class OpMethodInfoTest {
 			new OpMethodInfo( //
 				m, //
 				getClass(), //
-				new Hints(), //
+				Hints.empty(), //
 				"staticOp"));
 	}
 
@@ -94,7 +94,7 @@ public class OpMethodInfoTest {
 			new OpMethodInfo( //
 					m, //
 					Function.class, //
-					new Hints(), //
+					Hints.empty(), //
 					"staticOp"));
 	}
 
@@ -107,7 +107,7 @@ public class OpMethodInfoTest {
 				new OpMethodInfo( //
 						m, //
 						Computers.Arity1.class, //
-						new Hints(), //
+						Hints.empty(), //
 						"mutateDouble"));
 	}
 }

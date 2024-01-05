@@ -238,7 +238,7 @@ public class ProvenanceTest extends AbstractTestEnvironment implements
 	@Test
 	public void testMappingProvenanceAndCaching() {
 		// call (and run) the Op
-		Hints hints = new Hints();
+		Hints hints = Hints.empty();
 		int length = 200;
 		Double[] array = new Double[length];
 		Arrays.fill(array, 1.);
