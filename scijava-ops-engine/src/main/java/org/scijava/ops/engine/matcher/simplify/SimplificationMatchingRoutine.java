@@ -61,8 +61,13 @@ public class SimplificationMatchingRoutine extends RuntimeSafeMatchingRoutine {
 		if (!seen.containsKey(name)) {
 			SortedSet<OpInfo> ops = new TreeSet<>();
 			for (OpInfo info : env.infos(name)) {
-				if (info.declaredHints().contains(BaseOpHints.Simplification.FORBIDDEN)) continue;
-				if (info instanceof SimplifiedOpInfo) continue;
+				if (info.declaredHints().contains(BaseOpHints.Simplification.FORBIDDEN)){
+					ops.add(info);
+					continue;
+				}
+				if (info instanceof SimplifiedOpInfo) {
+					continue;
+				}
 				try {
 					ops.add(SimplificationUtils.simplifyInfo(env, info));
 				}
