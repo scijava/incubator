@@ -52,91 +52,91 @@ public class CreateTypes {
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.bit'
+	 * @implNote op names='create, create.bit', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<BitType> bitTypeSource = () -> new BitType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint2'
+	 * @implNote op names='create, create.uint2', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<Unsigned2BitType> uint2TypeSource = () -> new Unsigned2BitType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint4'
+	 * @implNote op names='create, create.uint4', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<Unsigned4BitType> uint4TypeSource = () -> new Unsigned4BitType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.byte'
+	 * @implNote op names='create, create.byte', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<ByteType> byteTypeSource = () -> new ByteType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint8'
+	 * @implNote op names='create, create.uint8', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<UnsignedByteType> uint8TypeSource = () -> new UnsignedByteType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint12'
+	 * @implNote op names='create, create.uint12', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<Unsigned12BitType> uint12TypeSource = () -> new Unsigned12BitType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.int16'
+	 * @implNote op names='create, create.int16', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<ShortType> shortTypeSource = () -> new ShortType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint16'
+	 * @implNote op names='create, create.uint16', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<UnsignedShortType> uint16TypeSource = () -> new UnsignedShortType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.int32'
+	 * @implNote op names='create, create.int32', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<IntType> int32TypeSource = () -> new IntType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint32'
+	 * @implNote op names='create, create.uint32', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<UnsignedIntType> uint32TypeSource = () -> new UnsignedIntType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.int64'
+	 * @implNote op names='create, create.int64', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<LongType> int64TypeSource = () -> new LongType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint64'
+	 * @implNote op names='create, create.uint64', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<UnsignedLongType> uint64TypeSource = () -> new UnsignedLongType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.uint128'
+	 * @implNote op names='create, create.uint128', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<Unsigned128BitType> uint128TypeSource = () -> new Unsigned128BitType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.float32'
+	 * @implNote op names='create, create.float32', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<FloatType> float32TypeSource = () -> new FloatType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.cfloat32'
+	 * @implNote op names='create, create.cfloat32', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<ComplexFloatType> cfloat32TypeSource = () -> new ComplexFloatType();
 
@@ -144,13 +144,13 @@ public class CreateTypes {
 	 * NB higher priority to match {@code Producer<RealType>} and {@code Producer<NativeType>}
 	 *
 	 * @output output
-	 * @implNote op names='create, create.float64', priority='100.'
+	 * @implNote op names='create, create.float64', priority='100.', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<DoubleType> float64TypeSource = () -> new DoubleType();
 
 	/**
 	 * @output output
-	 * @implNote op names='create, create.cfloat64'
+	 * @implNote op names='create, create.cfloat64', hints='simplification.FORBIDDEN'
 	 */
 	public final Producer<ComplexDoubleType> cfloat64TypeSource = () -> new ComplexDoubleType();
 
