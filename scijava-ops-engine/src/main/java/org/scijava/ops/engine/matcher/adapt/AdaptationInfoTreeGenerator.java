@@ -29,6 +29,7 @@
 
 package org.scijava.ops.engine.matcher.adapt;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collection;
@@ -40,6 +41,7 @@ import org.scijava.ops.api.OpEnvironment;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.engine.InfoTreeGenerator;
 import org.scijava.types.Types;
+import org.scijava.types.inference.GenericAssignability;
 
 public class AdaptationInfoTreeGenerator implements InfoTreeGenerator {
 
@@ -76,8 +78,12 @@ public class AdaptationInfoTreeGenerator implements InfoTreeGenerator {
 		OpInfo originalInfo = originalTree.info();
 		// TODO: The op type is wrong!
 		Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
-		if (!Types.isAssignable(originalInfo.opType(), adaptorTree.info().inputs()
-			.get(0).getType(), typeVarAssigns)) throw new IllegalArgumentException(
+//		GenericAssignability.checkGenericAssignability(originalInfo.opType(), adaptorTree.info().inputs().get(0).getType());
+		var adaptorType = adaptorTree.info().inputs().get(0).getType();
+		var superOpType = Types.getExactSuperType(originalInfo.opType(), Types.raw(adaptorType));
+		if (!GenericAssignability.checkGenericAssignability(adaptorType, (ParameterizedType) superOpType, typeVarAssigns, true)) throw new IllegalArgumentException(
+//		if (!Types.isAssignable(originalInfo.opType(), adaptorTree.info().inputs()
+//			.get(0).getType(), typeVarAssigns)) throw new IllegalArgumentException(
 				"The adaptor cannot be used on Op " + originalInfo);
 		Type adaptedOpType = Types.substituteTypeVariables(adaptorTree.info()
 			.output().getType(), typeVarAssigns);

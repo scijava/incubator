@@ -151,10 +151,9 @@ public class AdaptationMatchingRoutine implements MatchingRoutine {
 							);
 							Type mapped = Types.mapVarToTypes(matchedType, adaptorBounds);
 							// If the type variable is more specific now, update it
-							if (mapped != null && Types.isAssignable(mapped, map.get(
-								typeVar)))
-					{
-								map.put(typeVar, mapped);
+							if (mapped != null && Types.isAssignable(map.get(typeVar), mapped))
+							{
+//								map.put(typeVar, mapped);
 							}
 						}
 						dependencyBounds.clear();

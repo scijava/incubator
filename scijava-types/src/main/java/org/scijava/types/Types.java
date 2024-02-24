@@ -393,6 +393,9 @@ public final class Types {
 					Type[] typeVarsI = new Type[types.length];
 					for (int j = 0; j < typeVarsI.length; j++) {
 						typeVarsI[j] = castedTypes[j].getActualTypeArguments()[i];
+						if (Types.isRecursive(typeVarsI[j])) {
+							typeVarsI[j] = Types.parameterizeRaw(Types.raw(typeVarsI[j]));
+						}
 					}
 					// If each of these types implements some recursive interface, e.g.
 					// Comparable,
@@ -581,6 +584,13 @@ public final class Types {
 							return true;
 						}
 					}
+				}
+			}
+		}
+		else if (type instanceof TypeVariable<?>) {
+			for (Type bound: ((TypeVariable<?>) type).getBounds()) {
+				if (isRecursive(bound)) {
+					return true;
 				}
 			}
 		}
@@ -1847,7 +1857,7 @@ public final class Types {
 				if (type instanceof TypeVariable) {
 					TypeVariable<?> typeVar = (TypeVariable<?>) type;
 					Type[] bounds = typeVar.getBounds();
-					if (typeVarAssigns.containsKey(type)) {
+					if (typeVarAssigns.containsKey(type) && !typeVarAssigns.get(type).equals(type)) {
 						return isAssignable(typeVarAssigns.get(type), toParameterizedType,
 							typeVarAssigns);
 					}
@@ -1949,12 +1959,12 @@ public final class Types {
 						Type[] toTypes = ((ParameterizedType) toResolved)
 							.getActualTypeArguments();
 						for (int i = 0; i < fromTypes.length; i++) {
-							if (toTypes[i] instanceof TypeVariable<?> && Types.isAssignable(
-								fromTypes[i], toTypes[i], typeVarAssigns))
-							{
-								typeVarAssigns.put((TypeVariable<?>) toTypes[i], fromTypes[i]);
-								continue;
-							}
+//							if (toTypes[i] instanceof TypeVariable<?> && Types.isAssignable(
+//								fromTypes[i], toTypes[i], typeVarAssigns))
+//							{
+//								typeVarAssigns.put((TypeVariable<?>) toTypes[i], fromTypes[i]);
+//								continue;
+//							}
 							if (!(fromTypes[i] instanceof Any || toTypes[i] instanceof Any ||
 								fromTypes[i].equals(Any.class) || toTypes[i].equals(Any.class)))
 								return false;
@@ -2344,7 +2354,7 @@ public final class Types {
 				for (final Type bound : toTypeVarBounds) {
 					if (!isAssignable(type, bound, typeVarAssigns)) return false;
 				}
-
+				typeVarAssigns.put(toTypeVariable, type);
 				return true;
 			}
 

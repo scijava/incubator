@@ -417,24 +417,24 @@ public final class GenericAssignability {
 	private static void inferTypeVariables(Class<?> type, Type inferFrom,
 		Map<TypeVariable<?>, TypeMapping> typeMappings)
 	{
-		if (inferFrom instanceof TypeVariable<?>) {
-			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
-			// If current type var is absent put it to the map. Otherwise,
-			// we already encountered that var.
-			// Hence, we require them to be exactly the same.
-			if (Types.isAssignable(type, inferFrom, typeVarAssigns)) {
-				Type current = typeVarAssigns.putIfAbsent((TypeVariable<?>) inferFrom,
-					type);
-				if (current != null) {
-					if (current instanceof Any) {
-						typeVarAssigns.put((TypeVariable<?>) inferFrom, type);
-					}
-					else if (!Objects.equal(type, current)) {
-						throw new TypeInferenceException();
-					}
-				}
-			}
-		}
+//		if (inferFrom instanceof TypeVariable<?>) {
+//			TypeVarAssigns typeVarAssigns = new TypeVarAssigns(typeMappings);
+//			// If current type var is absent put it to the map. Otherwise,
+//			// we already encountered that var.
+//			// Hence, we require them to be exactly the same.
+//			if (Types.isAssignable(type, inferFrom, typeVarAssigns)) {
+//				Type current = typeVarAssigns.putIfAbsent((TypeVariable<?>) inferFrom,
+//					type);
+//				if (current != null) {
+//					if (current instanceof Any) {
+//						typeVarAssigns.put((TypeVariable<?>) inferFrom, type);
+//					}
+//					else if (!Objects.equal(type, current)) {
+//						throw new TypeInferenceException();
+//					}
+//				}
+//			}
+//		}
 	}
 
 	private static void inferTypeVariables(GenericArrayType type, Type inferFrom,
@@ -653,7 +653,7 @@ public final class GenericAssignability {
 		if (type instanceof TypeVariable) {
 			if (typeMappings.containsKey(type)) return;
 			TypeVariable<?> typeVar = (TypeVariable<?>) type;
-			typeMappings.put(typeVar, suitableTypeMapping(typeVar, Any.class, true));
+			typeMappings.put(typeVar, suitableTypeMapping(typeVar, Any.class , true));
 		}
 		else if (type instanceof ParameterizedType) {
 			ParameterizedType pType = (ParameterizedType) type;

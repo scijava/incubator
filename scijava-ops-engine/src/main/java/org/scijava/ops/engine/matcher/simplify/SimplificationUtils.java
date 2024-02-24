@@ -44,12 +44,7 @@ import java.util.function.Function;
 import org.scijava.function.Computers;
 import org.scijava.function.Container;
 import org.scijava.function.Mutable;
-import org.scijava.ops.api.Hints;
-import org.scijava.ops.api.OpEnvironment;
-import org.scijava.ops.api.OpInfo;
-import org.scijava.ops.api.OpMatchingException;
-import org.scijava.ops.api.OpRequest;
-import org.scijava.ops.api.RichOp;
+import org.scijava.ops.api.*;
 import org.scijava.ops.engine.BaseOpHints;
 import org.scijava.ops.engine.util.Infos;
 import org.scijava.ops.engine.util.internal.AnnotationUtils;
@@ -173,8 +168,7 @@ public final class SimplificationUtils {
 	}
 
 	public static SimplifiedOpInfo simplifyInfo(OpEnvironment env, OpInfo info) {
-		Hints h = new Hints(BaseOpHints.Adaptation.FORBIDDEN,
-			BaseOpHints.Simplification.FORBIDDEN);
+		Hints h = new Hints(BaseOpHints.Simplification.FORBIDDEN, BaseOpHints.Adaptation.FORBIDDEN);
 		List<RichOp<Function<?, ?>>> inFocusers = new ArrayList<>();
 		Type[] args = info.inputTypes().toArray(Type[]::new);
 		for (Type arg : args) {
@@ -207,8 +201,12 @@ public final class SimplificationUtils {
 		int ioIndex = SimplificationUtils.findMutableArgIndex(Types.raw(info
 			.opType()));
 		if (ioIndex > -1) {
+			var ioInfo = Ops.info(inFocusers.get(ioIndex));
+			Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
+			GenericAssignability.inferTypeVariables(new Type[] {ioInfo.outputType()}, new Type[] {args[ioIndex]}, typeAssigns);
+			var inNil = Nil.of(Types.mapVarToTypes(ioInfo.inputTypes().get(0), typeAssigns));
 			var nil = Nil.of(outType(info.outputType(), outSimplifier));
-			var copier = env.unary("engine.copy", h).inType(nil).outType(nil)
+			var copier = env.unary("engine.copy", h).inType(nil).outType(inNil)
 				.computer();
 			copyOp = org.scijava.ops.api.Ops.rich(copier);
 		}
