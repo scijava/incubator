@@ -73,7 +73,7 @@ public class SimplifiedOpRequest implements OpRequest {
 	private final RichOp<Computers.Arity1<?, ?>> outputCopier;
 
 	public SimplifiedOpRequest(OpRequest req, OpEnvironment env) {
-		Hints h = new Hints(Adaptation.FORBIDDEN, Simplification.FORBIDDEN);
+		Hints h = new Hints(Simplification.FORBIDDEN);
 		this.name = req.getName();
 		this.srcReq = req;
 		// Find the simplifiers and focusers

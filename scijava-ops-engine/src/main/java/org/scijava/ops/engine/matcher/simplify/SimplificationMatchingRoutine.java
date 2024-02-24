@@ -84,8 +84,8 @@ public class SimplificationMatchingRoutine extends RuntimeSafeMatchingRoutine {
 	public void checkSuitability(MatchingConditions conditions)
 		throws OpMatchingException
 	{
-		if (conditions.hints().containsAny(BaseOpHints.Simplification.IN_PROGRESS,
-			BaseOpHints.Simplification.FORBIDDEN)) //
+		var hints = conditions.hints();
+		if (hints.contains(BaseOpHints.Simplification.FORBIDDEN)) //
 			throw new OpMatchingException(
 				"Simplification is not suitable: Simplification is disabled");
 	}
@@ -106,35 +106,12 @@ public class SimplificationMatchingRoutine extends RuntimeSafeMatchingRoutine {
 			if (typesMatch(info.opType(), conditions.request().getType(),
 				typeVarAssigns))
 			{
-				OpCandidate candidate = new OpCandidate(env, request, info,
-					typeVarAssigns);
-				candidates.add(candidate);
+				candidates.add(new SimplifiedOpCandidate(env, request, info, typeVarAssigns));
 			}
 		}
-		if (!candidates.isEmpty()) {
-			final List<OpCandidate> matches = filterMatches(candidates);
-			return new MatchingResult(candidates, matches, Collections.singletonList(
-				request)).singleMatch();
-		}
-
-		// Pass 2 - Focus if needed
-		SimplifiedOpRequest simpleReq = new SimplifiedOpRequest(request, env);
-		for (final SimplifiedOpInfo info : simpleInfos) {
-			Map<TypeVariable<?>, Type> typeVarAssigns = new HashMap<>();
-			if (typesMatch(info.opType(), simpleReq.getType(), typeVarAssigns)) {
-				FocusedOpInfo focusedInfo = new FocusedOpInfo(info, simpleReq, env);
-				OpCandidate candidate = new OpCandidate(env, request, focusedInfo,
-					typeVarAssigns);
-				candidates.add(candidate);
-			}
-		}
-		List<OpRequest> reqs = Collections.singletonList(conditions.request());
-		if (candidates.isEmpty()) {
-			return MatchingResult.empty(reqs).singleMatch();
-		}
-		// narrow down candidates to the exact matches
 		final List<OpCandidate> matches = filterMatches(candidates);
-		return new MatchingResult(candidates, matches, reqs).singleMatch();
+		return new MatchingResult(candidates, matches, Collections.singletonList(
+			request)).singleMatch();
 	}
 
 	protected static SortedSet<SimplifiedOpInfo> getSimpleInfos(OpEnvironment env,

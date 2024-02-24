@@ -29,13 +29,6 @@
 
 package org.scijava.ops.engine;
 
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.scijava.ops.api.OpEnvironment;
 import org.scijava.ops.api.OpInfo;
 import org.scijava.ops.api.OpRequest;
@@ -43,6 +36,12 @@ import org.scijava.struct.Member;
 import org.scijava.struct.Struct;
 import org.scijava.struct.StructInstance;
 import org.scijava.types.Types;
+
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Container class for a possible operation match between an {@link OpRequest}
@@ -75,12 +74,6 @@ public class OpCandidate {
 	private String message;
 	private Member<?> statusItem;
 
-	/**
-	 * (Null-)Padded arguments of the op if the op has not required parameters. If
-	 * the op does not, this will be the same as {@link #request}.getArgs().
-	 */
-	private final Type[] paddedArgs;
-
 	public OpCandidate(final OpEnvironment env, final OpRequest request,
 		final OpInfo info, final Map<TypeVariable<?>, Type> typeVarAssigns)
 	{
@@ -89,7 +82,6 @@ public class OpCandidate {
 		this.info = info;
 		this.typeVarAssigns = typeVarAssigns;
 
-		this.paddedArgs = padTypes(this, getRequest().getArgs());
 		this.reifiedType = getReifiedType(request, info, typeVarAssigns);
 	}
 
@@ -129,7 +121,7 @@ public class OpCandidate {
 
 	/** Gets the priority of this result */
 	public double priority() {
-		return info.priority();
+		return opInfo().priority();
 	}
 
 	/**
@@ -140,9 +132,6 @@ public class OpCandidate {
 		return typeVarAssigns;
 	}
 
-	public Type[] paddedArgs() {
-		return paddedArgs;
-	}
 
 	/**
 	 * Gets the {@link Struct} metadata describing the op to match against.
@@ -150,7 +139,7 @@ public class OpCandidate {
 	 * @see OpInfo#struct()
 	 */
 	public Struct struct() {
-		return info.struct();
+		return opInfo().struct();
 	}
 
 	/** Sets the status of the matching attempt. */
@@ -227,7 +216,7 @@ public class OpCandidate {
 
 	@Override
 	public String toString() {
-		return info.toString();
+		return opInfo().toString();
 	}
 
 	public StructInstance<?> createOpInstance(List<?> dependencies) {
@@ -254,58 +243,6 @@ public class OpCandidate {
 				" cannot satisfy the requirements contained within OpRequest " +
 				request);
 		return typeVarAssigns;
-	}
-
-	private Type[] padTypes(final OpCandidate candidate, Type[] types) {
-		final Object[] padded = padArgs(candidate, (Object[]) types);
-		return Arrays.copyOf(padded, padded.length, Type[].class);
-	}
-
-	private Object[] padArgs(final OpCandidate candidate, Object... args) {
-		List<Member<?>> members;
-		String argName;
-		members = candidate.opInfo().inputs();
-		argName = "args";
-
-		int inputCount = 0, requiredCount = 0;
-		for (final Member<?> item : members) {
-			inputCount++;
-			if (!item.isRequired()) requiredCount++;
-		}
-		if (args.length == inputCount) {
-			// correct number of arguments
-			return args;
-		}
-		if (args.length > inputCount) {
-			// too many arguments
-			candidate.setStatus(StatusCode.TOO_MANY_ARGS, "\nNumber of " + argName +
-				" given: " + args.length + "  >  " + "Number of " + argName +
-				" of op: " + inputCount);
-			return null;
-		}
-		if (args.length < requiredCount) {
-			// too few arguments
-			candidate.setStatus(StatusCode.TOO_FEW_ARGS, "\nNumber of " + argName +
-				" given: " + args.length + "  <  " + "Number of required " + argName +
-				" of op: " + requiredCount);
-			return null;
-		}
-
-		// pad nullable parameters with null (from right to left)
-		final int argsToPad = inputCount - args.length;
-		final int nullableCount = inputCount - requiredCount;
-		final int nullablesToFill = nullableCount - argsToPad;
-		final Object[] paddedArgs = new Object[inputCount];
-		int argIndex = 0, paddedIndex = 0, nullableIndex = 0;
-		for (final Member<?> item : members) {
-			if (!item.isRequired() && nullableIndex++ >= nullablesToFill) {
-				// skip this nullable parameter (pad with null)
-				paddedIndex++;
-				continue;
-			}
-			paddedArgs[paddedIndex++] = args[argIndex++];
-		}
-		return paddedArgs;
 	}
 
 }

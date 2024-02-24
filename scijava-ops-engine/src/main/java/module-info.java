@@ -271,6 +271,7 @@ module org.scijava.ops.engine {
 	provides org.scijava.ops.engine.matcher.MatchingRoutine with
 		org.scijava.ops.engine.matcher.impl.RuntimeSafeMatchingRoutine,
 		org.scijava.ops.engine.matcher.adapt.AdaptationMatchingRoutine,
+		org.scijava.ops.engine.matcher.simplify.FocusedMatchingRoutine,
 		org.scijava.ops.engine.matcher.simplify.SimplificationMatchingRoutine;
 
 	provides org.scijava.ops.spi.OpCollection with

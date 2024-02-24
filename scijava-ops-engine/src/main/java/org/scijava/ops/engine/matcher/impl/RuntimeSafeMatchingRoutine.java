@@ -109,7 +109,7 @@ public class RuntimeSafeMatchingRoutine implements MatchingRoutine {
 	{
 		final ArrayList<OpCandidate> validCandidates = new ArrayList<>();
 		for (final OpCandidate candidate : candidates) {
-			final Type[] args = candidate.paddedArgs();
+			final Type[] args = candidate.getRequest().getArgs();
 			if (args == null) continue;
 			if (missArgs(candidate, args)) continue;
 			validCandidates.add(candidate);
@@ -120,19 +120,18 @@ public class RuntimeSafeMatchingRoutine implements MatchingRoutine {
 	protected List<OpCandidate> filterMatches(
 		final List<OpCandidate> candidates)
 	{
-		final List<OpCandidate> validCandidates = checkCandidates(candidates);
 
 		// List of valid candidates needs to be sorted according to priority.
 		// This is used as an optimization in order to not look at ops with
 		// lower priority than the already found one.
-		validCandidates.sort((c1, c2) -> Double.compare(c2.priority(), c1
+		candidates.sort((c1, c2) -> Double.compare(c2.priority(), c1
 			.priority()));
 
 		List<OpCandidate> matches;
-		matches = filterMatches(validCandidates, (cand) -> typesPerfectMatch(cand));
+		matches = filterMatches(candidates, this::typesPerfectMatch);
 		if (!matches.isEmpty()) return matches;
 
-		matches = filterMatches(validCandidates, (cand) -> typesMatch(cand));
+		matches = filterMatches(candidates, this::typesMatch);
 		return matches;
 	}
 
@@ -186,7 +185,7 @@ public class RuntimeSafeMatchingRoutine implements MatchingRoutine {
 	{
 		if (checkCandidates(Collections.singletonList(candidate)).isEmpty())
 			return false;
-		final Type[] reqArgTypes = candidate.paddedArgs();
+		final Type[] reqArgTypes = candidate.getRequest().getArgs();
 		final Type reqType = candidate.getRequest().getType();
 		final Type infoType = candidate.opInfo().opType();
 		Type implementedInfoType = Types.getExactSuperType(infoType, Types.raw(
@@ -329,7 +328,7 @@ public class RuntimeSafeMatchingRoutine implements MatchingRoutine {
 	 */
 	private boolean typesPerfectMatch(final OpCandidate candidate) {
 		int i = 0;
-		Type[] paddedArgs = candidate.paddedArgs();
+		Type[] paddedArgs = candidate.getRequest().getArgs();
 		for (final Type t : candidate.opInfo().inputTypes()) {
 			if (paddedArgs[i] != null) {
 				if (!t.equals(paddedArgs[i])) return false;

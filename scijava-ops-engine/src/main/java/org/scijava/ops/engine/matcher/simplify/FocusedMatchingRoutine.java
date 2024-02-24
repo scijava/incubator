@@ -1,4 +1,4 @@
-/*
+/*-
  * #%L
  * SciJava Operations Engine: a framework for reusable algorithms.
  * %%
@@ -27,63 +27,55 @@
  * #L%
  */
 
-package org.scijava.ops.engine.matcher.impl;
+package org.scijava.ops.engine.matcher.simplify;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.scijava.ops.api.OpMatchingException;
-import org.scijava.ops.engine.OpCandidate;
 import org.scijava.ops.api.OpEnvironment;
+import org.scijava.ops.api.OpInfo;
+import org.scijava.ops.api.OpMatchingException;
 import org.scijava.ops.api.OpRequest;
+import org.scijava.ops.engine.BaseOpHints.Simplification;
 import org.scijava.ops.engine.MatchingConditions;
+import org.scijava.ops.engine.OpCandidate;
+import org.scijava.ops.engine.matcher.MatchingResult;
 import org.scijava.ops.engine.matcher.MatchingRoutine;
 import org.scijava.ops.engine.matcher.OpMatcher;
+import org.scijava.ops.engine.matcher.impl.RuntimeSafeMatchingRoutine;
+import org.scijava.priority.Priority;
+import org.slf4j.LoggerFactory;
 
-/**
- * Default implementation of {@link OpMatcher}. Used for finding Ops which match
- * a {@link OpRequest request}.
- *
- * @author David Kolb
- */
-public class DefaultOpMatcher implements OpMatcher {
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.*;
 
-	private final List<MatchingRoutine> matchers;
+public class FocusedMatchingRoutine implements MatchingRoutine {
 
-	public DefaultOpMatcher(Collection<? extends MatchingRoutine> matchers) {
-		this.matchers = new ArrayList<>(matchers);
-		Collections.sort(this.matchers, Collections.reverseOrder());
+	@Override
+	public void checkSuitability(MatchingConditions conditions)
+		throws OpMatchingException
+	{
+		var hints = conditions.hints();
+		var suitable = hints.containsNone(
+			Simplification.IN_PROGRESS,
+			Simplification.FORBIDDEN
+		);
+		if (!suitable) throw new OpMatchingException(
+			"Focusing is not suitable: Simplification is not in progress");
 	}
 
 	@Override
-	public OpCandidate match(MatchingConditions conditions, OpEnvironment env) {
-		List<OpMatchingException> exceptions = new ArrayList<>(matchers.size());
-		// in priority order, search for a match
-		for (MatchingRoutine r : matchers) {
-			try {
-				return r.match(conditions, this, env);
-			}
-			catch (OpMatchingException e) {
-				exceptions.add(e);
-			}
-		}
-
-		// in the case of no matches, throw an agglomerated exception
-		throw agglomeratedException(conditions.request(), exceptions, env);
+	public OpCandidate findMatch(MatchingConditions conditions, OpMatcher matcher,
+		OpEnvironment env)
+	{
+		var simpleReq = new SimplifiedOpRequest(conditions.request(), env);
+		var hints = conditions.hints().plus(Simplification.IN_PROGRESS);
+		var focusedConditions = MatchingConditions.from(simpleReq, hints);
+		// Pass 2 - Focus if needed
+		return matcher.match(focusedConditions, env);
 	}
 
-	private OpMatchingException agglomeratedException( //
-		final OpRequest request, //
-		final List<OpMatchingException> list, //
-		final OpEnvironment env //
-	) {
-		// Develop help message
-		var msg = "No match found! Perhaps you meant: \n" + env.helpVerbose(
-			request);
-		OpMatchingException agglomerated = new OpMatchingException(msg);
-		list.forEach(agglomerated::addSuppressed);
-		return agglomerated;
+	@Override
+	public double priority() {
+		return Priority.EXTREMELY_LOW;
 	}
+
 }
