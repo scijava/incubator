@@ -85,10 +85,7 @@ import org.scijava.ops.spi.OpDependency;
 import org.scijava.priority.Priority;
 import org.scijava.struct.FunctionalMethodType;
 import org.scijava.struct.ItemIO;
-import org.scijava.types.DefaultTypeReifier;
-import org.scijava.types.Nil;
-import org.scijava.types.TypeReifier;
-import org.scijava.types.Types;
+import org.scijava.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -664,10 +661,17 @@ public class DefaultOpEnvironment implements OpEnvironment {
 	private OpRequest inferOpRequest(OpDependencyMember<?> dependency,
 		Map<TypeVariable<?>, Type> typeVarAssigns)
 	{
+		final Map<TypeVariable<?>, Type> inferences = new HashMap<>(typeVarAssigns);
+		for (var entry : inferences.entrySet()) {
+			var value = entry.getValue();
+			if (value.equals(Any.class) || value instanceof Any) {
+				inferences.put(entry.getKey(), entry.getKey());
+			}
+		}
 		final Type mappedDependencyType = Types.mapVarToTypes(new Type[] {
-			dependency.getType() }, typeVarAssigns)[0];
+			dependency.getType() }, inferences)[0];
 		final String dependencyName = dependency.getDependencyName();
-		return inferOpRequest(mappedDependencyType, dependencyName, typeVarAssigns);
+		return inferOpRequest(mappedDependencyType, dependencyName, inferences);
 	}
 
 	private RichOp<?> wrapViaCache(MatchingConditions conditions) {

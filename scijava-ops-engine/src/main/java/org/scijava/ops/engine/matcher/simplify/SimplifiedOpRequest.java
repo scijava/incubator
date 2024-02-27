@@ -73,7 +73,7 @@ public class SimplifiedOpRequest implements OpRequest {
 	private final RichOp<Computers.Arity1<?, ?>> outputCopier;
 
 	public SimplifiedOpRequest(OpRequest req, OpEnvironment env) {
-		Hints h = new Hints(Adaptation.FORBIDDEN, Simplification.FORBIDDEN);
+		Hints h = new Hints(Simplification.FORBIDDEN, Adaptation.FORBIDDEN);
 		this.name = req.getName();
 		this.srcReq = req;
 		// Find the simplifiers and focusers
@@ -106,17 +106,20 @@ public class SimplifiedOpRequest implements OpRequest {
 	}
 
 	private Type[] simpleArgs(Type[] args, List<RichOp<Function<?, ?>>> ops) {
-		Type[] opIns = new Type[args.length];
+		Type[] opIns = new Type[1];
+		Type[] inferFroms = new Type[1];
 		Type[] opOuts = new Type[args.length];
-		for (int i = 0; i < opIns.length; i++) {
+		Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
+		for (int i = 0; i < opOuts.length; i++) {
 			var info = Ops.info(ops.get(i));
-			opIns[i] = info.inputTypes().get(0);
-			opOuts[i] = info.outputType();
+			opIns[0] = info.inputTypes().get(0);
+			inferFroms[0] = args[i];
+			typeAssigns.clear();
+			GenericAssignability.inferTypeVariables(opIns, inferFroms, typeAssigns);
+			opOuts[i] = Types.mapVarToTypes(info.outputType(), typeAssigns);
 		}
 
-		Map<TypeVariable<?>, Type> typeAssigns = new HashMap<>();
-		GenericAssignability.inferTypeVariables(opIns, args, typeAssigns);
-		return Types.mapVarToTypes(opOuts, typeAssigns);
+		return opOuts;
 	}
 
 	public OpRequest srcReq() {

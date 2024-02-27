@@ -31,13 +31,7 @@ package org.scijava.ops.engine.matcher.simplify;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.scijava.ops.api.OpEnvironment;
 import org.scijava.ops.api.OpInfo;
@@ -54,13 +48,23 @@ import org.slf4j.LoggerFactory;
 
 public class SimplificationMatchingRoutine extends RuntimeSafeMatchingRoutine {
 
-	protected static final Map<OpEnvironment, Map<String, SortedSet<OpInfo>>> seenNames =
+	private static final Map<OpEnvironment, Map<String, SortedSet<OpInfo>>> seenNames =
 		new HashMap<>();
+	private static final Set<String> FORBIDDEN_NAMES = new HashSet<>();
+
+	static {
+		FORBIDDEN_NAMES.add("engine.focus");
+		FORBIDDEN_NAMES.add("engine.simplify");
+	}
 
 	protected static void addSimpleInfosToCache(OpEnvironment env, String name) {
 		Map<String, SortedSet<OpInfo>> seen = seenNames.computeIfAbsent(env,
 			e -> new HashMap<>());
 		if (!seen.containsKey(name)) {
+			if (FORBIDDEN_NAMES.contains(name)) {
+				seen.put(name, Collections.emptySortedSet());
+				return;
+			}
 			SortedSet<OpInfo> ops = new TreeSet<>();
 			for (OpInfo info : env.infos(name)) {
 				if (info.declaredHints().contains(BaseOpHints.Simplification.FORBIDDEN))
@@ -84,6 +88,10 @@ public class SimplificationMatchingRoutine extends RuntimeSafeMatchingRoutine {
 	public void checkSuitability(MatchingConditions conditions)
 		throws OpMatchingException
 	{
+		if (FORBIDDEN_NAMES.contains(conditions.request().getName())) {
+			throw new OpMatchingException(
+				"Cannot simplify requests for Ops of name \"" + FORBIDDEN_NAMES + "\"");
+		}
 		if (conditions.hints().containsAny(BaseOpHints.Simplification.IN_PROGRESS,
 			BaseOpHints.Simplification.FORBIDDEN)) //
 			throw new OpMatchingException(
@@ -157,7 +165,7 @@ public class SimplificationMatchingRoutine extends RuntimeSafeMatchingRoutine {
 
 	@Override
 	public double priority() {
-		return Priority.VERY_LOW;
+		return Priority.LOW;
 	}
 
 }

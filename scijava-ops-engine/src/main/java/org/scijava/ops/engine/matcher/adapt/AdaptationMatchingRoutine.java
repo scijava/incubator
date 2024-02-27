@@ -288,7 +288,7 @@ public class AdaptationMatchingRoutine implements MatchingRoutine {
 
 	@Override
 	public double priority() {
-		return Priority.LOW;
+		return Priority.VERY_LOW;
 	}
 
 }
