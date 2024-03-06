@@ -2,7 +2,7 @@
  * #%L
  * ImageJ2 software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2023 ImageJ2 developers.
+ * Copyright (C) 2014 - 2024 ImageJ2 developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,31 +27,36 @@
  * #L%
  */
 
-package org.scijava.ops.image;
+package org.scijava.ops.image.coloc.saca;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import net.imglib2.loops.LoopBuilder;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.type.numeric.real.DoubleType;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.scijava.ops.api.OpEnvironment;
-import org.scijava.ops.api.OpInfo;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
-public class OpRegressionTest {
+/**
+ * Helper class for Spatially Adaptive Colocalization Analysis (SACA) op.
+ *
+ * @author Edward Evans
+ */
 
-	protected static final OpEnvironment ops = OpEnvironment.build();
+public final class PNorm {
 
-	@Test
-	public void opDiscoveryRegressionIT() {
-		long expected = 1912;
-		long actual = ops.infos().size();
-		assertEquals(expected, actual);
-	}
+	private PNorm() {}
 
-	@Test
-	public void opDescriptionRegressionIT() {
-		// Ensure no ops have a null description
-		for (OpInfo info : ops.infos())
-			Assertions.assertNotNull(info.toString(), () -> "Info from " + info.id() +
-				" has a null description");
+	public static void compute(RandomAccessibleInterval<DoubleType> input,
+		boolean lowerTail, RandomAccessibleInterval<DoubleType> output)
+	{
+		// compute normal distribution over the image
+		NormalDistribution normalDistribution = new NormalDistribution();
+
+		LoopBuilder.setImages(input, output).multiThreaded().forEachPixel((i, o) -> {
+			double normDistValue = normalDistribution.cumulativeProbability(i.get());
+			if (!lowerTail) {
+				normDistValue = 1 - normDistValue;
+			}
+			o.set(normDistValue);
+		});
 	}
 }
