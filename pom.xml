@@ -45,7 +45,6 @@
 	</mailingLists>
 
 	<modules>
-		<module>scijava-persist</module>
 	</modules>
 
 	<scm>
